@@ -25,6 +25,10 @@ public class AutoDriveCommand extends CommandBase {
     this(drive, Optional.empty(), Optional.ofNullable(trajs));
   }
 
+  public AutoDriveCommand(SampleMecanumDrive drive, Trajectory traj) {
+    this(drive, Optional.of(traj), Optional.empty());
+  }
+
   @Override
   public void initialize() {
     if (trajectory != null) {
