@@ -30,7 +30,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   // intakeClawServo
   public static double IntakeClawServo_OPEN = 0.4;
   public static double IntakeClawServo_OPENWIDER = 0.2;
-  public static double IntakeClawServo_GRAB = 0.567;
+  public static double IntakeClawServo_GRAB = 0.54;
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;
@@ -50,8 +50,8 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public static long grabCommand_grab2AfterGrabDelayMs = 50;
   // slowHandoffCommand
   public static long handoffCommand_wristTurn2wristHandoffDelayMs = 100;
-  public static long slowHandoffCommand_wristHandoff2ArmHandoffDelayMs = 300;
-  public static long slowHandoffCommand_ArmHandoff2SlideRetractDelayMs = 200;
+  public static long slowHandoffCommand_wristHandoff2ArmHandoffDelayMs = 250;
+  public static long slowHandoffCommand_ArmHandoff2SlideRetractDelayMs = 0;
   // swipeCommand
   public static long swipeCommand_wrist2ExtendDelayMs = 50;
 
