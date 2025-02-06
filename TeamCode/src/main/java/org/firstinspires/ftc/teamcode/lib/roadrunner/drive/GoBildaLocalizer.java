@@ -6,6 +6,8 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.Localizer;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import lombok.experimental.ExtensionMethod;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.lib.GeomUtil;
 import org.firstinspires.ftc.teamcode.lib.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
@@ -47,6 +49,11 @@ public class GoBildaLocalizer implements Localizer {
   public Pose2d getPoseVelocity() {
     odometry.update();
     return odometry.getVelocity().toPose2d();
+  }
+
+  public Pose2D getMetricPose() {
+    odometry.update();
+    return odometry.getPosition();
   }
 
   public double getHeadingVelocity() {

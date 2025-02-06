@@ -246,7 +246,7 @@ public class TXBetaBotSolo extends CommandOpMode {
   @Override
   public void run() {
     Pose2d poseEstimate = drive.getPoseEstimate();
-    lift.periodicTest();
+    lift.periodicAsync();
     CommandScheduler.getInstance().run();
     TelemetryPacket packet = new TelemetryPacket();
     packet.fieldOverlay().setStroke("#3F51B5");

@@ -75,7 +75,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   private DcMotorEx leftFront, leftRear, rightRear, rightFront;
   private List<DcMotorEx> motors;
 
-  private GoBildaLocalizer od;
+  public GoBildaLocalizer od;
   private VoltageSensor batteryVoltageSensor;
 
   private List<Integer> lastEncPositions = new ArrayList<>();

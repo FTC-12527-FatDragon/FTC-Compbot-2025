@@ -34,9 +34,11 @@ public class VisionTest extends LinearOpMode {
       vision.setDetectionColor(color);
       telemetry.addData("Distance", vision.getDistance());
       telemetry.addData("TX", vision.getTx(0.0));
+      telemetry.addData("Strafe", vision.getStrafeOffset());
       telemetry.addData("TY", vision.getTy(0.0));
       telemetry.addData("Old Data", vision.isDataOld());
       telemetry.addData("Area", vision.isTargetVisible());
+      telemetry.update();
       //      boolean isUploaded =
       //          camera.updatePythonInputs(new double[] {colorChoice, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       // 0.0});

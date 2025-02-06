@@ -109,7 +109,7 @@ public class Lift extends MotorPIDSlideSubsystem {
     return MathUtils.isNear(Goal.PRE_HANG.setpointTicks, getCurrentPosition(), 10);
   }
 
-  public void periodicTest() {
+  public void periodicAsync() {
     telemetry.addData("Lift.Current Goal", goal);
     telemetry.addData("Lift.At Goal", atGoal());
     telemetry.addData("Lift.Current Position", getCurrentPosition());

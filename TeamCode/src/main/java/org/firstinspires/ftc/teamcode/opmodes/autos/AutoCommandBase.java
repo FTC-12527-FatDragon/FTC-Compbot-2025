@@ -256,7 +256,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
     CommandScheduler.getInstance().schedule(toRun);
 
     while (opModeIsActive() && !isStopRequested()) {
-      lift.periodicTest();
+      lift.periodicAsync();
       CommandScheduler.getInstance().run();
     }
     SlideSuperStucture.IntakeClawServo_OPEN = origval;

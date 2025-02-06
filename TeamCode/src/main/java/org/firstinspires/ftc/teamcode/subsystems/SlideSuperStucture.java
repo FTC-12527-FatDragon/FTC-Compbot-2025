@@ -28,9 +28,9 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public static double SlideArmServo_HANDOFF = 0.25;
   public static double SlideArmServo_AFTERGRAB = 0.675;
   // intakeClawServo
-  public static double IntakeClawServo_OPEN = 0.4;
+  public static double IntakeClawServo_OPEN = 0.3;
   public static double IntakeClawServo_OPENWIDER = 0.2;
-  public static double IntakeClawServo_GRAB = 0.54;
+  public static double IntakeClawServo_GRAB = 0.675;
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;
@@ -204,8 +204,8 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public enum Goal {
     STOW(0, 0, 0.2, IntakeClawServo_OPEN),
     AIM(slideExtensionVal, SlideArmServo_AFTERGRAB, 0.805, IntakeClawServo_OPEN),
-    GRAB(slideExtensionVal, 0.55, 0.805, IntakeClawServo_GRAB),
-    HANDOFF(0, 0.86, 0.25, IntakeClawServo_GRAB),
+    GRAB(slideExtensionVal, 0.525, 0.805, IntakeClawServo_GRAB),
+    HANDOFF(0, 0.91, 0.3, IntakeClawServo_GRAB),
     AUTOSWIPE(SlideMotor_extensionValue, 0.3, 0.45, IntakeClawServo_OPEN);
 
     public final double slideExtension;
@@ -295,9 +295,9 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   }
 
   public enum TurnServo {
-    DEG_0(0.2),
+    DEG_0(0.25),
     DEG_05(0.4),
-    DEG_08(0.7),
+    DEG_08(0.8),
     DEG_INVERTED_HORIZ(0.925),
     UNKNOWN(-1);
     public final double turnAngleDeg;
