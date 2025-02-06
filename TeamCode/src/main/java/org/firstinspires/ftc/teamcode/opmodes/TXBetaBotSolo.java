@@ -41,6 +41,8 @@ public class TXBetaBotSolo extends CommandOpMode {
   private SampleMecanumDrive drive;
   private Climber climber;
 
+  private DriverMode currentMode = DriverMode.SAMPLE;
+
   private boolean isPureHandoffCompelte = false;
 
   public static boolean setPose = false;
@@ -69,18 +71,23 @@ public class TXBetaBotSolo extends CommandOpMode {
             () -> gamepadEx1.getButton(GamepadKeys.Button.LEFT_STICK_BUTTON),
             () -> gamepadEx1.getButton(GamepadKeys.Button.DPAD_LEFT)));
 
-    // Basket Up Command
-    gamepadEx1
-        .getGamepadButton(GamepadKeys.Button.X)
+    // =================================================================================
+
+    // SAMPLE MODE
+
+    // BASKET UP
+    new FunctionalButton(
+            () -> gamepadEx1.getButton(GamepadKeys.Button.X) && currentMode == DriverMode.SAMPLE)
         .whenPressed(
             new ParallelCommandGroup(
                 new InstantCommand(() -> lift.setGoal(Lift.Goal.BASKET)),
                 new WaitUntilCommand(() -> lift.getCurrentPosition() > 300)
                     .andThen(new InstantCommand(liftClaw::upLiftArm))));
 
-    // Basket Drop and Back
-    gamepadEx1
-        .getGamepadButton(GamepadKeys.Button.B)
+    // BASKET DROP OFF AND STOW
+    // IF HANG ALSO --> STOW AND STOW
+    new FunctionalButton(
+            () -> gamepadEx1.getButton(GamepadKeys.Button.B) && currentMode == DriverMode.SAMPLE)
         .whenPressed(
             new SequentialCommandGroup(
                 new ConditionalCommand(
@@ -100,18 +107,35 @@ public class TXBetaBotSolo extends CommandOpMode {
                 new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)),
                 new InstantCommand(() -> isPureHandoffCompelte = false)));
 
-    // Aim
-    gamepadEx1
-        .getGamepadButton(GamepadKeys.Button.Y)
+    // FIRST AIM
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getButton(GamepadKeys.Button.Y)
+                    && slide.getGoal() != SlideSuperStucture.Goal.AIM
+                    && slide.getGoal() != SlideSuperStucture.Goal.PRE_AIM
+                    && currentMode == DriverMode.SAMPLE)
         .whenPressed(
             slide.aimCommand().alongWith(new InstantCommand(() -> isPureHandoffCompelte = false)),
+            false);
+
+    // CHANGE FROM FIRST AIM AND GET LOWER ---- PRE AIM
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getButton(GamepadKeys.Button.Y)
+                    && slide.getGoal() == SlideSuperStucture.Goal.AIM
+                    && currentMode == DriverMode.SAMPLE)
+        .whenPressed(
+            slide
+                .preAimCommand()
+                .alongWith(new InstantCommand(() -> isPureHandoffCompelte = false)),
             false);
 
     // Grab when aim
     new FunctionalButton(
             () ->
                 gamepadEx1.getButton(GamepadKeys.Button.A)
-                    && slide.getGoal() == SlideSuperStucture.Goal.AIM)
+                    && slide.getGoal() == SlideSuperStucture.Goal.PRE_AIM
+                    && currentMode == DriverMode.SAMPLE)
         .whenPressed(slide.grabCommand(), false);
 
     // Pure Handoff
@@ -131,55 +155,151 @@ public class TXBetaBotSolo extends CommandOpMode {
             () ->
                 gamepadEx1.getButton(GamepadKeys.Button.DPAD_RIGHT)
                     && slide.getGoal() == SlideSuperStucture.Goal.AIM
-                    && lift.getGoal() == Lift.Goal.STOW)
+                    && lift.getGoal() == Lift.Goal.STOW
+                    && currentMode == DriverMode.SAMPLE)
         .whenPressed(slowHandoffSCommand.get());
 
-    // Handoff from Aim
-    // Chamber Command
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5
+                    && slide.getGoal() == SlideSuperStucture.Goal.AIM
+                    && currentMode == DriverMode.SAMPLE)
+        .whenPressed(
+            new SequentialCommandGroup(
+                slide.preAimCommand(),
+                new WaitCommand(50),
+                new InstantCommand(slide::backwardSlideExtension)));
+
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5
+                    && slide.getGoal() == SlideSuperStucture.Goal.AIM
+                    && currentMode == DriverMode.SAMPLE)
+        .whenPressed(new InstantCommand(slide::forwardSlideExtension));
+
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getButton(GamepadKeys.Button.LEFT_BUMPER)
+                    && slide.getGoal() == SlideSuperStucture.Goal.AIM
+                    && currentMode == DriverMode.SAMPLE)
+        .whenPressed(new InstantCommand(() -> slide.leftTurnServo()));
+
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getButton(GamepadKeys.Button.RIGHT_BUMPER)
+                    && slide.getGoal() == SlideSuperStucture.Goal.AIM
+                    && currentMode == DriverMode.SAMPLE)
+        .whenPressed(new InstantCommand(() -> slide.rightTurnServo()));
+
+    // =================================================================================
+
+    // SPECIMEN MODE
     new FunctionalButton(
             () ->
                 gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)
                     && slide.getGoal() == SlideSuperStucture.Goal.AIM
-                    && lift.getGoal() == Lift.Goal.STOW)
+                    && slide.slideMotorAtHome()
+                    && currentMode == DriverMode.SAMPLE)
         .whenPressed(
-            fastHandoffCommand
-                .get()
-                .andThen(new WaitCommand(200))
-                .andThen(new InstantCommand(() -> slide.wristUp()))
-                .andThen(new WaitCommand(200))
-                .andThen(
-                    new ParallelCommandGroup(
-                        new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG)),
-                        new WaitUntilCommand(() -> lift.getCurrentPosition() > 100)
-                            .andThen(new InstantCommand(liftClaw::upLiftArm)))),
+            new SequentialCommandGroup(
+                new InstantCommand(() -> currentMode = DriverMode.SPECIMEN),
+                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.AVOID_COLLISION),
+                new WaitCommand(100),
+                slide.foldSlideStructureCommand(),
+                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL),
+                liftClaw.openClawCommand()));
+
+    // Right Bumper Claw Open
+    // Right Trigger Up Down
+    // Left Bumper Flip
+
+    new FunctionalButton(
+            () -> gamepadEx1.getButton(GamepadKeys.Button.B) && currentMode == DriverMode.SPECIMEN)
+        .whenPressed(
+            new SequentialCommandGroup(
+                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL),
+                new WaitCommand(100),
+                new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)),
+                liftClaw.openClawCommand()),
             false);
 
     new FunctionalButton(
             () ->
-                gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)
-                    && lift.getGoal() == Lift.Goal.HANG)
+                gamepadEx1.getButton(GamepadKeys.Button.RIGHT_BUMPER)
+                    && currentMode == DriverMode.SPECIMEN)
+        .whenPressed(liftClaw.switchClawCommand(), false);
+
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5
+                    && lift.getGoal() == Lift.Goal.STOW
+                    && currentMode == DriverMode.SPECIMEN)
+        .whenPressed(
+            new SequentialCommandGroup(
+                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_CHAMBER),
+                new WaitCommand(200),
+                new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG))));
+
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5
+                    && lift.getGoal() == Lift.Goal.HANG
+                    && currentMode == DriverMode.SPECIMEN)
         .whenPressed(new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG)));
 
     new FunctionalButton(
             () ->
-                gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)
-                    && lift.getGoal() == Lift.Goal.STOW
-                    && isPureHandoffCompelte)
-        .whenPressed(
-            new InstantCommand(() -> slide.wristUp())
-                .andThen(new WaitCommand(200))
-                .andThen(
-                    new ParallelCommandGroup(
-                        new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG)),
-                        new WaitUntilCommand(() -> lift.getCurrentPosition() > 100)
-                            .andThen(new InstantCommand(liftClaw::upLiftArm)))),
-            false);
-
-    new FunctionalButton(
-            () ->
-                gamepadEx1.getButton(GamepadKeys.Button.DPAD_DOWN)
-                    && lift.getGoal() == Lift.Goal.PRE_HANG)
+                gamepadEx1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5
+                    && lift.getGoal() == Lift.Goal.PRE_HANG
+                    && currentMode == DriverMode.SPECIMEN)
         .whenPressed(new InstantCommand(() -> lift.setGoal(Lift.Goal.HANG)));
+
+    // Handoff from Aim
+    // Chamber Command
+//    new FunctionalButton(
+//            () ->
+//                gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)
+//                    && slide.getGoal() == SlideSuperStucture.Goal.AIM
+//                    && lift.getGoal() == Lift.Goal.STOW)
+//        .whenPressed(
+//            fastHandoffCommand
+//                .get()
+//                .andThen(new WaitCommand(200))
+//                .andThen(new InstantCommand(() -> slide.wristUp()))
+//                .andThen(new WaitCommand(200))
+//                .andThen(
+//                    new ParallelCommandGroup(
+//                        new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG)),
+//                        new WaitUntilCommand(() -> lift.getCurrentPosition() > 100)
+//                            .andThen(new InstantCommand(liftClaw::upLiftArm)))),
+//            false);
+//
+//    new FunctionalButton(
+//            () ->
+//                gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)
+//                    && lift.getGoal() == Lift.Goal.HANG)
+//        .whenPressed(new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG)));
+//
+//    new FunctionalButton(
+//            () ->
+//                gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)
+//                    && lift.getGoal() == Lift.Goal.STOW
+//                    && isPureHandoffCompelte)
+//        .whenPressed(
+//            new InstantCommand(() -> slide.wristUp())
+//                .andThen(new WaitCommand(200))
+//                .andThen(
+//                    new ParallelCommandGroup(
+//                        new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG)),
+//                        new WaitUntilCommand(() -> lift.getCurrentPosition() > 100)
+//                            .andThen(new InstantCommand(liftClaw::upLiftArm)))),
+//            false);
+//
+//    new FunctionalButton(
+//            () ->
+//                gamepadEx1.getButton(GamepadKeys.Button.DPAD_DOWN)
+//                    && lift.getGoal() == Lift.Goal.PRE_HANG)
+//        .whenPressed(new InstantCommand(() -> lift.setGoal(Lift.Goal.HANG)));
 
     new FunctionalButton(
             () ->
@@ -192,30 +312,6 @@ public class TXBetaBotSolo extends CommandOpMode {
                 gamepadEx1.getButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
                     && slide.getGoal().slideExtension == 0)
         .whenHeld(slide.manualResetCommand());
-
-    new FunctionalButton(
-            () ->
-                gamepadEx1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5
-                    && slide.getGoal() == SlideSuperStucture.Goal.AIM)
-        .whenPressed(new InstantCommand(slide::backwardSlideExtension));
-
-    new FunctionalButton(
-            () ->
-                gamepadEx1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5
-                    && slide.getGoal() == SlideSuperStucture.Goal.AIM)
-        .whenPressed(new InstantCommand(slide::forwardSlideExtension));
-
-    new FunctionalButton(
-            () ->
-                gamepadEx1.getButton(GamepadKeys.Button.LEFT_BUMPER)
-                    && slide.getGoal() == SlideSuperStucture.Goal.AIM)
-        .whenPressed(new InstantCommand(() -> slide.leftTurnServo()));
-
-    new FunctionalButton(
-            () ->
-                gamepadEx1.getButton(GamepadKeys.Button.RIGHT_BUMPER)
-                    && slide.getGoal() == SlideSuperStucture.Goal.AIM)
-        .whenPressed(new InstantCommand(() -> slide.rightTurnServo()));
 
     gamepadEx2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenHeld(climber.elevateCommand());
 
@@ -260,6 +356,12 @@ public class TXBetaBotSolo extends CommandOpMode {
       drive.setPoseEstimate(Pose.toPose2d());
     }
     //    telemetry.addData("pose", );
+  }
+
+  public enum DriverMode {
+    CLIMB,
+    SAMPLE,
+    SPECIMEN
   }
 
   @Override

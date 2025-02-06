@@ -27,6 +27,9 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public static double SlideArmServo_GRAB = 0.53;
   public static double SlideArmServo_HANDOFF = 0.25;
   public static double SlideArmServo_AFTERGRAB = 0.675;
+  public static double SlideArmServo_PREAIM = 0.675;
+  public static double SlideArmServo_FOLD = 0.675;
+
   // intakeClawServo
   public static double IntakeClawServo_OPEN = 0.3;
   public static double IntakeClawServo_OPENWIDER = 0.2;
@@ -34,6 +37,8 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;
+  public static double WristServo_FOLD = 0.75;
+
   // wristTurnServo
   public static double WristTurnServo_POS0 = 0.2;
   public static double WristTurnServo_POS1 = 0.6;
@@ -113,6 +118,18 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
         setServoPosCommand(slideArmServo, Goal.AIM.slideArmPos, aimCommand_Arm2OpenDelayMs),
         new InstantCommand(() -> wristServo.setPosition(Goal.AIM.wristPos)),
         new InstantCommand(() -> intakeClawServo.setPosition(Goal.AIM.clawAngle)));
+  }
+
+  public Command preAimCommand() {
+    return new SequentialCommandGroup(
+        setGoalCommand(Goal.PRE_AIM), setServoPosCommand(slideArmServo, SlideArmServo_PREAIM, 0));
+  }
+
+  public Command foldSlideStructureCommand() {
+    return new SequentialCommandGroup(
+        setTurnServoPosCommand(TurnServo.DEG_0, 100),
+        setServoPosCommand(slideArmServo, SlideArmServo_FOLD, 100),
+        setServoPosCommand(wristServo, WristServo_FOLD, 100));
   }
 
   public Command grabCommand() {
@@ -203,6 +220,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   @Config
   public enum Goal {
     STOW(0, 0, 0.2, IntakeClawServo_OPEN),
+    PRE_AIM(slideExtensionVal, SlideArmServo_PREAIM, 0.805, IntakeClawServo_OPEN),
     AIM(slideExtensionVal, SlideArmServo_AFTERGRAB, 0.805, IntakeClawServo_OPEN),
     GRAB(slideExtensionVal, 0.525, 0.805, IntakeClawServo_GRAB),
     HANDOFF(0, 0.91, 0.3, IntakeClawServo_GRAB),
@@ -307,12 +325,12 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
     }
   }
 
-  private boolean slideMotorAtGoal() {
+  public boolean slideMotorAtGoal() {
     return MathUtils.isNear(
         goal.slideExtension, getCurrentPosition(), SlideMotor_atSetPointTolerance);
   }
 
-  private boolean slideMotorAtHome() {
+  public boolean slideMotorAtHome() {
     return MathUtils.isNear(0, getCurrentPosition(), SlideMotor_atSetPointTolerance);
   }
 
