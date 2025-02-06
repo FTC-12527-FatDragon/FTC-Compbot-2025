@@ -8,7 +8,6 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -30,10 +29,8 @@ public class Vision extends SubsystemBase {
   private static final double CAMERA_ANGLE = -45.0;
   private static final double TARGET_HEIGHT = 19.05;
 
-  private static final double strafeAlignment = 6.6667;
-
-
-  private  static final double strafeConversion = 0.4;
+  public static final double strafeConversionFactor = 6.6667;
+  public static final double cameraStrafeToBot = 127;
 
   Telemetry telemetry;
 
@@ -42,7 +39,7 @@ public class Vision extends SubsystemBase {
     led = hardwareMap.get(Servo.class, "LED");
     this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-    for(double i = 0; i <= 1.0; i += 0.1) {
+    for (double i = 0; i <= 1.0; i += 0.1) {
       setLEDPWM(i);
     }
 
@@ -52,7 +49,6 @@ public class Vision extends SubsystemBase {
   public void setLEDPWM(double positionPWM) {
     led.setPosition(positionPWM);
   }
-
 
   public void initializeCamera() {
     camera.setPollRateHz(50);
@@ -92,15 +88,16 @@ public class Vision extends SubsystemBase {
   public double getDistance() {
     double ty = getTy(0.0);
     double angleToGoalDegrees = CAMERA_ANGLE + ty;
-    double angleToGoalRadians = Math.toRadians(angleToGoalDegrees); 
+    double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
     double distanceMM = (TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(angleToGoalRadians);
     return Math.abs(distanceMM);
   }
 
+  // Get the strafe
   public double getStrafeOffset() {
     double tx = getTx(0);
     if (tx != 0) {
-      return tx * strafeAlignment - 127;
+      return tx * strafeConversionFactor - cameraStrafeToBot;
     }
     return 0;
   }
@@ -118,10 +115,10 @@ public class Vision extends SubsystemBase {
       telemetry.addData("Strafe Offset", getStrafeOffset());
       telemetry.update();
 
-//      telemetry.addData("Tx", result.getTx());
-//      telemetry.addData("Ty", result.getTy());
-//      telemetry.addData("Ta", result.getTa());
-      //telemetry.update();
+      //      telemetry.addData("Tx", result.getTx());
+      //      telemetry.addData("Ty", result.getTy());
+      //      telemetry.addData("Ta", result.getTa());
+      // telemetry.update();
     }
   }
 }

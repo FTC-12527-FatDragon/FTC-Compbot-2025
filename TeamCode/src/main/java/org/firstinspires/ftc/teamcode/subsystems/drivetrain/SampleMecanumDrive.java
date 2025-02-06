@@ -75,7 +75,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   private DcMotorEx leftFront, leftRear, rightRear, rightFront;
   private List<DcMotorEx> motors;
 
-  public GoBildaLocalizer od;
+  private GoBildaLocalizer od;
   private VoltageSensor batteryVoltageSensor;
 
   private List<Integer> lastEncPositions = new ArrayList<>();
@@ -337,6 +337,18 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   @Override
   public Double getExternalHeadingVelocity() {
     return od.getHeadingVelocity();
+  }
+
+  public double getDeltaX(Pose2d initalPose) {
+    Pose2d currentPose = od.getPoseEstimate();
+    return (currentPose.getX() - initalPose.getX()) * Math.cos(currentPose.getHeading())
+        + (currentPose.getY() - initalPose.getY()) * Math.sin(currentPose.getHeading());
+  }
+
+  public double getDeltaY(Pose2d initalPose) {
+    Pose2d currentPose = od.getPoseEstimate();
+    return (currentPose.getX() - initalPose.getX()) * Math.sin(currentPose.getHeading())
+        + (currentPose.getY() - initalPose.getY()) * Math.cos(currentPose.getHeading());
   }
 
   public static TrajectoryVelocityConstraint getVelocityConstraint(
