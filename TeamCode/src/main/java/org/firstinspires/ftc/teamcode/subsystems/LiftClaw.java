@@ -38,10 +38,12 @@ public class LiftClaw extends SubsystemBase {
   }
 
   public void openClaw() {
+    isClawOpen = true;
     liftClawServo.setPosition(ClawServo_OPEN);
   }
 
   public void closeClaw() {
+    isClawOpen = false;
     liftClawServo.setPosition(ClawServo_CLOSE);
   }
 
