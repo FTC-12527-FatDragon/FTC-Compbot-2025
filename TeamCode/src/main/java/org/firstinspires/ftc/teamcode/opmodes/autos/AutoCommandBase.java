@@ -121,7 +121,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
     return new ParallelCommandGroup(
         new InstantCommand(() -> lift.setGoal(Lift.Goal.BASKET)),
         new WaitUntilCommand(() -> lift.getCurrentPosition() > 300)
-            .andThen(new InstantCommand(liftClaw::upLiftArm)));
+            .andThen(liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_BASKET, 0)));
   }
 
   protected Command followTrajectory(TrajectorySequence trajectorySequence) {
@@ -130,10 +130,9 @@ public abstract class AutoCommandBase extends LinearOpMode {
 
   protected Command stowArmFromBasket() {
     return new SequentialCommandGroup(
-        new InstantCommand(liftClaw::openClaw),
+        liftClaw.openClawCommand(),
         new WaitCommand(100),
-        new InstantCommand(liftClaw::foldLiftArm),
-        new WaitCommand(200),
+        liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 200),
         new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)));
   }
 
@@ -146,7 +145,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
         .slowHandoffCommand()
         .beforeStarting(liftClaw::openClaw)
         .andThen(new WaitCommand(handoff_slide2LiftCloseDelayMs))
-        .andThen(new InstantCommand(liftClaw::closeClaw))
+        .andThen(liftClaw.closeClawCommand())
         .andThen(new WaitCommand(handoff_liftClose2OpenIntakeDelayMs))
         .andThen(new InstantCommand(slide::openIntakeClaw));
   }
@@ -157,9 +156,9 @@ public abstract class AutoCommandBase extends LinearOpMode {
 
   public static Command fastHandoff(SlideSuperStucture slide, LiftClaw liftClaw) {
     return new SequentialCommandGroup(
-        new InstantCommand(liftClaw::openClaw),
+        liftClaw.openClawCommand(),
         slide.fastHandoffCommand().alongWith(new WaitCommand(handoff_slide2LiftCloseDelayMs)),
-        new InstantCommand(liftClaw::closeClaw),
+        liftClaw.closeClawCommand(),
         new WaitCommand(handoff_liftClose2OpenIntakeDelayMs),
         new InstantCommand(slide::openIntakeClaw));
   }
@@ -168,7 +167,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
     return new ParallelCommandGroup(
         new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG)),
         new WaitUntilCommand(() -> lift.getCurrentPosition() > 90)
-            .andThen(new InstantCommand(liftClaw::upLiftArm)));
+            .andThen(liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_BASKET, 0)));
   }
 
   protected Command handoffAndLiftToChamber() {
@@ -201,7 +200,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
                       liftClaw.openClaw();
                     })),
         new WaitCommand(50),
-        new InstantCommand(liftClaw::foldLiftArm),
+        liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 0),
         new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)));
   }
 
@@ -213,7 +212,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
   public Command initializeCommand() {
     return new ParallelCommandGroup(
         //        new InstantCommand(slide::forwardSlideExtension),
-        new InstantCommand(liftClaw::closeClaw),
+        liftClaw.closeClawCommand(),
         new InstantCommand(slide::slideArmUp),
         new InstantCommand(slide::wristUp),
         new InstantCommand(slide::openIntakeClaw));
@@ -226,7 +225,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
         slide.manualResetCommand().withTimeout(1000), // interruptOn(slide::atHome),
         // lift.resetCommand().interruptOn(() -> lift.atHome(3)),
         lift.manualResetCommand().withTimeout(1000),
-        new InstantCommand(liftClaw::openClaw),
+        liftClaw.openClawCommand(),
         new InstantCommand(() -> autoEndPose = drive.getPoseEstimate()));
   }
 

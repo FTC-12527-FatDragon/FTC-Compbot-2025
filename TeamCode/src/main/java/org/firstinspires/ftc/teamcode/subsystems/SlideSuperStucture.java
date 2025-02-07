@@ -27,7 +27,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public static double SlideArmServo_GRAB = 0.53;
   public static double SlideArmServo_HANDOFF = 0.25;
   public static double SlideArmServo_AIM_ = 0.55;
-  public static double SlideArmServo_PREAIM = 0.5;
+  public static double SlideArmServo_PREAIM = 0.48;
   public static double SlideArmServo_FOLD = 0.95;
 
   // intakeClawServo
@@ -68,19 +68,17 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public static double kP = 0.02, kI = 0.0, kD = 0.0005;
   private final VoltageSensor batteryVoltageSensor;
 
-  private boolean hasGamepiece = false;
   private static double slideExtensionVal = 0;
 
   private static double turnAngleDeg = 0.2;
   private TurnServo turnServo = TurnServo.DEG_0;
 
-  //  private final Command emptyCommand = new InstantCommand(() -> {});
-
   @Setter @Getter private Goal goal = Goal.STOW;
+
+  private boolean isFirstAimToggled = false; // For Aim & Pre-Aim Transition
 
   //  private final Telemetry telemetry; // 0 0.5 0.8
 
-  //  private boolean isResetting = false;
   public static double resetPower = -0.9;
 
   public SlideSuperStucture(final HardwareMap hardwareMap, final Telemetry telemetry) {
@@ -95,7 +93,6 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
     setServoController(true);
 
     slideMotor = hardwareMap.get(DcMotorEx.class, "slideMotor");
-    slideMotor.setDirection(DcMotorEx.Direction.REVERSE);
     slideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -115,21 +112,27 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
     return new SequentialCommandGroup(
         setGoalCommand(Goal.AIM),
         setTurnServoPosCommand(TurnServo.DEG_0, aimCommand_wristTurn2ArmDelayMs),
-        setServoPosCommand(slideArmServo, Goal.AIM.slideArmPos, aimCommand_Arm2OpenDelayMs),
+        new ConditionalCommand(
+            setServoPosCommand(slideArmServo, SlideArmServo_PREAIM, aimCommand_Arm2OpenDelayMs),
+            setServoPosCommand(slideArmServo, Goal.AIM.slideArmPos, aimCommand_Arm2OpenDelayMs),
+            () -> isFirstAimToggled),
+        new InstantCommand(() -> isFirstAimToggled = !isFirstAimToggled),
         new InstantCommand(() -> wristServo.setPosition(Goal.AIM.wristPos)),
         new InstantCommand(() -> intakeClawServo.setPosition(Goal.AIM.clawAngle)));
   }
 
-  public Command preAimCommand() {
-    return new SequentialCommandGroup(
-        setGoalCommand(Goal.PRE_AIM), setServoPosCommand(slideArmServo, SlideArmServo_PREAIM, 0));
-  }
+  //  public Command preAimCommand() {
+  //    return new SequentialCommandGroup(
+  //        setGoalCommand(Goal.PRE_AIM), setServoPosCommand(slideArmServo, SlideArmServo_PREAIM,
+  // 0));
+  //  }
 
   public Command foldSlideStructureCommand() {
     return new SequentialCommandGroup(
         setTurnServoPosCommand(TurnServo.DEG_0, 100),
         setServoPosCommand(slideArmServo, SlideArmServo_FOLD, 100),
-        setServoPosCommand(wristServo, WristServo_FOLD, 100));
+        setServoPosCommand(wristServo, WristServo_FOLD, 100),
+        new InstantCommand(() -> isFirstAimToggled = false));
   }
 
   public Command grabCommand() {
@@ -139,12 +142,14 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
         setServoPosCommand(slideArmServo, Goal.GRAB.slideArmPos, grabCommand_armDown2GrabDelayMs),
         setServoPosCommand(intakeClawServo, Goal.GRAB.clawAngle, grabCommand_grab2AfterGrabDelayMs),
         new InstantCommand(() -> slideArmServo.setPosition(SlideArmServo_AIM_)),
+        new InstantCommand(() -> isFirstAimToggled = true),
         setGoalCommand(Goal.AIM));
   }
 
   public Command slowHandoffCommand() {
     return new SequentialCommandGroup(
         setGoalCommand(Goal.HANDOFF),
+        new InstantCommand(() -> isFirstAimToggled = false),
         setTurnServoPosCommand(TurnServo.DEG_0, handoffCommand_wristTurn2wristHandoffDelayMs),
         setServoPosCommand(
             wristServo, Goal.HANDOFF.wristPos, slowHandoffCommand_wristHandoff2ArmHandoffDelayMs),
@@ -220,7 +225,6 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   @Config
   public enum Goal {
     STOW(0, 0, 0.2, IntakeClawServo_OPEN),
-    PRE_AIM(slideExtensionVal, SlideArmServo_PREAIM, 0.805, IntakeClawServo_OPEN),
     AIM(slideExtensionVal, SlideArmServo_AIM_, 0.805, IntakeClawServo_OPEN),
     GRAB(slideExtensionVal, 0.42, 0.805, IntakeClawServo_GRAB),
     HANDOFF(0, 0.75, 0.25, IntakeClawServo_GRAB),

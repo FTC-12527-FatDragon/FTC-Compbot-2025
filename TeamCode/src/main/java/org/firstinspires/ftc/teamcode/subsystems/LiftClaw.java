@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.Command;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class LiftClaw extends SubsystemBase {
   public LiftClaw(final HardwareMap hardwareMap) {
     liftArmServo = hardwareMap.get(Servo.class, "liftArmServo"); // 0.3 Up 0.7 Down
     liftClawServo = hardwareMap.get(Servo.class, "clawServo"); // 0 Close 0.5 Open
+    liftClawServo.setPosition(LiftArmServo_STOW);
     setServoController(true);
   }
 
@@ -51,7 +54,7 @@ public class LiftClaw extends SubsystemBase {
     return new InstantCommand(this::openClaw);
   }
 
-  public Command closeClawCommad() {
+  public Command closeClawCommand() {
     return new InstantCommand(this::closeClaw);
   }
 
@@ -59,28 +62,23 @@ public class LiftClaw extends SubsystemBase {
     return new InstantCommand(this::switchLiftClaw);
   }
 
-  public void upLiftArm() {
-    liftArmServo.setPosition(LiftArmServo_SCORE_BASKET);
-  }
-
   public void foldLiftArm() {
     liftArmServo.setPosition(LiftArmServo_STOW);
   }
 
-  public void avoidCollision() {
-    liftArmServo.setPosition(LiftArmServo_AVOID_COLLISION);
+  public Command setLiftClawServo(LiftClawState state, long delay) {
+    return setServoPosCommand(liftArmServo, state.servoPos, delay);
   }
 
-  public void grabFromWall() {
-    liftArmServo.setPosition(LiftArmServo_GRAB_WALL);
-  }
-
-  public void scoreChamber() {
-    liftArmServo.setPosition(LiftArmServo_SCORE_CHAMBER);
-  }
-
-  public Command setLiftClawServo(LiftClawState state) {
-    return new InstantCommand(() -> liftClawServo.setPosition(state.servoPos));
+  private Command setServoPosCommand(Servo servo, double pos, long delay) {
+    return new ConditionalCommand(
+        new InstantCommand(
+                () -> {
+                  servo.setPosition(pos);
+                })
+            .andThen(new WaitCommand(delay)),
+        new InstantCommand(() -> {}),
+        () -> servo.getPosition() != pos);
   }
 
   @RequiredArgsConstructor

@@ -55,7 +55,6 @@ public class Lift extends MotorPIDSlideSubsystem {
     liftMotorUp.setRunMode(Motor.RunMode.RawPower);
     liftMotorDown.setRunMode(Motor.RunMode.RawPower);
 
-
     pidController = new PIDController(kP, kI, kD);
     pidController.setIntegrationBounds(-1 / kI, 1 / kI);
     feedforward = new ElevatorFeedforward(kS, kG, kV);
