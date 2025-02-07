@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.utils.MathUtils;
 
 @Config
 public class Lift extends MotorPIDSlideSubsystem {
-  public static double kP = 0.008, kI = 0.0, kD = 0.0, kV = 0.0003, kS = 0.12, kG = 0.12;
+  public static double kP = 0.015, kI = 0.0, kD = 0.0, kV = 0.0003, kS = 0.12, kG = 0.12;
   private final PIDController pidController;
   private final Motor liftMotorUp;
   private final Motor liftMotorDown;
@@ -37,6 +37,8 @@ public class Lift extends MotorPIDSlideSubsystem {
   public static double MAX_VEL = 0;
   public static double MAX_ACL = 0;
 
+  public static double PRE_HANG_TICKS = 175;
+
   private final ElevatorFeedforward feedforward;
 
   private final VoltageSensor batteryVoltageSensor;
@@ -46,10 +48,13 @@ public class Lift extends MotorPIDSlideSubsystem {
   public Lift(final HardwareMap hardwareMap, Telemetry telemetry) {
     liftMotorUp = new Motor(hardwareMap, "liftMotorUp");
     liftMotorDown = new Motor(hardwareMap, "liftMotorDown");
+    liftMotorUp.setInverted(true);
+    liftMotorDown.setInverted(true);
     liftMotorUp.stopAndResetEncoder();
     liftMotorDown.stopAndResetEncoder();
     liftMotorUp.setRunMode(Motor.RunMode.RawPower);
     liftMotorDown.setRunMode(Motor.RunMode.RawPower);
+
 
     pidController = new PIDController(kP, kI, kD);
     pidController.setIntegrationBounds(-1 / kI, 1 / kI);
@@ -148,7 +153,7 @@ public class Lift extends MotorPIDSlideSubsystem {
   public enum Goal {
     BASKET(770.0),
     STOW(0.0),
-    PRE_HANG(144.0),
+    PRE_HANG(PRE_HANG_TICKS),
     HANG(0),
     OPEN_LOOP(0.0);
 

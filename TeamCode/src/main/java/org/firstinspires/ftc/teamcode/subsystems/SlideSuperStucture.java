@@ -26,9 +26,9 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public static double SlideArmServo_AIM = 0.4;
   public static double SlideArmServo_GRAB = 0.53;
   public static double SlideArmServo_HANDOFF = 0.25;
-  public static double SlideArmServo_AFTERGRAB = 0.675;
-  public static double SlideArmServo_PREAIM = 0.675;
-  public static double SlideArmServo_FOLD = 0.675;
+  public static double SlideArmServo_AIM_ = 0.55;
+  public static double SlideArmServo_PREAIM = 0.5;
+  public static double SlideArmServo_FOLD = 0.95;
 
   // intakeClawServo
   public static double IntakeClawServo_OPEN = 0.3;
@@ -37,7 +37,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;
-  public static double WristServo_FOLD = 0.75;
+  public static double WristServo_FOLD = 0.5;
 
   // wristTurnServo
   public static double WristTurnServo_POS0 = 0.2;
@@ -138,7 +138,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
         setGoalCommand(Goal.GRAB),
         setServoPosCommand(slideArmServo, Goal.GRAB.slideArmPos, grabCommand_armDown2GrabDelayMs),
         setServoPosCommand(intakeClawServo, Goal.GRAB.clawAngle, grabCommand_grab2AfterGrabDelayMs),
-        new InstantCommand(() -> slideArmServo.setPosition(SlideArmServo_AFTERGRAB)),
+        new InstantCommand(() -> slideArmServo.setPosition(SlideArmServo_AIM_)),
         setGoalCommand(Goal.AIM));
   }
 
@@ -221,9 +221,9 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public enum Goal {
     STOW(0, 0, 0.2, IntakeClawServo_OPEN),
     PRE_AIM(slideExtensionVal, SlideArmServo_PREAIM, 0.805, IntakeClawServo_OPEN),
-    AIM(slideExtensionVal, SlideArmServo_AFTERGRAB, 0.805, IntakeClawServo_OPEN),
-    GRAB(slideExtensionVal, 0.525, 0.805, IntakeClawServo_GRAB),
-    HANDOFF(0, 0.91, 0.3, IntakeClawServo_GRAB),
+    AIM(slideExtensionVal, SlideArmServo_AIM_, 0.805, IntakeClawServo_OPEN),
+    GRAB(slideExtensionVal, 0.42, 0.805, IntakeClawServo_GRAB),
+    HANDOFF(0, 0.75, 0.25, IntakeClawServo_GRAB),
     AUTOSWIPE(SlideMotor_extensionValue, 0.3, 0.45, IntakeClawServo_OPEN);
 
     public final double slideExtension;

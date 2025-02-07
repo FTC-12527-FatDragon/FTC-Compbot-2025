@@ -39,7 +39,7 @@ public class TXBetaBotSolo extends CommandOpMode {
   private LiftClaw liftClaw;
   private SlideSuperStucture slide;
   private SampleMecanumDrive drive;
-  private Climber climber;
+  //private Climber climber;
 
   private DriverMode currentMode = DriverMode.SAMPLE;
 
@@ -58,7 +58,7 @@ public class TXBetaBotSolo extends CommandOpMode {
     liftClaw = new LiftClaw(hardwareMap);
     slide = new SlideSuperStucture(hardwareMap, telemetry);
     drive = new SampleMecanumDrive(hardwareMap);
-    climber = new Climber(hardwareMap);
+    //climber = new Climber(hardwareMap);
     drive.setPoseEstimate(AutoCommandBase.getAutoEndPose());
 
     // Teleop Drive Command
@@ -67,7 +67,7 @@ public class TXBetaBotSolo extends CommandOpMode {
             drive,
             () -> -gamepadEx1.getLeftY(),
             () -> gamepadEx1.getLeftX(),
-            () -> -gamepadEx1.getRightX(),
+            () -> gamepadEx1.getRightX(),
             () -> gamepadEx1.getButton(GamepadKeys.Button.LEFT_STICK_BUTTON),
             () -> gamepadEx1.getButton(GamepadKeys.Button.DPAD_LEFT)));
 
@@ -111,30 +111,28 @@ public class TXBetaBotSolo extends CommandOpMode {
     new FunctionalButton(
             () ->
                 gamepadEx1.getButton(GamepadKeys.Button.Y)
-                    && slide.getGoal() != SlideSuperStucture.Goal.AIM
-                    && slide.getGoal() != SlideSuperStucture.Goal.PRE_AIM
                     && currentMode == DriverMode.SAMPLE)
         .whenPressed(
             slide.aimCommand().alongWith(new InstantCommand(() -> isPureHandoffCompelte = false)),
             false);
 
-    // CHANGE FROM FIRST AIM AND GET LOWER ---- PRE AIM
-    new FunctionalButton(
-            () ->
-                gamepadEx1.getButton(GamepadKeys.Button.Y)
-                    && slide.getGoal() == SlideSuperStucture.Goal.AIM
-                    && currentMode == DriverMode.SAMPLE)
-        .whenPressed(
-            slide
-                .preAimCommand()
-                .alongWith(new InstantCommand(() -> isPureHandoffCompelte = false)),
-            false);
+//    // CHANGE FROM FIRST AIM AND GET LOWER ---- PRE AIM
+//    new FunctionalButton(
+//            () ->
+//                gamepadEx1.getButton(GamepadKeys.Button.Y)
+//                    && slide.getGoal() == SlideSuperStucture.Goal.AIM
+//                    && currentMode == DriverMode.SAMPLE)
+//        .whenPressed(
+//            slide
+//                .preAimCommand()
+//                .alongWith(new InstantCommand(() -> isPureHandoffCompelte = false)),
+//            false);
 
     // Grab when aim
     new FunctionalButton(
             () ->
                 gamepadEx1.getButton(GamepadKeys.Button.A)
-                    && slide.getGoal() == SlideSuperStucture.Goal.PRE_AIM
+                    && slide.getGoal() == SlideSuperStucture.Goal.AIM
                     && currentMode == DriverMode.SAMPLE)
         .whenPressed(slide.grabCommand(), false);
 
@@ -203,10 +201,11 @@ public class TXBetaBotSolo extends CommandOpMode {
         .whenPressed(
             new SequentialCommandGroup(
                 new InstantCommand(() -> currentMode = DriverMode.SPECIMEN),
-                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.AVOID_COLLISION),
-                new WaitCommand(100),
+                new InstantCommand(() -> liftClaw.avoidCollision()),
+                new WaitCommand(500),
                 slide.foldSlideStructureCommand(),
-                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL),
+                    new WaitCommand(500),
+                    new InstantCommand(() -> liftClaw.grabFromWall()),
                 liftClaw.openClawCommand()));
 
     // Right Bumper Claw Open
@@ -217,10 +216,11 @@ public class TXBetaBotSolo extends CommandOpMode {
             () -> gamepadEx1.getButton(GamepadKeys.Button.B) && currentMode == DriverMode.SPECIMEN)
         .whenPressed(
             new SequentialCommandGroup(
-                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL),
+                    liftClaw.openClawCommand(),
+                    new WaitCommand(100),
+                    new InstantCommand(() -> liftClaw.grabFromWall()),
                 new WaitCommand(100),
-                new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)),
-                liftClaw.openClawCommand()),
+                new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW))),
             false);
 
     new FunctionalButton(
@@ -236,9 +236,9 @@ public class TXBetaBotSolo extends CommandOpMode {
                     && currentMode == DriverMode.SPECIMEN)
         .whenPressed(
             new SequentialCommandGroup(
-                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_CHAMBER),
+                    new InstantCommand(() -> liftClaw.scoreChamber()),
                 new WaitCommand(200),
-                new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG))));
+                new InstantCommand(() -> lift.setGoal(Lift.Goal.HANG))));
 
     new FunctionalButton(
             () ->
@@ -249,7 +249,7 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     new FunctionalButton(
             () ->
-                gamepadEx1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5
+                gamepadEx1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5
                     && lift.getGoal() == Lift.Goal.PRE_HANG
                     && currentMode == DriverMode.SPECIMEN)
         .whenPressed(new InstantCommand(() -> lift.setGoal(Lift.Goal.HANG)));
@@ -313,30 +313,30 @@ public class TXBetaBotSolo extends CommandOpMode {
                     && slide.getGoal().slideExtension == 0)
         .whenHeld(slide.manualResetCommand());
 
-    gamepadEx2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenHeld(climber.elevateCommand());
-
-    //    gamepadEx2.getGamepadButton(GamepadKeys.Button.A).whenHeld(slide.swipeCommand());
-
-    gamepadEx2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenHeld(climber.declineCommand());
-
-    gamepadEx2
-        .getGamepadButton(GamepadKeys.Button.B)
-        .toggleWhenPressed(
-            new StartEndCommand(
-                () -> {
-                  climber.closeClimberLock();
-                  climber.closeSlideLock();
-                  gamepadEx2.gamepad.rumble(10);
-                },
-                () -> {
-                  climber.openClimberLock();
-                  climber.openSlideLock();
-                  gamepadEx2.gamepad.rumbleBlips(1);
-                }));
-
-    gamepadEx2
-        .getGamepadButton(GamepadKeys.Button.X)
-        .whenPressed(new InstantCommand(climber::keep));
+//    gamepadEx2.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenHeld(climber.elevateCommand());
+//
+//    //    gamepadEx2.getGamepadButton(GamepadKeys.Button.A).whenHeld(slide.swipeCommand());
+//
+//    gamepadEx2.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenHeld(climber.declineCommand());
+//
+//    gamepadEx2
+//        .getGamepadButton(GamepadKeys.Button.B)
+//        .toggleWhenPressed(
+//            new StartEndCommand(
+//                () -> {
+//                  climber.closeClimberLock();
+//                  climber.closeSlideLock();
+//                  gamepadEx2.gamepad.rumble(10);
+//                },
+//                () -> {
+//                  climber.openClimberLock();
+//                  climber.openSlideLock();
+//                  gamepadEx2.gamepad.rumbleBlips(1);
+//                }));
+//
+//    gamepadEx2
+//        .getGamepadButton(GamepadKeys.Button.X)
+//        .whenPressed(new InstantCommand(climber::keep));
   }
 
   @Override
