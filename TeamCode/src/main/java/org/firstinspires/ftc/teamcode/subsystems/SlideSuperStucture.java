@@ -247,6 +247,10 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
     forwardSlideExtension(SlideMotor_extensionValue);
   }
 
+  public boolean isSlideExtended() {
+    return slideMotor.getCurrentPosition() > 200;
+  }
+
   public void forwardSlideExtension(double slideExtension) {
     slideExtensionVal = slideExtension;
   }
