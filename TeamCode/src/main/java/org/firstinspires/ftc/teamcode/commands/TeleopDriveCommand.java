@@ -39,7 +39,7 @@ public class TeleopDriveCommand extends CommandBase {
 
     double forwardValue = forward.getAsDouble();
     double funValue = fun.getAsDouble();
-    double rotateValue = rotate.getAsDouble() * 0.8;
+    double rotateValue = rotate.getAsDouble() * 0.7;
 
     if (shouldSlow.getAsBoolean()) {
       forwardValue *= 0.3;

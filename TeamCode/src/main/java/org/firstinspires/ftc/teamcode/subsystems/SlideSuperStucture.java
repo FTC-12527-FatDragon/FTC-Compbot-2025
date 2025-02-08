@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.Range;
+
+import edu.wpi.first.math.MathUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -24,16 +26,16 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   // ---- Configs ----
   // SlideArmServo
   public static double SlideArmServo_AIM = 0.4;
-  public static double SlideArmServo_GRAB = 0.53;
-  public static double SlideArmServo_HANDOFF = 0.25;
-  public static double SlideArmServo_AIM_ = 0.55;
-  public static double SlideArmServo_PREAIM = 0.48;
-  public static double SlideArmServo_FOLD = 0.95;
+  public static double SlideArmServo_GRAB = 0.27;
+  public static double SlideArmServo_HANDOFF = 0.55;
+  public static double SlideArmServo_AIM_ = 0.38;
+  public static double SlideArmServo_PREAIM = 0.3;
+  public static double SlideArmServo_FOLD = 0.71;
 
   // intakeClawServo
-  public static double IntakeClawServo_OPEN = 0.3;
+  public static double IntakeClawServo_OPEN = 0.37;
   public static double IntakeClawServo_OPENWIDER = 0.2;
-  public static double IntakeClawServo_GRAB = 0.675;
+  public static double IntakeClawServo_GRAB = 0.54;
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;
@@ -52,7 +54,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public static long aimCommand_Arm2OpenDelayMs = 20;
   // grabCommand
   public static long grabCommand_armDown2GrabDelayMs = 100;
-  public static long grabCommand_grab2AfterGrabDelayMs = 50;
+  public static long grabCommand_grab2AfterGrabDelayMs = 80;
   // slowHandoffCommand
   public static long handoffCommand_wristTurn2wristHandoffDelayMs = 100;
   public static long slowHandoffCommand_wristHandoff2ArmHandoffDelayMs = 250;
@@ -222,12 +224,16 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
     wristServo.setPosition(Goal.HANDOFF.wristPos);
   }
 
+  public boolean isSlideArmFold() {
+    return MathUtil.isNear(SlideArmServo_FOLD, slideArmServo.getPosition(), 0.01);
+  }
+
   @Config
   public enum Goal {
     STOW(0, 0, 0.2, IntakeClawServo_OPEN),
     AIM(slideExtensionVal, SlideArmServo_AIM_, 0.805, IntakeClawServo_OPEN),
-    GRAB(slideExtensionVal, 0.42, 0.805, IntakeClawServo_GRAB),
-    HANDOFF(0, 0.75, 0.25, IntakeClawServo_GRAB),
+    GRAB(slideExtensionVal, SlideArmServo_GRAB, 0.805, IntakeClawServo_GRAB),
+    HANDOFF(0, SlideArmServo_HANDOFF, 0.25, IntakeClawServo_GRAB),
     AUTOSWIPE(SlideMotor_extensionValue, 0.3, 0.45, IntakeClawServo_OPEN);
 
     public final double slideExtension;
@@ -265,6 +271,9 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
         turnServo = TurnServo.DEG_05;
         break;
       case DEG_05:
+        turnServo = TurnServo.DEG_07;
+        break;
+      case DEG_07:
         turnServo = TurnServo.DEG_08;
         break;
       case DEG_08:
@@ -282,8 +291,11 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
       case DEG_05:
         turnServo = TurnServo.DEG_0;
         break;
-      case DEG_08:
+      case DEG_07:
         turnServo = TurnServo.DEG_05;
+        break;
+      case DEG_08:
+        turnServo = TurnServo.DEG_07;
         break;
     }
     setServoPos(turnServo);
@@ -323,6 +335,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public enum TurnServo {
     DEG_0(0.25),
     DEG_05(0.4),
+    DEG_07(0.6),
     DEG_08(0.8),
     DEG_INVERTED_HORIZ(0.925),
     UNKNOWN(-1);
