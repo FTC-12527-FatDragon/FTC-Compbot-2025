@@ -65,7 +65,7 @@ public class DriveConstants {
    * angular distances although most angular parameters are wrapped in Math.toRadians() for
    * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
    */
-  public static double WHEEL_RADIUS = 2; // INCH!!
+  public static double WHEEL_RADIUS = 2.05; // INCH!!
   public static double GEAR_RATIO =
       1; // output (wheel) speed / input (motor) speed, >1 -> 加速 <1 -> 减速
   public static double TRACK_WIDTH; // INCH!!
@@ -145,8 +145,8 @@ public class DriveConstants {
         GoBildaLocalizerPerpendicularOffset = new Translation2dHelperClass(0, 92.5);
         TRACK_WIDTH = 16.19;
         kV = 0.012;
-        kA = 0.003;
-        kStatic = 0.065;
+        kA = 0.0025;
+        kStatic = 0.025;
         MAX_VEL = 51.064485597344834;
         MAX_ANG_VEL = Math.toRadians(143.51011005498376);
         break;
