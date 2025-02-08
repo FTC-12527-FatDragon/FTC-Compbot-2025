@@ -12,7 +12,6 @@ import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.StartEndCommand;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -49,6 +48,7 @@ public class TXBetaBotSolo extends CommandOpMode {
   public static boolean setPose = false;
   public static Pose2dHelperClass Pose = new Pose2dHelperClass();
   private boolean isTimerStart = false;
+  private boolean lowBasketMode = false;
 
   @Override
   public void initialize() {
@@ -83,13 +83,23 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     // SAMPLE MODE
 
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getButton(GamepadKeys.Button.START) && currentMode == DriverMode.SAMPLE)
+        .whenPressed(() -> lowBasketMode = !lowBasketMode);
+
+
+
     // BASKET UP
     new FunctionalButton(
             () -> gamepadEx1.getButton(GamepadKeys.Button.X) && currentMode == DriverMode.SAMPLE)
         .whenPressed(
             new ParallelCommandGroup(
-                new InstantCommand(() -> lift.setGoal(Lift.Goal.BASKET)),
-                new WaitUntilCommand(() -> lift.getCurrentPosition() > 200)
+                new ConditionalCommand(
+                    new InstantCommand(() -> lift.setGoal(Lift.Goal.HIGH_BASKET)),
+                    new InstantCommand(() -> lift.setGoal(Lift.Goal.LOW_BASKET)),
+                    () -> !lowBasketMode),
+                new WaitUntilCommand(() -> lift.getCurrentPosition() > 150)
                     .andThen(liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_BASKET, 0))));
 
     // BASKET DROP OFF AND STOW
@@ -295,7 +305,7 @@ public class TXBetaBotSolo extends CommandOpMode {
         .toggleWhenPressed(climber.holdOnCommand());
 
     new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3))
-            .whenPressed(climber.elevateCommand().withTimeout(2000));
+        .whenPressed(climber.elevateCommand().withTimeout(2000));
 
     // =================================================================================
 
@@ -308,7 +318,7 @@ public class TXBetaBotSolo extends CommandOpMode {
 
   @Override
   public void run() {
-    if(!isTimerStart) {
+    if (!isTimerStart) {
       timer.reset();
       isTimerStart = true;
     }
@@ -350,20 +360,34 @@ public class TXBetaBotSolo extends CommandOpMode {
     boolean isSlideArmFold = slide.isSlideArmFold();
     boolean isLiftArmGrab = liftClaw.isLiftArmGrab();
 
-    if (isLiftArmStow) {
-      if(isSlideArmFold) {
-
-      }
-      else {
-
-      }
+    if (isLiftArmGrab && isSlideArmFold) {
+      currentMode = DriverMode.SPECIMEN;
+      return;
     }
-    else {
-      if(isSlideArmFold) { //STOW
 
+    // !Not Grab || !Fold
+
+    if (isLiftArmStow) {
+      if (isSlideArmFold) {
+        CommandScheduler.getInstance()
+            .schedule(
+                new SequentialCommandGroup(
+                    new InstantCommand(() -> currentMode = DriverMode.SPECIMEN),
+                    liftClaw.setLiftClawServo(LiftClaw.LiftClawState.AVOID_COLLISION, 200),
+                    slide.foldSlideStructureCommand(),
+                    new WaitCommand(200),
+                    liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 0),
+                    liftClaw.openClawCommand()));
+      } else { // Slide Arm aim
+        currentMode = DriverMode.SAMPLE;
       }
-      else {
-
+    } else {
+      if (isSlideArmFold) { // FOLD && STOW
+        liftClaw.grabFromWall();
+        currentMode = DriverMode.SPECIMEN;
+      } else { // FOLD && !STOW
+        liftClaw.foldLiftArm();
+        currentMode = DriverMode.SAMPLE;
       }
     }
   }

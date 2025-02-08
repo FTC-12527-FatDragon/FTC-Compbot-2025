@@ -119,7 +119,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
 
   protected Command upLiftToBasket() {
     return new ParallelCommandGroup(
-        new InstantCommand(() -> lift.setGoal(Lift.Goal.BASKET)),
+        new InstantCommand(() -> lift.setGoal(Lift.Goal.HIGH_BASKET)),
         new WaitUntilCommand(() -> lift.getCurrentPosition() > 300)
             .andThen(liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_BASKET, 0)));
   }

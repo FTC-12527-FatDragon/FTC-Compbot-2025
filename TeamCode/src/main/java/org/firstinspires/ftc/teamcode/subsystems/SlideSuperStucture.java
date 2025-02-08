@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.Range;
-
 import edu.wpi.first.math.MathUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,8 +45,8 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public static double WristTurnServo_POS1 = 0.6;
   public static double WristTurnServo_POS2 = 0.8;
   // slideMotor
-  public static double SlideMotor_atSetPointTolerance = 10;
-  public static double SlideMotor_extensionValue = 275;
+  public static double SlideMotor_atSetPointTolerance = 18;
+  public static double SlideMotor_extensionValue = 325;
 
   // aimCommand
   public static long aimCommand_wristTurn2ArmDelayMs = 0;
@@ -76,8 +75,6 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   private TurnServo turnServo = TurnServo.DEG_0;
 
   @Setter @Getter private Goal goal = Goal.STOW;
-
-  private boolean isFirstAimToggled = false; // For Aim & Pre-Aim Transition
 
   //  private final Telemetry telemetry; // 0 0.5 0.8
 
@@ -114,11 +111,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
     return new SequentialCommandGroup(
         setGoalCommand(Goal.AIM),
         setTurnServoPosCommand(TurnServo.DEG_0, aimCommand_wristTurn2ArmDelayMs),
-        new ConditionalCommand(
-            setServoPosCommand(slideArmServo, SlideArmServo_PREAIM, aimCommand_Arm2OpenDelayMs),
-            setServoPosCommand(slideArmServo, Goal.AIM.slideArmPos, aimCommand_Arm2OpenDelayMs),
-            () -> isFirstAimToggled),
-        new InstantCommand(() -> isFirstAimToggled = !isFirstAimToggled),
+        setServoPosCommand(slideArmServo, Goal.AIM.slideArmPos, aimCommand_Arm2OpenDelayMs),
         new InstantCommand(() -> wristServo.setPosition(Goal.AIM.wristPos)),
         new InstantCommand(() -> intakeClawServo.setPosition(Goal.AIM.clawAngle)));
   }
@@ -133,8 +126,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
     return new SequentialCommandGroup(
         setTurnServoPosCommand(TurnServo.DEG_0, 100),
         setServoPosCommand(slideArmServo, SlideArmServo_FOLD, 100),
-        setServoPosCommand(wristServo, WristServo_FOLD, 100),
-        new InstantCommand(() -> isFirstAimToggled = false));
+        setServoPosCommand(wristServo, WristServo_FOLD, 100));
   }
 
   public Command grabCommand() {
@@ -144,14 +136,12 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
         setServoPosCommand(slideArmServo, Goal.GRAB.slideArmPos, grabCommand_armDown2GrabDelayMs),
         setServoPosCommand(intakeClawServo, Goal.GRAB.clawAngle, grabCommand_grab2AfterGrabDelayMs),
         new InstantCommand(() -> slideArmServo.setPosition(SlideArmServo_AIM_)),
-        new InstantCommand(() -> isFirstAimToggled = true),
         setGoalCommand(Goal.AIM));
   }
 
   public Command slowHandoffCommand() {
     return new SequentialCommandGroup(
         setGoalCommand(Goal.HANDOFF),
-        new InstantCommand(() -> isFirstAimToggled = false),
         setTurnServoPosCommand(TurnServo.DEG_0, handoffCommand_wristTurn2wristHandoffDelayMs),
         setServoPosCommand(
             wristServo, Goal.HANDOFF.wristPos, slowHandoffCommand_wristHandoff2ArmHandoffDelayMs),
@@ -171,11 +161,6 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
         new InstantCommand(() -> slideArmServo.setPosition(Goal.HANDOFF.slideArmPos)),
         new InstantCommand(() -> slideExtensionVal = Goal.HANDOFF.slideExtension),
         new WaitUntilCommand(this::slideMotorAtHome));
-  }
-
-  public Command handoffCommand() {
-    return new ConditionalCommand(
-        slowHandoffCommand(), fastHandoffCommand(), this::slideMotorAtHome);
   }
 
   public Command swipeCommand() {

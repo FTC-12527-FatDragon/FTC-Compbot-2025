@@ -46,11 +46,11 @@ public class Climber extends SubsystemBase {
   }
 
   public Command declineCommand() {
-    return new StartEndCommand(this::decline, this::keep);
+    return new StartEndCommand(this::decline, this::stop);
   }
 
   public Command holdOnCommand() {
-    return new StartEndCommand(this::holdOn, this::keep);
+    return new StartEndCommand(this::holdOn, this::stop);
   }
 
   public Command decline2ArmUp() {
