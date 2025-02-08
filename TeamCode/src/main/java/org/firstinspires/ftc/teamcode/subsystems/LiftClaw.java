@@ -8,6 +8,8 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import edu.wpi.first.math.MathUtil;
 import lombok.RequiredArgsConstructor;
 
 @Config
@@ -68,6 +70,14 @@ public class LiftClaw extends SubsystemBase {
 
   public Command setLiftClawServo(LiftClawState state, long delay) {
     return setServoPosCommand(liftArmServo, state.servoPos, delay);
+  }
+
+  public boolean isLiftArmStow() {
+    return MathUtil.isNear(LiftArmServo_STOW, liftArmServo.getPosition(), 0.01);
+  }
+
+  public boolean isLiftArmGrab() {
+    return MathUtil.isNear(LiftArmServo_GRAB_WALL, liftArmServo.getPosition(), 0.01);
   }
 
   private Command setServoPosCommand(Servo servo, double pos, long delay) {

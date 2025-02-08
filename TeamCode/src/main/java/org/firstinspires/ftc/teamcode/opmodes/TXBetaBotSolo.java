@@ -12,11 +12,14 @@ import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.StartEndCommand;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import edu.wpi.first.math.MathUtil;
 import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.opmode.LocalizationTest;
@@ -39,12 +42,13 @@ public class TXBetaBotSolo extends CommandOpMode {
   private LiftClaw liftClaw;
   private SlideSuperStucture slide;
   private SampleMecanumDrive drive;
-  // private Climber climber;
+  private ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
   private DriverMode currentMode = DriverMode.SAMPLE;
 
   public static boolean setPose = false;
   public static Pose2dHelperClass Pose = new Pose2dHelperClass();
+  private boolean isTimerStart = false;
 
   @Override
   public void initialize() {
@@ -57,6 +61,11 @@ public class TXBetaBotSolo extends CommandOpMode {
     liftClaw = new LiftClaw(hardwareMap);
     slide = new SlideSuperStucture(hardwareMap, telemetry);
     drive = new SampleMecanumDrive(hardwareMap);
+
+    initializeMode();
+
+    isTimerStart = false;
+
     // climber = new Climber(hardwareMap);
     drive.setPoseEstimate(AutoCommandBase.getAutoEndPose());
 
@@ -113,7 +122,7 @@ public class TXBetaBotSolo extends CommandOpMode {
         () -> AutoCommandBase.slowHandoff(slide, liftClaw).andThen(new WaitCommand(50));
 
     Supplier<Command> fastHandoffCommand = // TODO: Remove duplicate code
-        () -> AutoCommandBase.fastHandoff(slide, liftClaw).andThen(new WaitCommand(150));
+        () -> AutoCommandBase.fastHandoff(slide, liftClaw);
 
     Supplier<Command> handoffCommand =
         () ->
@@ -284,14 +293,33 @@ public class TXBetaBotSolo extends CommandOpMode {
     new FunctionalButton(
             () -> gamepadEx1.getButton(GamepadKeys.Button.B) && currentMode == DriverMode.CLIMB)
         .toggleWhenPressed(climber.holdOnCommand());
+
+    new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3))
+            .whenPressed(climber.elevateCommand().withTimeout(2000));
+
+    // =================================================================================
+
+    new FunctionalButton(() -> MathUtil.isNear(60, timer.time(), 0.3))
+        .whenPressed(new InstantCommand(() -> gamepad1.rumble(500)));
+
+    new FunctionalButton(() -> MathUtil.isNear(90, timer.time(), 0.3))
+        .whenPressed(new InstantCommand(() -> gamepad1.rumble(500)));
   }
 
   @Override
   public void run() {
+    if(!isTimerStart) {
+      timer.reset();
+      isTimerStart = true;
+    }
+
     Pose2d poseEstimate = drive.getPoseEstimate();
     lift.periodicAsync();
+
     CommandScheduler.getInstance().run();
+
     TelemetryPacket packet = new TelemetryPacket();
+
     packet.fieldOverlay().setStroke("#3F51B5");
     LocalizationTest.drawRobot(packet.fieldOverlay(), poseEstimate);
     FtcDashboard.getInstance().sendTelemetryPacket(packet);
@@ -302,7 +330,6 @@ public class TXBetaBotSolo extends CommandOpMode {
       setPose = false;
       drive.setPoseEstimate(Pose.toPose2d());
     }
-    //    telemetry.addData("pose", );
   }
 
   public enum DriverMode {
@@ -316,5 +343,28 @@ public class TXBetaBotSolo extends CommandOpMode {
     CommandScheduler.getInstance().reset();
     slide.setServoController(false);
     liftClaw.setServoController(false);
+  }
+
+  public void initializeMode() {
+    boolean isLiftArmStow = liftClaw.isLiftArmStow();
+    boolean isSlideArmFold = slide.isSlideArmFold();
+    boolean isLiftArmGrab = liftClaw.isLiftArmGrab();
+
+    if (isLiftArmStow) {
+      if(isSlideArmFold) {
+
+      }
+      else {
+
+      }
+    }
+    else {
+      if(isSlideArmFold) { //STOW
+
+      }
+      else {
+
+      }
+    }
   }
 }
