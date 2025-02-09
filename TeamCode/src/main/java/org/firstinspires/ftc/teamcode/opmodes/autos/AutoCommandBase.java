@@ -288,11 +288,11 @@ public abstract class AutoCommandBase extends LinearOpMode {
               telemetry.addData("Current Pose", currentPoseRelativeToField);
               Pose2d targetPoseRelativeToRobot =
                   new Pose2dHelperClass(
-                          Units.mmToInches(vision.getStrafeOffset()),
-                          Units.mmToInches(vision.getDistance()),
+                          vision.getDistance() / 25.4,
+                          vision.getStrafeOffset() / 25.4,
                           0)
                       .toPose2d();
-              telemetry.addData("Target Robot Pose", currentPoseRelativeToField);
+              telemetry.addData("Target Robot Pose", targetPoseRelativeToRobot);
 
               //              Pose2d currentPoseRelativeToField = currentPose.get();
               //              Pose2d targetPoseRelativeToRobot = targetPose.get();
@@ -314,13 +314,14 @@ public abstract class AutoCommandBase extends LinearOpMode {
                       + 0; // We move our claw instead of robot heading
 
               Pose2d targetPoseRelativeToField = new Pose2d(fieldX, fieldY, fieldHeading);
-              telemetry.addData("Target Field Pose", currentPoseRelativeToField);
+              telemetry.addData("Target Field Pose", targetPoseRelativeToField);
 
               // Generate trajectory to target pose
               sequence =
                   TrajectoryManager.trajectorySequenceBuilder(currentPoseRelativeToField)
                       .lineToLinearHeading(targetPoseRelativeToField)
                       .build();
+
 
               CommandScheduler.getInstance().schedule(new AutoDriveCommand(drive, sequence));
             }));
