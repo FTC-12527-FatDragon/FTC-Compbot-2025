@@ -49,6 +49,7 @@ public class TXBetaBotSolo extends CommandOpMode {
 
   public static boolean setPose = false;
   public static Pose2dHelperClass Pose = new Pose2dHelperClass();
+  public static boolean shouldClimb = false;
   private boolean isTimerStart = false;
   private boolean lowBasketMode = false;
 
@@ -320,7 +321,7 @@ public class TXBetaBotSolo extends CommandOpMode {
             () -> gamepadEx1.getButton(GamepadKeys.Button.B) && currentMode == DriverMode.CLIMB)
         .toggleWhenPressed(climber.holdOnCommand());
 
-    new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3))
+    new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3) && shouldClimb)
         .whenPressed(climber.elevateCommand().withTimeout(2000));
 
     gamepadEx1

@@ -8,11 +8,11 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import edu.wpi.first.math.MathUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.lib.Units;
 
 @Config
 public class Vision extends SubsystemBase {
@@ -26,14 +26,14 @@ public class Vision extends SubsystemBase {
   @Getter @Setter private SampleColor detectionColor = SampleColor.BLUE;
   @Getter private LLResult result;
 
-  private static final double CAMERA_HEIGHT = 307.0;
-  private static final double CAMERA_ANGLE = -45.0;
-  private static final double TARGET_HEIGHT = 19.05;
+  public static double CAMERA_HEIGHT = 307.0;
+  public static double CAMERA_ANGLE = -45.0;
+  public static double TARGET_HEIGHT = 19.05;
 
-  public static final double strafeConversionFactor = 6.6667;
-  public static final double cameraStrafeToBot = 127;
+  public static double strafeConversionFactor = 6.6667;
+  public static double cameraStrafeToBot = 127;
 
-  public static final double sampleToRobotDistance  = 40;
+  public static double sampleToRobotDistance = 40;
 
   Telemetry telemetry;
 
@@ -90,6 +90,9 @@ public class Vision extends SubsystemBase {
 
   public double getDistance() {
     double ty = getTy(0.0);
+    if (MathUtil.isNear(0, ty, 0.01)) {
+      return 0;
+    }
     double angleToGoalDegrees = CAMERA_ANGLE + ty;
     double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
     double distanceMM = (TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(angleToGoalRadians);
