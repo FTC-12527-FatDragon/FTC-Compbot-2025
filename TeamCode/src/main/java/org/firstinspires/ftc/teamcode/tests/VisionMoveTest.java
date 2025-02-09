@@ -30,7 +30,6 @@ public class VisionMoveTest extends CommandOpMode {
     limelight.initializeCamera();
     drive = new SampleMecanumDrive(hardwareMap);
 
-    limelight.setLEDPWM(ledPWM);
 
     gamepadEx1
         .getGamepadButton(GamepadKeys.Button.A)

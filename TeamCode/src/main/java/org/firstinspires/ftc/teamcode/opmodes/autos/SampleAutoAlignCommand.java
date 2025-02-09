@@ -14,18 +14,21 @@ public class SampleAutoAlignCommand extends CommandBase {
   private final Vision vision;
   private final Telemetry telemetry;
   private TrajectorySequence trajectorySequence;
-
   private boolean isTargetVisibleWhenStart = true;
+  private int flag = 0;
 
   public SampleAutoAlignCommand(SampleMecanumDrive drive, Vision vision, Telemetry telemetry) {
     this.drive = drive;
     this.vision = vision;
     this.telemetry = telemetry;
+    addRequirements(drive);
   }
 
   @Override
   public void initialize() {
-      isTargetVisibleWhenStart = vision.isTargetVisible();
+    isTargetVisibleWhenStart = vision.isTargetVisible();
+    flag += 1;
+    telemetry.addData("isVisibleWhenStart", isTargetVisibleWhenStart);
 
     Pose2d currentPoseRelativeToField = drive.getPoseEstimate();
     telemetry.addData("Current Pose", currentPoseRelativeToField);
@@ -50,33 +53,33 @@ public class SampleAutoAlignCommand extends CommandBase {
 
     Pose2d targetPoseRelativeToField = new Pose2d(fieldX, fieldY, fieldHeading);
     telemetry.addData("Target Field Pose", targetPoseRelativeToField);
-
-    trajectorySequence =
-        TrajectoryManager.trajectorySequenceBuilder(currentPoseRelativeToField)
-            .lineToLinearHeading(targetPoseRelativeToField)
-            .build();
-
-    
-
-      drive.followTrajectorySequenceAsync(trajectorySequence);
+    telemetry.addData("flag", flag);
+    if (isTargetVisibleWhenStart) {
+      trajectorySequence =
+          TrajectoryManager.trajectorySequenceBuilder(currentPoseRelativeToField)
+              .lineToLinearHeading(targetPoseRelativeToField)
+              .build();
+    } else {
+        cancel();
+    }
+    drive.followTrajectorySequenceAsync(trajectorySequence);
   }
 
   @Override
   public void execute() {
-      drive.update();
+    drive.update();
   }
 
   @Override
   public void end(boolean interrupted) {
-      isTargetVisibleWhenStart = true;
-
+    isTargetVisibleWhenStart = true;
   }
 
   @Override
   public boolean isFinished() {
-      if (!isTargetVisibleWhenStart) {
-          return true;
-      }
-      return !drive.isBusy();
+    if (!isTargetVisibleWhenStart) {
+      return true;
+    }
+    return !drive.isBusy();
   }
 }

@@ -23,6 +23,7 @@ import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.opmode.LocalizationTest;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
+import org.firstinspires.ftc.teamcode.opmodes.autos.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
@@ -68,6 +69,7 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     initializeMode();
     vision.initializeCamera();
+    vision.setLEDPWM();
 
     isTimerStart = false;
 
@@ -326,11 +328,7 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     gamepadEx1
         .getGamepadButton(GamepadKeys.Button.BACK)
-        .whenPressed(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> drive.setPoseEstimate(new Pose2d())),
-                AutoCommandBase.alignToSample(
-                    drive, vision, telemetry, () -> vision.isTargetVisible())));
+        .whenPressed(new SampleAutoAlignCommand(drive, vision, telemetry));
 
     // =================================================================================
 

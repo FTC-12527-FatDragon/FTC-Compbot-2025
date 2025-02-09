@@ -20,7 +20,7 @@ public class Vision extends SubsystemBase {
 
   private final Servo led;
 
-  public static double ledPWM = 0;
+  public static double ledPWM = 0.5;
 
   @Getter private boolean isDataOld = false;
   @Getter @Setter private SampleColor detectionColor = SampleColor.BLUE;
@@ -41,16 +41,10 @@ public class Vision extends SubsystemBase {
     camera = hardwareMap.get(Limelight3A.class, "limelight");
     led = hardwareMap.get(Servo.class, "LED");
     this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-    for (double i = 0; i <= 1.0; i += 0.1) {
-      setLEDPWM(i);
-    }
-
-    setLEDPWM(ledPWM);
   }
 
-  public void setLEDPWM(double positionPWM) {
-    led.setPosition(positionPWM);
+  public void setLEDPWM() {
+    led.setPosition(ledPWM);
   }
 
   public void initializeCamera() {
@@ -85,7 +79,7 @@ public class Vision extends SubsystemBase {
     if (result == null) {
       return false;
     }
-    return result.getTa() > 2;
+    return !MathUtil.isNear(0, result.getTa(), 0.0001) ;
   }
 
   public double getDistance() {
