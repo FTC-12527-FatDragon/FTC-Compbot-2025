@@ -33,6 +33,8 @@ public class Vision extends SubsystemBase {
   public static final double strafeConversionFactor = 6.6667;
   public static final double cameraStrafeToBot = 127;
 
+  public static final double sampleToRobotDistance  = 40;
+
   Telemetry telemetry;
 
   public Vision(final HardwareMap hardwareMap, Telemetry telemetry) {
@@ -91,14 +93,14 @@ public class Vision extends SubsystemBase {
     double angleToGoalDegrees = CAMERA_ANGLE + ty;
     double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
     double distanceMM = (TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(angleToGoalRadians);
-    return Units.mmToInches(Math.abs(distanceMM) - 40);
+    return Math.abs(distanceMM) - sampleToRobotDistance;
   }
 
   // Get the strafe
   public double getStrafeOffset() {
     double tx = getTx(0);
     if (tx != 0) {
-      return Units.mmToInches(tx * strafeConversionFactor - cameraStrafeToBot);
+      return tx * strafeConversionFactor - cameraStrafeToBot;
     }
     return 0;
   }

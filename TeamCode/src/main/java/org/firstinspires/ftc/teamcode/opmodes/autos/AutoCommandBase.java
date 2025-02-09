@@ -318,9 +318,8 @@ public abstract class AutoCommandBase extends LinearOpMode {
               telemetry.addData("Target Robot Pose Null", targetPoseRelativeToField == null);
               telemetry.addData("Sequence Null", sequence == null);
               telemetry.addData("Target Field Pose", targetPoseRelativeToField == null);
-            }),
-        new WaitCommand(50),
-        new AutoDriveCommand(drive, sequence));
+              CommandScheduler.getInstance().schedule(new AutoDriveCommand(drive, sequence));
+            }));
   }
 
   /**
