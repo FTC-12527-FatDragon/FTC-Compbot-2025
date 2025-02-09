@@ -328,7 +328,10 @@ public class TXBetaBotSolo extends CommandOpMode {
         .getGamepadButton(GamepadKeys.Button.BACK)
         .whenPressed(
             new SequentialCommandGroup(
-                new InstantCommand(() -> drive.setPoseEstimate(new Pose2d())),
+                new InstantCommand(() -> {
+                  drive.setPoseEstimate(new Pose2d());
+                  telemetry.addLine("Ln 332: Reseted pose");
+                }),
                 AutoCommandBase.alignToSample(
                     drive, vision, telemetry, () -> vision.isTargetVisible())));
 
