@@ -329,7 +329,8 @@ public class TXBetaBotSolo extends CommandOpMode {
         .whenPressed(
             new SequentialCommandGroup(
                 new InstantCommand(() -> drive.setPoseEstimate(new Pose2d())),
-                AutoCommandBase.alignToSample(drive, vision, telemetry)));
+                AutoCommandBase.alignToSample(
+                    drive, vision, telemetry, () -> vision.isTargetVisible())));
 
     // =================================================================================
 

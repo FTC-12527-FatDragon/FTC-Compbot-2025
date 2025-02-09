@@ -15,10 +15,10 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import lombok.Getter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.AutoDriveCommand;
-import org.firstinspires.ftc.teamcode.lib.Units;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
@@ -52,6 +52,9 @@ public abstract class AutoCommandBase extends LinearOpMode {
   }
 
   private static TrajectorySequence sequence = null;
+
+  private static int count = 0;
+  private static boolean isTargetVisible = false;
 
   public static FieldConfig Field = new FieldConfig();
 
@@ -276,7 +279,10 @@ public abstract class AutoCommandBase extends LinearOpMode {
   }
 
   public static Command alignToSample(
-      SampleMecanumDrive drive, Vision vision, Telemetry telemetry) {
+      SampleMecanumDrive drive,
+      Vision vision,
+      Telemetry telemetry,
+      BooleanSupplier isTargetVisible) {
     AtomicReference<TrajectorySequence> sequenceContainer = new AtomicReference<>();
     //    AtomicReference<Pose2d> currentPoseRelativeToField = new AtomicReference<>();
     //    AtomicReference<Pose2d> targetPoseRelativeToRobot = new AtomicReference<>();
@@ -288,9 +294,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
               telemetry.addData("Current Pose", currentPoseRelativeToField);
               Pose2d targetPoseRelativeToRobot =
                   new Pose2dHelperClass(
-                          vision.getDistance() / 25.4,
-                          vision.getStrafeOffset() / 25.4,
-                          0)
+                          vision.getDistance() / 25.4, -vision.getStrafeOffset() / 25.4, 0)
                       .toPose2d();
               telemetry.addData("Target Robot Pose", targetPoseRelativeToRobot);
 
@@ -322,7 +326,8 @@ public abstract class AutoCommandBase extends LinearOpMode {
                       .lineToLinearHeading(targetPoseRelativeToField)
                       .build();
 
-
+              count += 1;
+              telemetry.addData("Count", count);
               CommandScheduler.getInstance().schedule(new AutoDriveCommand(drive, sequence));
             }));
   }
