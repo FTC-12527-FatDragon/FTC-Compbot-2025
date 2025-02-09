@@ -27,6 +27,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
 import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStucture;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.utils.FunctionalButton;
 import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
@@ -40,6 +41,7 @@ public class TXBetaBotSolo extends CommandOpMode {
   private Climber climber;
   private LiftClaw liftClaw;
   private SlideSuperStucture slide;
+  private Vision vision;
   private SampleMecanumDrive drive;
   private ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
@@ -61,8 +63,10 @@ public class TXBetaBotSolo extends CommandOpMode {
     liftClaw = new LiftClaw(hardwareMap);
     slide = new SlideSuperStucture(hardwareMap, telemetry);
     drive = new SampleMecanumDrive(hardwareMap);
+    vision = new Vision(hardwareMap, telemetry);
 
     initializeMode();
+    vision.initializeCamera();
 
     isTimerStart = false;
 
@@ -88,7 +92,19 @@ public class TXBetaBotSolo extends CommandOpMode {
                 gamepadEx1.getButton(GamepadKeys.Button.START) && currentMode == DriverMode.SAMPLE)
         .whenPressed(() -> lowBasketMode = !lowBasketMode);
 
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getButton(GamepadKeys.Button.START)
+                    && lift.getGoal() == Lift.Goal.LOW_BASKET
+                    && currentMode == DriverMode.SAMPLE)
+        .whenPressed(() -> lift.setGoal(Lift.Goal.HIGH_BASKET));
 
+    new FunctionalButton(
+            () ->
+                gamepadEx1.getButton(GamepadKeys.Button.START)
+                    && lift.getGoal() == Lift.Goal.HIGH_BASKET
+                    && currentMode == DriverMode.SAMPLE)
+        .whenPressed(() -> lift.setGoal(Lift.Goal.LOW_BASKET));
 
     // BASKET UP
     new FunctionalButton(
@@ -307,6 +323,13 @@ public class TXBetaBotSolo extends CommandOpMode {
     new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3))
         .whenPressed(climber.elevateCommand().withTimeout(2000));
 
+    gamepadEx1
+        .getGamepadButton(GamepadKeys.Button.BACK)
+        .whenPressed(
+            new SequentialCommandGroup(
+                new InstantCommand(() -> drive.setPoseEstimate(new Pose2d())),
+                AutoCommandBase.alignToSample(drive, vision, telemetry)));
+
     // =================================================================================
 
     new FunctionalButton(() -> MathUtil.isNear(60, timer.time(), 0.3))
@@ -333,9 +356,9 @@ public class TXBetaBotSolo extends CommandOpMode {
     packet.fieldOverlay().setStroke("#3F51B5");
     LocalizationTest.drawRobot(packet.fieldOverlay(), poseEstimate);
     FtcDashboard.getInstance().sendTelemetryPacket(packet);
-    telemetry.addData("X", poseEstimate.getX());
-    telemetry.addData("Y", poseEstimate.getY());
-    telemetry.addData("Heading", poseEstimate.getHeading());
+    telemetry.addData("Pose X", poseEstimate.getX());
+    telemetry.addData("Pose Y", poseEstimate.getY());
+    telemetry.addData("Pose Heading", poseEstimate.getHeading());
     if (setPose) {
       setPose = false;
       drive.setPoseEstimate(Pose.toPose2d());
@@ -351,6 +374,7 @@ public class TXBetaBotSolo extends CommandOpMode {
   @Override
   public void reset() {
     CommandScheduler.getInstance().reset();
+    CommandScheduler.getInstance().cancelAll();
     slide.setServoController(false);
     liftClaw.setServoController(false);
   }

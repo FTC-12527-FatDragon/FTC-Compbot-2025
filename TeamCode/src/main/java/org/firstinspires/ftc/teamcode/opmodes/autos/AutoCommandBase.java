@@ -14,14 +14,20 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.Getter;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.AutoDriveCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
 import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStucture;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrain.TrajectoryManager;
+import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 
 /**
  * Layout: Field Coordinate: +-----+-----+-----+-----+-----+-----^ x | 0 | 1 | 2 | 3 | 4 | 5 |
@@ -36,6 +42,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected SlideSuperStucture slide;
   protected SampleMecanumDrive drive;
   protected Climber climb;
+  protected Vision vision;
 
   public static long handoff_slide2LiftCloseDelayMs = 150;
   public static long handoff_liftClose2OpenIntakeDelayMs = 50;
@@ -107,13 +114,14 @@ public abstract class AutoCommandBase extends LinearOpMode {
     liftClaw = new LiftClaw(hardwareMap);
     climb = new Climber(hardwareMap);
     slide = new SlideSuperStucture(hardwareMap, telemetry);
-
     drive = new SampleMecanumDrive(hardwareMap);
+    vision = new Vision(hardwareMap, telemetry);
 
     slide.stow();
     slide.backwardSlideExtension();
     liftClaw.closeClaw();
     liftClaw.foldLiftArm();
+    vision.initializeCamera();
     //    drive.setPoseEstimate(startPose);
   }
 
@@ -227,6 +235,89 @@ public abstract class AutoCommandBase extends LinearOpMode {
         lift.manualResetCommand().withTimeout(1000),
         liftClaw.openClawCommand(),
         new InstantCommand(() -> autoEndPose = drive.getPoseEstimate()));
+  }
+
+  public static Command generateVisionPath(
+      AtomicReference<TrajectorySequence> sequenceContainer,
+      AtomicReference<Pose2d> currentPose,
+      AtomicReference<Pose2d> targetPose) {
+    Runnable pathGeneration =
+        () -> {
+          Pose2d currentPoseRelativeToField = currentPose.get();
+          Pose2d targetPoseRelativeToRobot = targetPose.get();
+          // Transform target pose from robot-relative to field-relative coordinates
+          double fieldX =
+              currentPoseRelativeToField.getX()
+                  + (targetPoseRelativeToRobot.getX()
+                          * Math.cos(currentPoseRelativeToField.getHeading())
+                      - targetPoseRelativeToRobot.getY()
+                          * Math.sin(currentPoseRelativeToField.getHeading()));
+          double fieldY =
+              currentPoseRelativeToField.getY()
+                  + (targetPoseRelativeToRobot.getX()
+                          * Math.sin(currentPoseRelativeToField.getHeading())
+                      + targetPoseRelativeToRobot.getY()
+                          * Math.cos(currentPoseRelativeToField.getHeading()));
+          double fieldHeading =
+              currentPoseRelativeToField.getHeading()
+                  + 0; // We move our claw instead of robot heading
+
+          Pose2d targetPoseRelativeToField = new Pose2d(fieldX, fieldY, fieldHeading);
+
+          // Generate trajectory to target pose
+          sequenceContainer.set(
+              TrajectoryManager.trajectorySequenceBuilder(currentPoseRelativeToField)
+                  .lineToLinearHeading(targetPoseRelativeToField)
+                  .build());
+        };
+    return new InstantCommand(pathGeneration);
+  }
+
+  public static Command alignToSample(SampleMecanumDrive drive, Vision vision, Telemetry telemetry) {
+    AtomicReference<TrajectorySequence> sequenceContainer = new AtomicReference<>();
+//    AtomicReference<Pose2d> currentPoseRelativeToField = new AtomicReference<>();
+//    AtomicReference<Pose2d> targetPoseRelativeToRobot = new AtomicReference<>();
+    return new SequentialCommandGroup(
+        new InstantCommand(
+            () -> {
+              Pose2d currentPose = drive.getPoseEstimate();
+              telemetry.addData("Align Pose Null", currentPose == null);
+              telemetry.addData("Align Pose X", currentPose.getX());
+              telemetry.addData("Align Pose Y", currentPose.getY());
+              telemetry.addData("Align Pose Heading", currentPose.getHeading());
+              Pose2d currentPoseRelativeToField = drive.getPoseEstimate();
+              Pose2d targetPoseRelativeToRobot =
+                  new Pose2dHelperClass(vision.getStrafeOffset(), vision.getDistance(), 0)
+                      .toPose2d();
+
+//              Pose2d currentPoseRelativeToField = currentPose.get();
+//              Pose2d targetPoseRelativeToRobot = targetPose.get();
+              // Transform target pose from robot-relative to field-relative coordinates
+              double fieldX =
+                      currentPoseRelativeToField.getX()
+                              + (targetPoseRelativeToRobot.getX()
+                              * Math.cos(currentPoseRelativeToField.getHeading())
+                              - targetPoseRelativeToRobot.getY()
+                              * Math.sin(currentPoseRelativeToField.getHeading()));
+              double fieldY =
+                      currentPoseRelativeToField.getY()
+                              + (targetPoseRelativeToRobot.getX()
+                              * Math.sin(currentPoseRelativeToField.getHeading())
+                              + targetPoseRelativeToRobot.getY()
+                              * Math.cos(currentPoseRelativeToField.getHeading()));
+              double fieldHeading =
+                      currentPoseRelativeToField.getHeading()
+                              + 0; // We move our claw instead of robot heading
+
+              Pose2d targetPoseRelativeToField = new Pose2d(fieldX, fieldY, fieldHeading);
+
+              // Generate trajectory to target pose
+              sequenceContainer.set(
+                      TrajectoryManager.trajectorySequenceBuilder(currentPoseRelativeToField)
+                              .lineToLinearHeading(targetPoseRelativeToField)
+                              .build());
+            }),
+        new AutoDriveCommand(drive, sequenceContainer.get()));
   }
 
   /**

@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.lib.Units;
 
 @Config
 public class Vision extends SubsystemBase {
@@ -90,16 +91,24 @@ public class Vision extends SubsystemBase {
     double angleToGoalDegrees = CAMERA_ANGLE + ty;
     double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
     double distanceMM = (TARGET_HEIGHT - CAMERA_HEIGHT) / Math.tan(angleToGoalRadians);
-    return Math.abs(distanceMM);
+    return Units.mmToInches(Math.abs(distanceMM) - 40);
   }
 
   // Get the strafe
   public double getStrafeOffset() {
     double tx = getTx(0);
     if (tx != 0) {
-      return tx * strafeConversionFactor - cameraStrafeToBot;
+      return Units.mmToInches(tx * strafeConversionFactor - cameraStrafeToBot);
     }
     return 0;
+  }
+
+  public SlideSuperStucture.TurnServo getTurnServoDegree() {
+    if (result == null) {
+      return SlideSuperStucture.TurnServo.DEG_0;
+    }
+    double sampleDegrees = result.getPythonOutput()[3];
+    return SlideSuperStucture.TurnServo.DEG_08;
   }
 
   @Override
@@ -113,7 +122,7 @@ public class Vision extends SubsystemBase {
       // Less than 100 milliseconds old
       isDataOld = staleness >= 100;
       telemetry.addData("Strafe Offset", getStrafeOffset());
-      telemetry.update();
+      telemetry.addData("Distance", getDistance());
 
       //      telemetry.addData("Tx", result.getTx());
       //      telemetry.addData("Ty", result.getTy());
