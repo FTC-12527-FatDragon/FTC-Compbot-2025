@@ -28,4 +28,18 @@ public class MathUtils {
   public static double getRotDist(double start, double end) {
     return MathUtils.getRadRotDist(start, end);
   }
+
+  /**
+   * Linear mapping function to map a value from one range to another
+   *
+   * @param x Input value to map
+   * @param inMin Input range minimum
+   * @param inMax Input range maximum
+   * @param outMin Output range minimum
+   * @param outMax Output range maximum
+   * @return Mapped value in the output range
+   */
+  public static double linear(double x, double inMin, double inMax, double outMin, double outMax) {
+    return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+  }
 }

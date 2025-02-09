@@ -31,9 +31,9 @@ public class Vision extends SubsystemBase {
   public static double TARGET_HEIGHT = 19.05;
 
   public static double strafeConversionFactor = 6.6667;
-  public static double cameraStrafeToBot = 127;
+  public static double cameraStrafeToBot = -20;
 
-  public static double sampleToRobotDistance = 40;
+  public static double sampleToRobotDistance = 160;
 
   Telemetry telemetry;
 
@@ -79,7 +79,7 @@ public class Vision extends SubsystemBase {
     if (result == null) {
       return false;
     }
-    return !MathUtil.isNear(0, result.getTa(), 0.0001) ;
+    return !MathUtil.isNear(0, result.getTa(), 0.0001);
   }
 
   public double getDistance() {
@@ -102,12 +102,11 @@ public class Vision extends SubsystemBase {
     return 0;
   }
 
-  public SlideSuperStucture.TurnServo getTurnServoDegree() {
+  public Double getTurnServoDegree() {
     if (result == null) {
-      return SlideSuperStucture.TurnServo.DEG_0;
+      return null;
     }
-    double sampleDegrees = result.getPythonOutput()[3];
-    return SlideSuperStucture.TurnServo.DEG_08;
+    return result.getPythonOutput()[3];
   }
 
   @Override
@@ -122,6 +121,7 @@ public class Vision extends SubsystemBase {
       isDataOld = staleness >= 100;
       telemetry.addData("Strafe Offset", getStrafeOffset());
       telemetry.addData("Distance", getDistance());
+      telemetry.addData("Turn Servo Degrees", getTurnServoDegree());
 
       //      telemetry.addData("Tx", result.getTx());
       //      telemetry.addData("Ty", result.getTy());

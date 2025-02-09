@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.Range;
 import edu.wpi.first.math.MathUtil;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -73,6 +74,8 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
 
   private static double turnAngleDeg = 0.2;
   private TurnServo turnServo = TurnServo.DEG_0;
+
+  @Setter private boolean isAutoTurnControl = false;
 
   @Setter @Getter private Goal goal = Goal.STOW;
 
@@ -239,7 +242,11 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   }
 
   public boolean isSlideExtended() {
-    return slideMotor.getCurrentPosition() > 200;
+    return MathUtil.isNear(SlideMotor_extensionValue, slideMotor.getCurrentPosition(), 20);
+  }
+
+  public void forwardSlideExtension(AtomicReference<Double> slideExtension) {
+    slideExtensionVal = slideExtension.get();
   }
 
   public void forwardSlideExtension(double slideExtension) {
@@ -289,6 +296,11 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public void setServoPos(TurnServo pos) {
     turnAngleDeg = pos.turnAngleDeg;
     turnServo = pos;
+  }
+
+  public void setTurnServo(AtomicReference<Double> servoPos) {
+    isAutoTurnControl = true;
+    wristTurnServo.setPosition(servoPos.get());
   }
 
   private Command setTurnServoPosCommand(TurnServo pos, long delay) {
@@ -382,7 +394,9 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
 
   @Override
   public void periodic() {
-    wristTurnServo.setPosition(Range.clip(turnAngleDeg, 0, 1));
+    if (!isAutoTurnControl) {
+      wristTurnServo.setPosition(Range.clip(turnAngleDeg, 0, 1));
+    }
 
     slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     double setpointTicks = slideExtensionVal;

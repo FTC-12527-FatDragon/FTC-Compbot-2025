@@ -19,11 +19,12 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import edu.wpi.first.math.MathUtil;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.opmode.LocalizationTest;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
-import org.firstinspires.ftc.teamcode.opmodes.autos.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
@@ -82,7 +83,7 @@ public class TXBetaBotSolo extends CommandOpMode {
             drive,
             () -> -gamepadEx1.getLeftY(),
             () -> gamepadEx1.getLeftX(),
-            () -> gamepadEx1.getRightX(),
+            () -> -gamepadEx1.getRightX(),
             () -> gamepadEx1.getButton(GamepadKeys.Button.LEFT_STICK_BUTTON),
             () -> gamepadEx1.getButton(GamepadKeys.Button.DPAD_LEFT)));
 
@@ -156,7 +157,8 @@ public class TXBetaBotSolo extends CommandOpMode {
     Supplier<Command> handoffCommand =
         () ->
             new ConditionalCommand(
-                fastHandoffCommand.get(), slowHandoffSCommand.get(), slide::isSlideExtended);
+                    fastHandoffCommand.get(), slowHandoffSCommand.get(), slide::isSlideExtended)
+                .beforeStarting(() -> slide.setAutoTurnControl(false));
 
     new FunctionalButton(
             () ->
@@ -326,9 +328,21 @@ public class TXBetaBotSolo extends CommandOpMode {
     new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3) && shouldClimb)
         .whenPressed(climber.elevateCommand().withTimeout(2000));
 
+    AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
+    AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
+
     gamepadEx1
         .getGamepadButton(GamepadKeys.Button.BACK)
-        .whenPressed(new SampleAutoAlignCommand(drive, vision, telemetry));
+        .whenPressed(
+            new SequentialCommandGroup(
+                slowHandoffSCommand.get(),
+                new SampleAutoAlignCommand(
+                    drive, vision, telemetry, turnServoSupplier, slideExtensionSupplier),
+                slide.aimCommand(),
+                new WaitCommand(50),
+                new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)),
+                new WaitCommand(100),
+                new InstantCommand(() -> slide.setTurnServo(turnServoSupplier))));
 
     // =================================================================================
 

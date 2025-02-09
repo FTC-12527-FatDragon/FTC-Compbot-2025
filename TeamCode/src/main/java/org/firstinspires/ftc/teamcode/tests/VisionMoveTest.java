@@ -30,7 +30,6 @@ public class VisionMoveTest extends CommandOpMode {
     limelight.initializeCamera();
     drive = new SampleMecanumDrive(hardwareMap);
 
-
     gamepadEx1
         .getGamepadButton(GamepadKeys.Button.A)
         .whenHeld(new StrafeCommand(drive, limelight, telemetry))
