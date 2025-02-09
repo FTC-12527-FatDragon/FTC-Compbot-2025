@@ -51,6 +51,8 @@ public abstract class AutoCommandBase extends LinearOpMode {
     public double blockSideLengthInch = 24;
   }
 
+  private static TrajectorySequence sequence = null;
+
   public static FieldConfig Field = new FieldConfig();
 
   public static class RobotConfig {
@@ -280,11 +282,6 @@ public abstract class AutoCommandBase extends LinearOpMode {
     return new SequentialCommandGroup(
         new InstantCommand(
             () -> {
-              Pose2d currentPose = drive.getPoseEstimate();
-              telemetry.addData("Align Pose Null", currentPose == null);
-              telemetry.addData("Align Pose X", currentPose.getX());
-              telemetry.addData("Align Pose Y", currentPose.getY());
-              telemetry.addData("Align Pose Heading", currentPose.getHeading());
               Pose2d currentPoseRelativeToField = drive.getPoseEstimate();
               Pose2d targetPoseRelativeToRobot =
                   new Pose2dHelperClass(vision.getStrafeOffset(), vision.getDistance(), 0)
@@ -312,12 +309,18 @@ public abstract class AutoCommandBase extends LinearOpMode {
               Pose2d targetPoseRelativeToField = new Pose2d(fieldX, fieldY, fieldHeading);
 
               // Generate trajectory to target pose
-              sequenceContainer.set(
+              sequence =
                       TrajectoryManager.trajectorySequenceBuilder(currentPoseRelativeToField)
                               .lineToLinearHeading(targetPoseRelativeToField)
-                              .build());
+                              .build();
+
+              telemetry.addData("Current Pose Null", currentPoseRelativeToField == null);
+              telemetry.addData("Target Robot Pose Null", targetPoseRelativeToField == null);
+              telemetry.addData("Sequence Null", sequence == null);
+              telemetry.addData("Target Field Pose", targetPoseRelativeToField == null);
             }),
-        new AutoDriveCommand(drive, sequenceContainer.get()));
+        new WaitCommand(50),
+        new AutoDriveCommand(drive, sequence));
   }
 
   /**
