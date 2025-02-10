@@ -44,7 +44,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequenceRunner;
-import org.firstinspires.ftc.teamcode.lib.roadrunner.util.LynxModuleUtil;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 
 /*
@@ -80,7 +79,7 @@ public class SampleTankDrive extends TankDrive {
         new TankPIDVAFollower(
             AXIAL_PID, CROSS_TRACK_PID, new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
 
-    LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
+    // LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
     batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 

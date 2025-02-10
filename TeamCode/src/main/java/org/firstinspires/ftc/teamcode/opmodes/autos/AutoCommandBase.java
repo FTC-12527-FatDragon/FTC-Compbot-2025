@@ -44,10 +44,6 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected SampleMecanumDrive drive;
   protected Climber climb;
   protected Vision vision;
-  protected SampleAutoAlignCommand sampleAutoAlignCommand;
-
-  private final AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
-  private final AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
 
   public static long handoff_slide2LiftCloseDelayMs = 150;
   public static long handoff_liftClose2OpenIntakeDelayMs = 50;
@@ -133,11 +129,6 @@ public abstract class AutoCommandBase extends LinearOpMode {
     liftClaw.foldLiftArm();
     vision.initializeCamera();
     vision.setLEDPWM();
-
-    sampleAutoAlignCommand =
-        new SampleAutoAlignCommand(
-            drive, slide, vision, telemetry, turnServoSupplier, slideExtensionSupplier);
-    //    drive.setPoseEstimate(startPose);
   }
 
   protected Command upLiftToBasket() {
@@ -152,6 +143,11 @@ public abstract class AutoCommandBase extends LinearOpMode {
   }
 
   protected Command autoSamplePickCommand() {
+    AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
+    AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
+    SampleAutoAlignCommand sampleAutoAlignCommand =
+        new SampleAutoAlignCommand(
+            drive, slide, vision, telemetry, turnServoSupplier, slideExtensionSupplier);
     return new SequentialCommandGroup(
         sampleAutoAlignCommand.alongWith(
             new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
@@ -187,7 +183,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
   }
 
   protected Command fastHandoff() {
-    return fastHandoff(slide, liftClaw);
+    return fastHandoff(slide, liftClaw).beforeStarting(() -> slide.setAutoTurnControl(false));
   }
 
   public static Command fastHandoff(SlideSuperStucture slide, LiftClaw liftClaw) {

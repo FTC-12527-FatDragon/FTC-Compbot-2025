@@ -45,7 +45,6 @@ import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.GoBildaLocalizer;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequenceRunner;
-import org.firstinspires.ftc.teamcode.lib.roadrunner.util.LynxModuleUtil;
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
@@ -100,7 +99,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
             new Pose2d(1.5, 1.5, Math.toRadians(2)), // Pose Error
             ADMISSIBLE_TIMEOUT);
 
-    LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
+    // LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
     batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
