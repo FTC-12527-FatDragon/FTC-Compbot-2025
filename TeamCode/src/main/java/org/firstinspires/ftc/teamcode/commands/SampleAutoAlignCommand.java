@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode.commands;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 import java.util.concurrent.atomic.AtomicReference;
+import lombok.Getter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStucture;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.TrajectoryManager;
@@ -15,6 +17,8 @@ public class SampleAutoAlignCommand extends CommandBase {
   private final SampleMecanumDrive drive;
   private final Vision vision;
   private final Telemetry telemetry;
+  private final SlideSuperStucture slide;
+
   private AtomicReference<Double> turnServo;
   private AtomicReference<Double> slideExtension;
 
@@ -22,13 +26,17 @@ public class SampleAutoAlignCommand extends CommandBase {
   private TrajectorySequence trajectorySequence;
   private boolean isTargetVisibleWhenStart = true;
 
+  @Getter private boolean isInitializing = true;
+
   public SampleAutoAlignCommand(
       SampleMecanumDrive drive,
+      SlideSuperStucture slide,
       Vision vision,
       Telemetry telemetry,
       AtomicReference<Double> turnServoSupplier,
       AtomicReference<Double> slideExtensionSupplier) {
     this.drive = drive;
+    this.slide = slide;
     this.vision = vision;
     this.telemetry = telemetry;
     this.turnServo = turnServoSupplier;
@@ -38,10 +46,11 @@ public class SampleAutoAlignCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    isInitializing = true;
+
     isTargetVisibleWhenStart = vision.isTargetVisible();
 
     setTurnServo();
-
     telemetry.addData("isVisibleWhenStart", isTargetVisibleWhenStart);
 
     Pose2d currentPoseRelativeToField = drive.getPoseEstimate();
@@ -106,6 +115,7 @@ public class SampleAutoAlignCommand extends CommandBase {
 
   @Override
   public void execute() {
+    isInitializing = false;
     drive.update();
   }
 

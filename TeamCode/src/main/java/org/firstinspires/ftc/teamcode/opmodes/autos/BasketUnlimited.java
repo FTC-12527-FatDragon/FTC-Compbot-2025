@@ -6,15 +6,16 @@ import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import org.firstinspires.ftc.teamcode.commands.AutoPathCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStucture;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.TrajectoryManager;
 import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 
 @Config
-@Autonomous(name = "Basket 1+3", group = "Autos")
-public class Basket1Plus3 extends AutoCommandBase {
-  public static boolean isAscent = true;
+@Autonomous(name = "Basket ∞", group = "Autos")
+public class BasketUnlimited extends AutoCommandBase {
+  public static boolean isAscent = false;
 
   // For Basket Scoring
   public static Pose2dHelperClass Basket = new Pose2dHelperClass(9.5, 16.5, -45);
@@ -26,15 +27,21 @@ public class Basket1Plus3 extends AutoCommandBase {
   public static Pose2dHelperClass S2 = new Pose2dHelperClass(23, 19.5, 0);
 
   // The left sample
-  public static Pose2dHelperClass S1Extend = new Pose2dHelperClass(10, 19.5, 20);
+  public static Pose2dHelperClass S1Extend = new Pose2dHelperClass(10, 19.5, 16.8);
 
-  public static long basketWaitMs = 500;
+  public static long basketWaitMs = 600;
 
   // Ascent zone
   public static double xValue5 = 60;
   public static double yValue5 = -16;
   public static double heading5 = 90;
   public static double tangent5 = -90;
+
+  // Ascent zone for Pick
+  public static double xValue6 = 60;
+  public static double yValue6 = -16;
+  public static double heading6 = 270;
+  public static double tangent6 = 0;
 
   Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
 
@@ -77,13 +84,18 @@ public class Basket1Plus3 extends AutoCommandBase {
   // leftmost sample to basket
   TrajectorySequence S1Extend2Basket =
       TrajectoryManager.trajectorySequenceBuilder(Basket2S1Extend.end())
-          .lineToLinearHeading(Basket.toPose2d())
+          .lineToSplineHeading(Basket.toPose2d())
           .build();
 
   //  // basket to ascent zone
   TrajectorySequence Basket2Ascent =
       TrajectoryManager.trajectorySequenceBuilder(S1Extend2Basket.end())
           .splineToLinearHeading(new Pose2d(xValue5, yValue5, Math.toRadians(heading5)), tangent5)
+          .build();
+
+  TrajectorySequence Basket2Pick =
+      TrajectoryManager.trajectorySequenceBuilder(Basket.toPose2d())
+          .splineToSplineHeading(new Pose2d(xValue6, yValue6, Math.toRadians(heading6)),tangent6)
           .build();
 
   public Pose2d getStartPose() {
@@ -125,11 +137,12 @@ public class Basket1Plus3 extends AutoCommandBase {
         upLiftToBasket(),
         wait(drive, basketWaitMs),
         stowArmFromBasket(),
-        //                wait(drive, 1500),
-        isAscent
-            ? followTrajectory(Basket2Ascent)
-                .alongWith(climb.decline2ArmUp())
-                .andThen(climb.elevate2ArmDown())
-            : new InstantCommand(() -> {}));
+        wait(drive, basketWaitMs),
+        followTrajectory(Basket2Pick),
+        autoSamplePickCommand(),
+        new AutoPathCommand(drive, Basket.toPose2d())
+            .alongWith(slowHandoff().andThen(upLiftToBasket())),
+            wait(drive, basketWaitMs),
+            stowArmFromBasket());
   }
 }

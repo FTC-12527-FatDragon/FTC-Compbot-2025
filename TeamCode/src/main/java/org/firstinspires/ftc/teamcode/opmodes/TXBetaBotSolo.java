@@ -55,6 +55,8 @@ public class TXBetaBotSolo extends CommandOpMode {
   private boolean isTimerStart = false;
   private boolean lowBasketMode = false;
 
+  private SampleAutoAlignCommand sampleAutoAlignCommand;
+
   @Override
   public void initialize() {
     this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -67,6 +69,12 @@ public class TXBetaBotSolo extends CommandOpMode {
     slide = new SlideSuperStucture(hardwareMap, telemetry);
     drive = new SampleMecanumDrive(hardwareMap);
     vision = new Vision(hardwareMap, telemetry);
+
+    AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
+    AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
+    sampleAutoAlignCommand =
+        new SampleAutoAlignCommand(
+            drive, slide, vision, telemetry, turnServoSupplier, slideExtensionSupplier);
 
     initializeMode();
     vision.initializeCamera();
@@ -328,21 +336,21 @@ public class TXBetaBotSolo extends CommandOpMode {
     new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3) && shouldClimb)
         .whenPressed(climber.elevateCommand().withTimeout(2000));
 
-    AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
-    AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
-
     gamepadEx1
         .getGamepadButton(GamepadKeys.Button.BACK)
         .whenPressed(
             new SequentialCommandGroup(
                 slowHandoffSCommand.get(),
-                new SampleAutoAlignCommand(
-                    drive, vision, telemetry, turnServoSupplier, slideExtensionSupplier),
-                slide.aimCommand(),
-                new WaitCommand(50),
-                new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)),
-                new WaitCommand(100),
-                new InstantCommand(() -> slide.setTurnServo(turnServoSupplier))));
+                sampleAutoAlignCommand.alongWith(
+                    new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
+                        .andThen(
+                            slide.aimCommand(),
+                            new WaitCommand(50),
+                            new InstantCommand(
+                                () -> slide.forwardSlideExtension(slideExtensionSupplier)),
+                            new InstantCommand(() -> slide.setTurnServo(turnServoSupplier)),
+                            new WaitCommand(100))),
+                slide.grabCommand()));
 
     // =================================================================================
 

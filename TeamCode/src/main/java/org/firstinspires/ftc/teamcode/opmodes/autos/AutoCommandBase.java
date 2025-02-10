@@ -19,6 +19,7 @@ import java.util.function.BooleanSupplier;
 import lombok.Getter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.AutoDriveCommand;
+import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
@@ -43,6 +44,10 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected SampleMecanumDrive drive;
   protected Climber climb;
   protected Vision vision;
+  protected SampleAutoAlignCommand sampleAutoAlignCommand;
+
+  private final AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
+  private final AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
 
   public static long handoff_slide2LiftCloseDelayMs = 150;
   public static long handoff_liftClose2OpenIntakeDelayMs = 50;
@@ -127,18 +132,36 @@ public abstract class AutoCommandBase extends LinearOpMode {
     liftClaw.closeClaw();
     liftClaw.foldLiftArm();
     vision.initializeCamera();
+    vision.setLEDPWM();
+
+    sampleAutoAlignCommand =
+        new SampleAutoAlignCommand(
+            drive, slide, vision, telemetry, turnServoSupplier, slideExtensionSupplier);
     //    drive.setPoseEstimate(startPose);
   }
 
   protected Command upLiftToBasket() {
     return new ParallelCommandGroup(
         new InstantCommand(() -> lift.setGoal(Lift.Goal.HIGH_BASKET)),
-        new WaitUntilCommand(() -> lift.getCurrentPosition() > 300)
+        new WaitUntilCommand(() -> lift.getCurrentPosition() > 150)
             .andThen(liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_BASKET, 0)));
   }
 
   protected Command followTrajectory(TrajectorySequence trajectorySequence) {
     return new AutoDriveCommand(drive, trajectorySequence);
+  }
+
+  protected Command autoSamplePickCommand() {
+    return new SequentialCommandGroup(
+        sampleAutoAlignCommand.alongWith(
+            new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
+                .andThen(
+                    slide.aimCommand(),
+                    new WaitCommand(50),
+                    new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)),
+                    new InstantCommand(() -> slide.setTurnServo(turnServoSupplier)),
+                    new WaitCommand(100))),
+        slide.grabCommand());
   }
 
   protected Command stowArmFromBasket() {
@@ -150,7 +173,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
   }
 
   protected Command slowHandoff() {
-    return slowHandoff(slide, liftClaw);
+    return slowHandoff(slide, liftClaw).beforeStarting(() -> slide.setAutoTurnControl(false));
   }
 
   public static Command slowHandoff(SlideSuperStucture slide, LiftClaw liftClaw) {
