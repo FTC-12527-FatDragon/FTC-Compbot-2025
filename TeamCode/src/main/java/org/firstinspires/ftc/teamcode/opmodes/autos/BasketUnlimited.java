@@ -5,7 +5,9 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.AutoPathCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStucture;
@@ -18,18 +20,21 @@ public class BasketUnlimited extends AutoCommandBase {
   public static boolean isAscent = false;
 
   // For Basket Scoring
-  public static Pose2dHelperClass Basket = new Pose2dHelperClass(9.5, 16.5, -45);
+  public static Pose2dHelperClass Basket = new Pose2dHelperClass(-56.48, -58.15, 45);
 
   // The right sample
-  public static Pose2dHelperClass S3 = new Pose2dHelperClass(23, 8.75, 0);
+  public static Pose2dHelperClass S3 = new Pose2dHelperClass(-49, -53.48, 90);
 
   // The middle sample
-  public static Pose2dHelperClass S2 = new Pose2dHelperClass(23, 19.5, 0);
+  public static Pose2dHelperClass S2 = new Pose2dHelperClass(-58.3, -53.31, 90);
 
   // The left sample
-  public static Pose2dHelperClass S1Extend = new Pose2dHelperClass(10, 19.5, 16.8);
+  public static Pose2dHelperClass S1Extend = new Pose2dHelperClass(-61, -53.98, 103);
 
-  public static long basketWaitMs = 600;
+  // Middle point for spline
+  public static Pose2dHelperClass splinePoint = new Pose2dHelperClass(-23.44, 1.25, 0);
+
+  public static long basketWaitMs = 500;
 
   // Ascent zone
   public static double xValue5 = 60;
@@ -43,7 +48,9 @@ public class BasketUnlimited extends AutoCommandBase {
   public static double heading6 = 270;
   public static double tangent6 = 0;
 
-  Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
+  public static long slideExtend2Grab = 50;
+
+  Pose2d startPose = new Pose2d(-40.13, -63.82, Math.toRadians(90));
 
   // Start to Basket
   TrajectorySequence L12Basket =
@@ -95,54 +102,58 @@ public class BasketUnlimited extends AutoCommandBase {
 
   TrajectorySequence Basket2Pick =
       TrajectoryManager.trajectorySequenceBuilder(Basket.toPose2d())
-          .splineToSplineHeading(new Pose2d(xValue6, yValue6, Math.toRadians(heading6)),tangent6)
+          .splineToLinearHeading(splinePoint.toPose2d(), 0)
           .build();
 
   public Pose2d getStartPose() {
-    return new Pose2d(); // TODO: return the field relative pose
+    return drive.getPoseEstimate(); // TODO: return the field relative pose
   }
 
   @Override
   public Command runAutoCommand() {
+    Supplier<Command> slideExtendCommand =
+        () -> new InstantCommand(() -> slide.forwardSlideExtension());
     return new SequentialCommandGroup(
-        new InstantCommand(() -> drive.setPoseEstimate(L12Basket.start()))
-            .alongWith(slide.manualResetCommand().withTimeout(200)),
+        new InstantCommand(() -> drive.setPoseEstimate(L12Basket.start())),
+//            .alongWith(slide.manualResetCommand().withTimeout(200)),
         slide.aimCommand().beforeStarting(liftClaw::closeClaw),
         followTrajectory(L12Basket).alongWith(upLiftToBasket()),
         wait(drive, 200),
-        stowArmFromBasket(),
-        followTrajectory(Basket2S3).alongWith(slide.aimCommand()),
+        stowArmFromBasket().alongWith(slide.aimCommand()),
+        followTrajectory(Basket2S3),
+        slideExtendCommand.get(),
+        wait(drive, slideExtend2Grab),
         slide.grabCommand(),
         followTrajectory(S32Basket).alongWith(slowHandoff().andThen(upLiftToBasket())),
         wait(drive, basketWaitMs),
-        stowArmFromBasket(),
-        followTrajectory(Basket2S2).alongWith(slide.aimCommand()),
+        stowArmFromBasket().alongWith(slide.aimCommand()),
+        followTrajectory(Basket2S2),
+        slideExtendCommand.get(),
+            wait(drive, slideExtend2Grab),
         slide.grabCommand(),
         followTrajectory(S22Basket).alongWith(slowHandoff().andThen(upLiftToBasket())),
         wait(drive, basketWaitMs),
-        stowArmFromBasket(),
-        followTrajectory(Basket2S1Extend).alongWith(slide.aimCommand()),
-        //                wait(drive, 300),
+        stowArmFromBasket().alongWith(slide.aimCommand()),
+        followTrajectory(Basket2S1Extend),
         new InstantCommand(
             () -> {
               slide.forwardSlideExtension(440);
               slide.setServoPos(SlideSuperStucture.TurnServo.DEG_0);
             }),
-        wait(drive, 500),
+        wait(drive, slideExtend2Grab),
         slide.grabCommand(),
-        //                wait(drive, 300),
         slowHandoff(),
-        //                wait(drive, 300),
         followTrajectory(S1Extend2Basket),
         upLiftToBasket(),
         wait(drive, basketWaitMs),
         stowArmFromBasket(),
         wait(drive, basketWaitMs),
         followTrajectory(Basket2Pick),
+        new WaitCommand(slideExtend2Grab),
         autoSamplePickCommand(),
         new AutoPathCommand(drive, Basket.toPose2d())
             .alongWith(slowHandoff().andThen(upLiftToBasket())),
-            wait(drive, basketWaitMs),
-            stowArmFromBasket());
+        wait(drive, basketWaitMs),
+        stowArmFromBasket());
   }
 }

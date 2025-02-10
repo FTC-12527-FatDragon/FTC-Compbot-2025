@@ -9,13 +9,15 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.TrajectoryManager;
 
 @Config
 public class AutoPathCommand extends CommandBase {
-    public static double tangent = -90;
+  public static double tangent = -90;
   private final SampleMecanumDrive drive;
   private Pose2d goalPose;
+  private Pose2d splinePose;
   private TrajectorySequence trajectorySequence;
 
   public AutoPathCommand(SampleMecanumDrive drive, Pose2d goalPose) {
     this.drive = drive;
+    this.splinePose = splinePose;
     this.goalPose = goalPose;
   }
 
@@ -23,7 +25,8 @@ public class AutoPathCommand extends CommandBase {
   public void initialize() {
     trajectorySequence =
         TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate())
-            .splineToSplineHeading(goalPose, -90)
+            .forward(-15.5)
+            .splineToLinearHeading(goalPose, -90)
             .build();
     drive.followTrajectorySequenceAsync(trajectorySequence);
   }

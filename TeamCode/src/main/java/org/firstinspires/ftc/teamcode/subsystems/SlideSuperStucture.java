@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.hardware.configuration.ServoHubConfiguration;
 import com.qualcomm.robotcore.util.Range;
 import edu.wpi.first.math.MathUtil;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,11 +27,11 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   // ---- Configs ----
   // SlideArmServo
   public static double SlideArmServo_AIM = 0.4;
-  public static double SlideArmServo_GRAB = 0.27;
-  public static double SlideArmServo_HANDOFF = 0.55;
-  public static double SlideArmServo_AIM_ = 0.38;
+  public static double SlideArmServo_GRAB = 0.1;
+  public static double SlideArmServo_HANDOFF = 0.68;
+  public static double SlideArmServo_AIM_ = 0.3;
   public static double SlideArmServo_PREAIM = 0.3;
-  public static double SlideArmServo_FOLD = 0.71;
+  public static double SlideArmServo_FOLD = 1;
 
   // intakeClawServo
   public static double IntakeClawServo_OPEN = 0.37;
