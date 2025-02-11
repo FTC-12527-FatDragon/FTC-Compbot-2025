@@ -45,7 +45,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected Climber climb;
   protected Vision vision;
 
-  public static long handoff_slide2LiftCloseDelayMs = 150;
+  public static long handoff_slide2LiftCloseDelayMs = 200;
   public static long handoff_liftClose2OpenIntakeDelayMs = 50;
 
   public static class FieldConfig {
@@ -156,7 +156,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
                     new WaitCommand(50),
                     new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)),
                     new InstantCommand(() -> slide.setTurnServo(turnServoSupplier)),
-                    new WaitCommand(100))),
+                    new WaitCommand(200))),
         slide.grabCommand());
   }
 

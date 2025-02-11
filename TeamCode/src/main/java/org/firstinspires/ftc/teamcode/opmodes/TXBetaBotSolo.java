@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.opmode.LocalizationTest;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
+import org.firstinspires.ftc.teamcode.opmodes.autos.BasketUnlimited;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
@@ -83,7 +84,7 @@ public class TXBetaBotSolo extends CommandOpMode {
     isTimerStart = false;
 
     // climber = new Climber(hardwareMap);
-    drive.setPoseEstimate(AutoCommandBase.getAutoEndPose());
+    drive.setPoseEstimate(BasketUnlimited.startPose);
 
     // Teleop Drive Command
     drive.setDefaultCommand(
@@ -336,21 +337,23 @@ public class TXBetaBotSolo extends CommandOpMode {
     new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3) && shouldClimb)
         .whenPressed(climber.elevateCommand().withTimeout(2000));
 
-    //    gamepadEx1
-    //        .getGamepadButton(GamepadKeys.Button.BACK)
-    //        .whenPressed(
-    //            new SequentialCommandGroup(
-    //                slowHandoffSCommand.get(),
-    //                sampleAutoAlignCommand.alongWith(
-    //                    new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
-    //                        .andThen(
-    //                            slide.aimCommand(),
-    //                            new WaitCommand(50),
-    //                            new InstantCommand(
-    //                                () -> slide.forwardSlideExtension(slideExtensionSupplier)),
-    //                            new InstantCommand(() -> slide.setTurnServo(turnServoSupplier)),
-    //                            new WaitCommand(100))),
-    //                slide.grabCommand()));
+//        gamepadEx1
+//            .getGamepadButton(GamepadKeys.Button.BACK)
+//            .whenPressed(
+//                new SequentialCommandGroup(
+//                    slowHandoffSCommand.get(),
+//                    sampleAutoAlignCommand.alongWith(
+//                        new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
+//                            .andThen(
+//                                slide.aimCommand(),
+//                                new WaitCommand(50),
+//                                new InstantCommand(
+//                                    () -> slide.forwardSlideExtension(slideExtensionSupplier)),
+//                                new InstantCommand(() -> slide.setTurnServo(turnServoSupplier)),
+//                                new WaitCommand(100))),
+//                    slide.grabCommand()));
+
+        gamepadEx1.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new InstantCommand(() -> drive.setPoseEstimate(BasketUnlimited.startPose)));
 
     // =================================================================================
 

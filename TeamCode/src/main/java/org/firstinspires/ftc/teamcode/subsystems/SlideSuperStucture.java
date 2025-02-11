@@ -26,20 +26,20 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   // ---- Configs ----
   // SlideArmServo
   public static double SlideArmServo_AIM = 0.4;
-  public static double SlideArmServo_GRAB = 0.1;
-  public static double SlideArmServo_HANDOFF = 0.68;
-  public static double SlideArmServo_AIM_ = 0.3;
+  public static double SlideArmServo_GRAB = 0.215;
+  public static double SlideArmServo_HANDOFF = 0.49;
+  public static double SlideArmServo_AIM_ = 0.33;
   public static double SlideArmServo_PREAIM = 0.3;
-  public static double SlideArmServo_FOLD = 1;
+  public static double SlideArmServo_FOLD = 0.65;
 
   // intakeClawServo
-  public static double IntakeClawServo_OPEN = 0.37;
+  public static double IntakeClawServo_OPEN = 0.87;
   public static double IntakeClawServo_OPENWIDER = 0.2;
-  public static double IntakeClawServo_GRAB = 0.54;
+  public static double IntakeClawServo_GRAB = 0.48;
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;
-  public static double WristServo_FOLD = 0.5;
+  public static double WristServo_FOLD = 0.51;
 
   // wristTurnServo
   public static double WristTurnServo_POS0 = 0.2;
@@ -47,7 +47,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   public static double WristTurnServo_POS2 = 0.8;
   // slideMotor
   public static double SlideMotor_atSetPointTolerance = 18;
-  public static double SlideMotor_extensionValue = 325;
+  public static double SlideMotor_extensionValue = 300;
 
   // aimCommand
   public static long aimCommand_wristTurn2ArmDelayMs = 0;
@@ -219,9 +219,9 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   @Config
   public enum Goal {
     STOW(0, 0, 0.2, IntakeClawServo_OPEN),
-    AIM(slideExtensionVal, SlideArmServo_AIM_, 0.805, IntakeClawServo_OPEN),
-    GRAB(slideExtensionVal, SlideArmServo_GRAB, 0.805, IntakeClawServo_GRAB),
-    HANDOFF(0, SlideArmServo_HANDOFF, 0.25, IntakeClawServo_GRAB),
+    AIM(slideExtensionVal, SlideArmServo_AIM_, 0.2, IntakeClawServo_OPEN),
+    GRAB(slideExtensionVal, SlideArmServo_GRAB, 0.2, IntakeClawServo_GRAB),
+    HANDOFF(0, SlideArmServo_HANDOFF, 0.81, IntakeClawServo_GRAB),
     AUTOSWIPE(SlideMotor_extensionValue, 0.3, 0.45, IntakeClawServo_OPEN);
 
     public final double slideExtension;
@@ -299,8 +299,12 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   }
 
   public void setTurnServo(AtomicReference<Double> servoPos) {
+    setTurnServo(servoPos.get());
+  }
+
+  public void setTurnServo(double servoPos) {
     isAutoTurnControl = true;
-    wristTurnServo.setPosition(servoPos.get());
+    wristTurnServo.setPosition(servoPos);
   }
 
   private Command setTurnServoPosCommand(TurnServo pos, long delay) {
