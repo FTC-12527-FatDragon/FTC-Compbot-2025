@@ -41,6 +41,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import lombok.Setter;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.GoBildaLocalizer;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
@@ -51,8 +52,16 @@ import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.Trajecto
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
-  public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(7, 0, 0.5);
-  public static PIDCoefficients HEADING_PID = new PIDCoefficients(2, 0, 0.15);
+  public static PIDCoefficients FAST_TRANSLATIONAL_PID = new PIDCoefficients(7, 0, 0.5);
+  public static PIDCoefficients FAST_HEADING_PID = new PIDCoefficients(2, 0, 0.15);
+
+  public static PIDCoefficients MED_TRANSLATIONAL_PID = new PIDCoefficients(7, 0, 0.5);
+  public static PIDCoefficients MED_HEADING_PID = new PIDCoefficients(2, 0, 0.15);
+
+  public static PIDCoefficients SLOW_TRANSLATIONAL_PID = new PIDCoefficients(7, 0, 0.5);
+  public static PIDCoefficients SLOW_HEADING_PID = new PIDCoefficients(2, 0, 0.15);
+
+  @Setter public static Mode currentMode = Mode.FAST;
 
   public static double LATERAL_MULTIPLIER = 1.4514;
 
@@ -62,14 +71,18 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
 
   public static double ADMISSIBLE_TIMEOUT = 0.5;
 
-  private TrajectorySequenceRunner trajectorySequenceRunner;
+  private TrajectorySequenceRunner fastTrajectorySequenceRunner;
+  private TrajectorySequenceRunner medTrajectorySequenceRunner;
+  private TrajectorySequenceRunner slowTrajectorySequenceRunner;
 
   private static final TrajectoryVelocityConstraint VEL_CONSTRAINT =
       getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
   private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT =
       getAccelerationConstraint(MAX_ACCEL);
 
-  private TrajectoryFollower follower;
+  private TrajectoryFollower fastFollower;
+  private TrajectoryFollower medFollower;
+  private TrajectoryFollower slowFollower;
 
   private DcMotorEx leftFront, leftRear, rightRear, rightFront;
   private List<DcMotorEx> motors;
@@ -91,11 +104,27 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
         TRACK_WIDTH,
         LATERAL_MULTIPLIER); // Drive Constants are passed to here
 
-    follower =
+    fastFollower =
         new HolonomicPIDVAFollower(
-            TRANSLATIONAL_PID,
-            TRANSLATIONAL_PID,
-            HEADING_PID,
+            FAST_TRANSLATIONAL_PID,
+            FAST_TRANSLATIONAL_PID,
+            FAST_HEADING_PID,
+            new Pose2d(1.5, 1.5, Math.toRadians(2)), // Pose Error
+            ADMISSIBLE_TIMEOUT);
+
+    medFollower =
+        new HolonomicPIDVAFollower(
+            MED_TRANSLATIONAL_PID,
+            MED_TRANSLATIONAL_PID,
+            MED_HEADING_PID,
+            new Pose2d(1.5, 1.5, Math.toRadians(2)), // Pose Error
+            ADMISSIBLE_TIMEOUT);
+
+    slowFollower =
+        new HolonomicPIDVAFollower(
+            SLOW_TRANSLATIONAL_PID,
+            SLOW_TRANSLATIONAL_PID,
+            SLOW_HEADING_PID,
             new Pose2d(1.5, 1.5, Math.toRadians(2)), // Pose Error
             ADMISSIBLE_TIMEOUT);
 
@@ -145,10 +174,30 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
     // TODO: if desired, use setLocalizer() to change the localization method
     setLocalizer(od);
 
-    trajectorySequenceRunner =
+    fastTrajectorySequenceRunner =
         new TrajectorySequenceRunner(
-            follower,
-            HEADING_PID,
+            fastFollower,
+            FAST_HEADING_PID,
+            batteryVoltageSensor,
+            lastEncPositions,
+            lastEncVels,
+            lastTrackingEncPositions,
+            lastTrackingEncVels);
+
+    medTrajectorySequenceRunner =
+        new TrajectorySequenceRunner(
+            medFollower,
+            FAST_HEADING_PID,
+            batteryVoltageSensor,
+            lastEncPositions,
+            lastEncVels,
+            lastTrackingEncPositions,
+            lastTrackingEncVels);
+
+    slowTrajectorySequenceRunner =
+        new TrajectorySequenceRunner(
+            slowFollower,
+            FAST_HEADING_PID,
             batteryVoltageSensor,
             lastEncPositions,
             lastEncVels,
@@ -176,8 +225,20 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   }
 
   public void turnAsync(double angle) {
-    trajectorySequenceRunner.followTrajectorySequenceAsync(
-        trajectorySequenceBuilder(getPoseEstimate()).turn(angle).build());
+    switch (currentMode) {
+      case FAST:
+        fastTrajectorySequenceRunner.followTrajectorySequenceAsync(
+            trajectorySequenceBuilder(getPoseEstimate()).turn(angle).build());
+        break;
+      case MEDIUM:
+        medTrajectorySequenceRunner.followTrajectorySequenceAsync(
+            trajectorySequenceBuilder(getPoseEstimate()).turn(angle).build());
+        break;
+      case SLOW:
+        slowTrajectorySequenceRunner.followTrajectorySequenceAsync(
+            trajectorySequenceBuilder(getPoseEstimate()).turn(angle).build());
+        break;
+    }
   }
 
   public void turn(double angle) {
@@ -186,8 +247,20 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   }
 
   public void followTrajectoryAsync(Trajectory trajectory) {
-    trajectorySequenceRunner.followTrajectorySequenceAsync(
-        trajectorySequenceBuilder(trajectory.start()).addTrajectory(trajectory).build());
+    switch (currentMode) {
+      case FAST:
+        fastTrajectorySequenceRunner.followTrajectorySequenceAsync(
+            trajectorySequenceBuilder(trajectory.start()).addTrajectory(trajectory).build());
+        break;
+      case MEDIUM:
+        medTrajectorySequenceRunner.followTrajectorySequenceAsync(
+            trajectorySequenceBuilder(trajectory.start()).addTrajectory(trajectory).build());
+        break;
+      case SLOW:
+        slowTrajectorySequenceRunner.followTrajectorySequenceAsync(
+            trajectorySequenceBuilder(trajectory.start()).addTrajectory(trajectory).build());
+        break;
+    }
   }
 
   public void followTrajectory(Trajectory trajectory) {
@@ -196,7 +269,17 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   }
 
   public void followTrajectorySequenceAsync(TrajectorySequence trajectorySequence) {
-    trajectorySequenceRunner.followTrajectorySequenceAsync(trajectorySequence);
+    switch (currentMode) {
+      case FAST:
+        fastTrajectorySequenceRunner.followTrajectorySequenceAsync(trajectorySequence);
+        break;
+      case MEDIUM:
+        medTrajectorySequenceRunner.followTrajectorySequenceAsync(trajectorySequence);
+        break;
+      case SLOW:
+        slowTrajectorySequenceRunner.followTrajectorySequenceAsync(trajectorySequence);
+        break;
+    }
   }
 
   public void followTrajectorySequence(TrajectorySequence trajectorySequence) {
@@ -205,12 +288,31 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   }
 
   public Pose2d getLastError() {
-    return trajectorySequenceRunner.getLastPoseError();
+    switch (currentMode) {
+      case FAST:
+        return fastTrajectorySequenceRunner.getLastPoseError();
+      case MEDIUM:
+        return medTrajectorySequenceRunner.getLastPoseError();
+      case SLOW:
+        return slowTrajectorySequenceRunner.getLastPoseError();
+    }
+    return new Pose2d();
   }
 
   public void update() {
     updatePoseEstimate();
-    DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
+    DriveSignal signal = null;
+    switch (currentMode) {
+      case FAST:
+        signal = fastTrajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
+        break;
+      case MEDIUM:
+        signal = medTrajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
+        break;
+      case SLOW:
+        signal = slowTrajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
+        break;
+    }
     if (signal != null) setDriveSignal(signal);
   }
 
@@ -219,7 +321,15 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   }
 
   public boolean isBusy() {
-    return trajectorySequenceRunner.isBusy();
+    switch (currentMode) {
+      case FAST:
+        return fastTrajectorySequenceRunner.isBusy();
+      case MEDIUM:
+        return medTrajectorySequenceRunner.isBusy();
+      case SLOW:
+        return slowTrajectorySequenceRunner.isBusy();
+    }
+    return false;
   }
 
   public void setMode(DcMotor.RunMode runMode) {
@@ -360,5 +470,11 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
 
   public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
     return new ProfileAccelerationConstraint(maxAccel);
+  }
+
+  enum Mode {
+    SLOW,
+    MEDIUM,
+    FAST
   }
 }
