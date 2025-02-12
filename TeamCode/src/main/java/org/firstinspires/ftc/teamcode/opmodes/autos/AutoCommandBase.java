@@ -48,62 +48,8 @@ public abstract class AutoCommandBase extends LinearOpMode {
   public static long handoff_slide2LiftCloseDelayMs = 200;
   public static long handoff_liftClose2OpenIntakeDelayMs = 50;
 
-  public static class FieldConfig {
-    public double blockSideLengthInch = 24;
-  }
-
   private static TrajectorySequence sequence = null;
 
-  private static int count = 0;
-  private static boolean isTargetVisible = false;
-
-  public static FieldConfig Field = new FieldConfig();
-
-  public static class RobotConfig {
-    public double robotBack2FrontXLenInch = 16.5;
-    public double robotLeft2RightYLenInch = 15.5;
-  }
-
-  public static RobotConfig Robot = new RobotConfig();
-  //
-  //  public enum StartPoseConfig{
-  //    L0(robotCentral, true),
-  //    R0(robotCentral, false),
-  //    L1(robotCentral, true),
-  //    R1(robotCentral, false),
-  //    L2(robotCentral, true),
-  //    R2(robotCentral, false),
-  //    L3(robotCentral, true),
-  //    R3(robotCentral, false),
-  //    L4(robotCentral, true),
-  //    R4(robotCentral, false),
-  //    L5(robotCentral, true),
-  //    R5(new Vector2d(0, 0), false);
-  //    public final Vector2d startPose;
-  //    StartPoseConfig(final Vector2d startPose, boolean isLeft){
-  //      if(isLeft){
-  //        this.startPose = new Vector2d(startPose.getX(), startPose.getY() - robotCentral.getY());
-  //      }else{
-  //        this.startPose = startPose.plus(robotCentral);
-  //      }
-  //    }
-  //  }
-  //  public static StartPoseConfig StartPose = StartPoseConfig.L1;
-  //
-  //  public enum StartHeadingConfig{
-  //    LEFT(Math.toRadians(-90)),
-  //    FRONT(Math.toRadians(0)),
-  //    RIGHT(Math.toRadians(90)),
-  //    BACK(Math.toRadians(180));
-  //    public final double heading;
-  //    StartHeadingConfig(double headingrad){
-  //      heading = headingrad;
-  //    }
-  //  }
-  //  public static StartHeadingConfig StartHeading = StartHeadingConfig.FRONT;
-  //  protected static Vector2d robotCentral = new Vector2d(Robot.robotBack2FrontXLenInch,
-  // Robot.robotLeft2RightYLenInch);
-  //  protected static Pose2d startPose = new Pose2d(StartPose.startPose, StartHeading.heading);
   @Getter private static Pose2d autoEndPose = new Pose2d();
 
   protected void initialize() {
@@ -122,13 +68,6 @@ public abstract class AutoCommandBase extends LinearOpMode {
     slide = new SlideSuperStucture(hardwareMap, telemetry);
     drive = new SampleMecanumDrive(hardwareMap);
     vision = new Vision(hardwareMap, telemetry);
-
-    slide.stow();
-    slide.backwardSlideExtension();
-    liftClaw.closeClaw();
-    liftClaw.foldLiftArm();
-    vision.initializeCamera();
-    vision.setLEDPWM();
   }
 
   protected Command upLiftToBasket() {
@@ -195,47 +134,6 @@ public abstract class AutoCommandBase extends LinearOpMode {
         new InstantCommand(slide::openIntakeClaw));
   }
 
-  protected Command upLiftToChamber() {
-    return new ParallelCommandGroup(
-        new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG)),
-        new WaitUntilCommand(() -> lift.getCurrentPosition() > 90)
-            .andThen(liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_BASKET, 0)));
-  }
-
-  protected Command handoffAndLiftToChamber() {
-    return fastHandoff()
-        .andThen(new WaitCommand(150))
-        .andThen(new InstantCommand(slide::slideArmDown))
-        .andThen(new WaitCommand(150))
-        .andThen(upLiftToChamber());
-  }
-
-  protected Command hangAndStowLift() {
-    return new SequentialCommandGroup(
-        new InstantCommand(() -> lift.setGoal(Lift.Goal.HANG))
-            .alongWith(new InstantCommand(slide::slideArmDown)),
-        new ParallelDeadlineGroup(new WaitCommand(100), new WaitUntilCommand(() -> lift.atHome(10)))
-            .andThen(
-                new WaitCommand(160)
-                    .deadlineWith(
-                        lift.manualResetCommand()
-                            .alongWith(
-                                new SequentialCommandGroup(
-                                    new WaitCommand(100),
-                                    new InstantCommand(
-                                        () -> drive.setWeightedDrivePower(new Pose2d(1, 0, 0))),
-                                    new WaitCommand(50)))))
-            .andThen(
-                new InstantCommand(
-                    () -> {
-                      drive.setWeightedDrivePower(new Pose2d(0, 0, 0));
-                      liftClaw.openClaw();
-                    })),
-        new WaitCommand(50),
-        liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 0),
-        new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)));
-  }
-
   public Command wait(SampleMecanumDrive drive, long ms) {
     return new ParallelDeadlineGroup(
         new WaitCommand(ms), new RunCommand(drive::update).interruptOn(this::isStopRequested));
@@ -261,94 +159,10 @@ public abstract class AutoCommandBase extends LinearOpMode {
         new InstantCommand(() -> autoEndPose = drive.getPoseEstimate()));
   }
 
-  public static Command generateVisionPath(
-      AtomicReference<TrajectorySequence> sequenceContainer,
-      AtomicReference<Pose2d> currentPose,
-      AtomicReference<Pose2d> targetPose) {
-    Runnable pathGeneration =
-        () -> {
-          Pose2d currentPoseRelativeToField = currentPose.get();
-          Pose2d targetPoseRelativeToRobot = targetPose.get();
-          // Transform target pose from robot-relative to field-relative coordinates
-          double fieldX =
-              currentPoseRelativeToField.getX()
-                  + (targetPoseRelativeToRobot.getX()
-                          * Math.cos(currentPoseRelativeToField.getHeading())
-                      - targetPoseRelativeToRobot.getY()
-                          * Math.sin(currentPoseRelativeToField.getHeading()));
-          double fieldY =
-              currentPoseRelativeToField.getY()
-                  + (targetPoseRelativeToRobot.getX()
-                          * Math.sin(currentPoseRelativeToField.getHeading())
-                      + targetPoseRelativeToRobot.getY()
-                          * Math.cos(currentPoseRelativeToField.getHeading()));
-          double fieldHeading =
-              currentPoseRelativeToField.getHeading()
-                  + 0; // We move our claw instead of robot heading
-
-          Pose2d targetPoseRelativeToField = new Pose2d(fieldX, fieldY, fieldHeading);
-
-          // Generate trajectory to target pose
-          sequenceContainer.set(
-              TrajectoryManager.trajectorySequenceBuilder(currentPoseRelativeToField)
-                  .lineToLinearHeading(targetPoseRelativeToField)
-                  .build());
-        };
-    return new InstantCommand(pathGeneration);
-  }
-
-  public static Command alignToSample(
-      SampleMecanumDrive drive,
-      Vision vision,
-      Telemetry telemetry,
-      BooleanSupplier isTargetVisible) {
-    AtomicReference<TrajectorySequence> sequenceContainer = new AtomicReference<>();
-    //    AtomicReference<Pose2d> currentPoseRelativeToField = new AtomicReference<>();
-    //    AtomicReference<Pose2d> targetPoseRelativeToRobot = new AtomicReference<>();
-
+  public Command upLiftToPreHang() {
     return new SequentialCommandGroup(
-        new InstantCommand(
-            () -> {
-              Pose2d currentPoseRelativeToField = drive.getPoseEstimate();
-              telemetry.addData("Current Pose", currentPoseRelativeToField);
-              Pose2d targetPoseRelativeToRobot =
-                  new Pose2dHelperClass(
-                          vision.getDistance() / 25.4, -vision.getStrafeOffset() / 25.4, 0)
-                      .toPose2d();
-              telemetry.addData("Target Robot Pose", targetPoseRelativeToRobot);
-
-              //              Pose2d currentPoseRelativeToField = currentPose.get();
-              //              Pose2d targetPoseRelativeToRobot = targetPose.get();
-              // Transform target pose from robot-relative to field-relative coordinates
-              double fieldX =
-                  currentPoseRelativeToField.getX()
-                      + (targetPoseRelativeToRobot.getX()
-                              * Math.cos(currentPoseRelativeToField.getHeading())
-                          - targetPoseRelativeToRobot.getY()
-                              * Math.sin(currentPoseRelativeToField.getHeading()));
-              double fieldY =
-                  currentPoseRelativeToField.getY()
-                      + (targetPoseRelativeToRobot.getX()
-                              * Math.sin(currentPoseRelativeToField.getHeading())
-                          + targetPoseRelativeToRobot.getY()
-                              * Math.cos(currentPoseRelativeToField.getHeading()));
-              double fieldHeading =
-                  currentPoseRelativeToField.getHeading()
-                      + 0; // We move our claw instead of robot heading
-
-              Pose2d targetPoseRelativeToField = new Pose2d(fieldX, fieldY, fieldHeading);
-              telemetry.addData("Target Field Pose", targetPoseRelativeToField);
-
-              // Generate trajectory to target pose
-              sequence =
-                  TrajectoryManager.trajectorySequenceBuilder(currentPoseRelativeToField)
-                      .lineToLinearHeading(targetPoseRelativeToField)
-                      .build();
-
-              count += 1;
-              telemetry.addData("Count", count);
-              CommandScheduler.getInstance().schedule(new AutoDriveCommand(drive, sequence));
-            }));
+            liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_CHAMBER, 200),
+            new InstantCommand(() -> lift.setGoal(Lift.Goal.HANG)));
   }
 
   /**
@@ -365,10 +179,15 @@ public abstract class AutoCommandBase extends LinearOpMode {
    */
   public abstract Pose2d getStartPose();
 
+  public abstract void initializeSuperStructure();
+
   @Override
   public void runOpMode() throws InterruptedException {
     double origval = SlideSuperStucture.IntakeClawServo_OPEN;
+
     initialize();
+    initializeSuperStructure();
+
     SlideSuperStucture.IntakeClawServo_OPEN = SlideSuperStucture.IntakeClawServo_OPENWIDER;
     drive.setPoseEstimate(getStartPose());
     Command toRun = runAutoCommand().andThen(autoFinish());

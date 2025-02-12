@@ -339,6 +339,27 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
     return false;
   }
 
+  public void breakFollowing(boolean cancelAll) {
+    if(cancelAll) {
+      fastTrajectorySequenceRunner.breakFollowing();
+      medTrajectorySequenceRunner.breakFollowing();
+      slowTrajectorySequenceRunner.breakFollowing();
+      return;
+    }
+
+    switch (currentTrajectoryMode) {
+      case FAST:
+        fastTrajectorySequenceRunner.breakFollowing();
+        break;
+      case MEDIUM:
+        medTrajectorySequenceRunner.breakFollowing();
+        break;
+      case SLOW:
+        slowTrajectorySequenceRunner.breakFollowing();
+        break;
+    }
+  }
+
   public void setMode(DcMotor.RunMode runMode) {
     for (DcMotorEx motor : motors) {
       motor.setMode(runMode);

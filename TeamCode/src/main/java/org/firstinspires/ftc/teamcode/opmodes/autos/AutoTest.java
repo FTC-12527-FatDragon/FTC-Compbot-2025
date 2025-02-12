@@ -105,6 +105,11 @@ public class AutoTest extends AutoCommandBase {
   }
 
   @Override
+  public void initializeSuperStructure() {
+
+  }
+
+  @Override
   public Command runAutoCommand() {
     return new SequentialCommandGroup(followTrajectory(trajs1));
   }

@@ -10,9 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.LineToLinearPathCommand;
 import org.firstinspires.ftc.teamcode.commands.SplineToPathCommand;
-import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystems.drivetrain.TrajectoryManager;
 import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 
 @Config
@@ -62,8 +60,20 @@ public class BasketUnlimited extends AutoCommandBase {
 
   public static Pose2d startPose = new Pose2d(-40.13, -63.82, Math.toRadians(90));
 
+  @Override
   public Pose2d getStartPose() {
-    return drive.getPoseEstimate(); // TODO: return the field relative pose
+    return drive.getPoseEstimate();
+  }
+
+  @Override
+  public void initializeSuperStructure() {
+    drive.breakFollowing(true);
+    slide.stow();
+    slide.backwardSlideExtension();
+    liftClaw.closeClaw();
+    liftClaw.foldLiftArm();
+    vision.initializeCamera();
+    vision.setLEDPWM();
   }
 
   // spotless:off
@@ -132,7 +142,6 @@ public class BasketUnlimited extends AutoCommandBase {
             .alongWith(new WaitCommand(pick2Handoff).andThen(slowHandoff(), upLiftToBasket())),
         wait(drive, basketWaitForAutoPickMs),
         stowArmFromBasket().alongWith(slowHandoff()));
-
   }
   // spotless:on
 }

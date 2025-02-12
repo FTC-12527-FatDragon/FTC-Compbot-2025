@@ -125,6 +125,12 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
   // 0));
   //  }
 
+  public void foldSlideStructure() {
+    setTurnServo(TurnServo.DEG_0.turnAngleDeg);
+    slideArmServo.setPosition(SlideArmServo_FOLD);
+    wristServo.setPosition(WristServo_FOLD);
+  }
+
   public Command foldSlideStructureCommand() {
     return new SequentialCommandGroup(
         setTurnServoPosCommand(TurnServo.DEG_0, 100),
