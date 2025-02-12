@@ -18,7 +18,6 @@ import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 @Config
 @Autonomous(name = "Basket ∞", group = "Autos")
 public class BasketUnlimited extends AutoCommandBase {
-  public static boolean isAscent = false;
 
   // For Basket Scoring
   public static Pose2dHelperClass Basket = new Pose2dHelperClass(-56, -56, 45);
@@ -57,23 +56,9 @@ public class BasketUnlimited extends AutoCommandBase {
   public static double goPickTangent = 0;
   public static double bakcPickTangent = 0;
 
-  // Ascent zone
-  public static double xValue5 = 60;
-  public static double yValue5 = -16;
-  public static double heading5 = 90;
-  public static double tangent5 = -90;
-
-  // Ascent zone for Pick
-  public static double xValue6 = 60;
-  public static double yValue6 = -16;
-  public static double heading6 = 270;
-  public static double tangent6 = 0;
-
   public static double S1TurnPos = 0.35;
   public static double S2TurnPos = 0.25;
   public static double S3TurnPos = 0.17;
-
-  public static long slideExtend2Grab = 150;
 
   public static Pose2d startPose = new Pose2d(-40.13, -63.82, Math.toRadians(90));
 
