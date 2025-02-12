@@ -28,22 +28,20 @@ public class LineToLinearPathCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    if(!isBack) {
+    if (!isBack) {
       trajectorySequence =
-              TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate())
-                      .lineToLinearHeading(goalPose)
-                      .build();
+          TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate())
+              .lineToLinearHeading(goalPose)
+              .build();
+      drive.followTrajectorySequenceAsync(trajectorySequence);
+    } else {
+      trajectorySequence =
+          TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate())
+              .forward(-12)
+              .lineToLinearHeading(goalPose)
+              .build();
       drive.followTrajectorySequenceAsync(trajectorySequence);
     }
-    else {
-      trajectorySequence =
-              TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate())
-                      .forward(-12)
-                      .lineToLinearHeading(goalPose)
-                      .build();
-      drive.followTrajectorySequenceAsync(trajectorySequence);
-    }
-
   }
 
   @Override

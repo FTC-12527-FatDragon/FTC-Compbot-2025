@@ -337,23 +337,27 @@ public class TXBetaBotSolo extends CommandOpMode {
     new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3) && shouldClimb)
         .whenPressed(climber.elevateCommand().withTimeout(2000));
 
-//        gamepadEx1
-//            .getGamepadButton(GamepadKeys.Button.BACK)
-//            .whenPressed(
-//                new SequentialCommandGroup(
-//                    slowHandoffSCommand.get(),
-//                    sampleAutoAlignCommand.alongWith(
-//                        new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
-//                            .andThen(
-//                                slide.aimCommand(),
-//                                new WaitCommand(50),
-//                                new InstantCommand(
-//                                    () -> slide.forwardSlideExtension(slideExtensionSupplier)),
-//                                new InstantCommand(() -> slide.setTurnServo(turnServoSupplier)),
-//                                new WaitCommand(100))),
-//                    slide.grabCommand()));
+    //        gamepadEx1
+    //            .getGamepadButton(GamepadKeys.Button.BACK)
+    //            .whenPressed(
+    //                new SequentialCommandGroup(
+    //                    slowHandoffSCommand.get(),
+    //                    sampleAutoAlignCommand.alongWith(
+    //                        new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
+    //                            .andThen(
+    //                                slide.aimCommand(),
+    //                                new WaitCommand(50),
+    //                                new InstantCommand(
+    //                                    () ->
+    // slide.forwardSlideExtension(slideExtensionSupplier)),
+    //                                new InstantCommand(() ->
+    // slide.setTurnServo(turnServoSupplier)),
+    //                                new WaitCommand(100))),
+    //                    slide.grabCommand()));
 
-        gamepadEx1.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(new InstantCommand(() -> drive.setPoseEstimate(BasketUnlimited.startPose)));
+    gamepadEx1
+        .getGamepadButton(GamepadKeys.Button.BACK)
+        .whenPressed(new InstantCommand(() -> drive.setPoseEstimate(BasketUnlimited.startPose)));
 
     // =================================================================================
 

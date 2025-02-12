@@ -263,14 +263,16 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
     }
   }
 
-
   public void followTrajectory(Trajectory trajectory) {
     followTrajectoryAsync(trajectory);
     waitForIdle();
   }
 
   public void followTrajectorySequenceLineLinearAsync(Pose2d goalPose) {
-    followTrajectorySequenceAsync(TrajectoryManager.trajectorySequenceBuilder(getPoseEstimate()).lineToLinearHeading(goalPose).build());
+    followTrajectorySequenceAsync(
+        TrajectoryManager.trajectorySequenceBuilder(getPoseEstimate())
+            .lineToLinearHeading(goalPose)
+            .build());
   }
 
   public void followTrajectorySequenceAsync(TrajectorySequence trajectorySequence) {
