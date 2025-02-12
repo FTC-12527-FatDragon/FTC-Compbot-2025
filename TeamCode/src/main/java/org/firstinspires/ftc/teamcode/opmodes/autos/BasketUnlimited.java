@@ -77,64 +77,6 @@ public class BasketUnlimited extends AutoCommandBase {
 
   public static Pose2d startPose = new Pose2d(-40.13, -63.82, Math.toRadians(90));
 
-  TrajectorySequence preLoad2Basket =
-      TrajectoryManager.trajectorySequenceBuilder(startPose)
-          .splineToLinearHeading(Basket.toPose2d(), Basket.getHeadingRad())
-          .build();
-
-  // Start to Basket
-  TrajectorySequence L12Basket =
-      TrajectoryManager.trajectorySequenceBuilder(startPose)
-          .splineToLinearHeading(Basket.toPose2d(), Basket.getHeadingRad())
-          .build();
-
-  // Basket to the rightmost sample
-  TrajectorySequence Basket2S3 =
-      TrajectoryManager.trajectorySequenceBuilder(L12Basket.end())
-          .lineToLinearHeading(S1.toPose2d())
-          .build();
-
-  // rightmost sample to basket
-  TrajectorySequence S32Basket =
-      TrajectoryManager.trajectorySequenceBuilder(Basket2S3.end())
-          .lineToLinearHeading(Basket.toPose2d())
-          .build();
-
-  // basket to middle sample
-  TrajectorySequence Basket2S2 =
-      TrajectoryManager.trajectorySequenceBuilder(S32Basket.end())
-          .lineToLinearHeading(S2.toPose2d())
-          .build();
-
-  // middle sample to basket
-  TrajectorySequence S22Basket =
-      TrajectoryManager.trajectorySequenceBuilder(Basket2S2.end())
-          .lineToLinearHeading(Basket.toPose2d())
-          .build();
-
-  // basket to leftmost sample
-  TrajectorySequence Basket2S1Extend =
-      TrajectoryManager.trajectorySequenceBuilder(S22Basket.end())
-          .lineToLinearHeading(S3.toPose2d())
-          .build();
-
-  // leftmost sample to basket
-  TrajectorySequence S1Extend2Basket =
-      TrajectoryManager.trajectorySequenceBuilder(Basket2S1Extend.end())
-          .lineToSplineHeading(Basket.toPose2d())
-          .build();
-
-  //  // basket to ascent zone
-  TrajectorySequence Basket2Ascent =
-      TrajectoryManager.trajectorySequenceBuilder(S1Extend2Basket.end())
-          .splineToLinearHeading(new Pose2d(xValue5, yValue5, Math.toRadians(heading5)), tangent5)
-          .build();
-
-  TrajectorySequence Basket2Pick =
-      TrajectoryManager.trajectorySequenceBuilder(Basket.toPose2d())
-          .splineToLinearHeading(splinePoint1.toPose2d(), 0)
-          .build();
-
   public Pose2d getStartPose() {
     return drive.getPoseEstimate(); // TODO: return the field relative pose
   }
