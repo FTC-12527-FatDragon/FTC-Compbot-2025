@@ -13,11 +13,11 @@ import lombok.RequiredArgsConstructor;
 
 @Config
 public class LiftClaw extends SubsystemBase {
-  public static double LiftArmServo_SCORE_BASKET = 0.7;
-  public static double LiftArmServo_STOW = 0.175;
-  public static double LiftArmServo_GRAB_WALL = 0.267;
-  public static double LiftArmServo_SCORE_CHAMBER = 0.7;
-  public static double LiftArmServo_AVOID_COLLISION = 0.5;
+  public static double LiftArmServo_SCORE_BASKET = 0.88;
+  public static double LiftArmServo_STOW = 0.36;
+  public static double LiftArmServo_GRAB_WALL = 0.45;
+  public static double LiftArmServo_SCORE_CHAMBER = 0.88;
+  public static double LiftArmServo_AVOID_COLLISION = 0.55;
 
   public static double ClawServo_CLOSE = 0.68;
   public static double ClawServo_OPEN = 0.28;
@@ -69,6 +69,10 @@ public class LiftClaw extends SubsystemBase {
 
   public void grabFromWall() {
     liftArmServo.setPosition(LiftArmServo_GRAB_WALL);
+  }
+
+  public void upLiftArm() {
+    liftArmServo.setPosition(LiftArmServo_SCORE_BASKET);
   }
 
   public Command setLiftClawServo(LiftClawState state, long delay) {

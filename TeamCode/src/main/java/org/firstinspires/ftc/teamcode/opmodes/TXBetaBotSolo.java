@@ -26,6 +26,7 @@ import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.opmode.LocalizationTest;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
 import org.firstinspires.ftc.teamcode.opmodes.autos.BasketUnlimited;
+import org.firstinspires.ftc.teamcode.opmodes.autos.Chamber6;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
@@ -357,7 +358,7 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     gamepadEx1
         .getGamepadButton(GamepadKeys.Button.BACK)
-        .whenPressed(new InstantCommand(() -> drive.setPoseEstimate(BasketUnlimited.startPose)));
+        .whenPressed(new InstantCommand(() -> drive.setPoseEstimate(Chamber6.startPose)));
 
     // =================================================================================
 

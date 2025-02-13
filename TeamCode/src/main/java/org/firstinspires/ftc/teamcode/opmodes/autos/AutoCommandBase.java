@@ -15,9 +15,7 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BooleanSupplier;
 import lombok.Getter;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.AutoDriveCommand;
 import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
@@ -27,8 +25,6 @@ import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
 import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStucture;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystems.drivetrain.TrajectoryManager;
-import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 
 /**
  * Layout: Field Coordinate: +-----+-----+-----+-----+-----+-----^ x | 0 | 1 | 2 | 3 | 4 | 5 |
@@ -150,7 +146,6 @@ public abstract class AutoCommandBase extends LinearOpMode {
 
   public Command autoFinish() {
     return new ParallelCommandGroup(
-        slide.aimCommand(),
         // TODO: needs discussion
         slide.manualResetCommand().withTimeout(1000), // interruptOn(slide::atHome),
         // lift.resetCommand().interruptOn(() -> lift.atHome(3)),
@@ -159,10 +154,10 @@ public abstract class AutoCommandBase extends LinearOpMode {
         new InstantCommand(() -> autoEndPose = drive.getPoseEstimate()));
   }
 
-  public Command upLiftToPreHang() {
+  public Command upLiftToHang() {
     return new SequentialCommandGroup(
-            liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_CHAMBER, 200),
-            new InstantCommand(() -> lift.setGoal(Lift.Goal.HANG)));
+        liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_CHAMBER, 200),
+        new InstantCommand(() -> lift.setGoal(Lift.Goal.HANG)));
   }
 
   /**

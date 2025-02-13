@@ -105,9 +105,7 @@ public class AutoTest extends AutoCommandBase {
   }
 
   @Override
-  public void initializeSuperStructure() {
-
-  }
+  public void initializeSuperStructure() {}
 
   @Override
   public Command runAutoCommand() {
