@@ -328,15 +328,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   }
 
   public boolean isBusy() {
-    switch (currentTrajectoryMode) {
-      case FAST:
-        return fastTrajectorySequenceRunner.isBusy();
-      case MEDIUM:
-        return medTrajectorySequenceRunner.isBusy();
-      case SLOW:
-        return slowTrajectorySequenceRunner.isBusy();
-    }
-    return false;
+    return fastTrajectorySequenceRunner.isBusy() || medTrajectorySequenceRunner.isBusy() || slowTrajectorySequenceRunner.isBusy();
   }
 
   public void breakFollowing(boolean cancelAll) {

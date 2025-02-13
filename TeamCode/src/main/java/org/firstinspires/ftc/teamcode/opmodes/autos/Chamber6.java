@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.LineToLinearPathCommand;
+import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
@@ -46,6 +47,15 @@ public class Chamber6 extends AutoCommandBase {
   public static long liftClawOpenToFold = 300;
   public static long liftUpToOpen = 300;
 
+  Supplier<Command> upLiftArmOpen =
+          () ->
+                  new SequentialCommandGroup(
+                          liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_BASKET, liftUpToOpen),
+                          liftClaw.openClawCommand());
+
+  Supplier<Command> slideExtendCommand =
+          () -> new InstantCommand(() -> slide.forwardSlideExtension(350));
+
   @Override
   public Pose2d getStartPose() {
     return drive.getPoseEstimate();
@@ -60,25 +70,33 @@ public class Chamber6 extends AutoCommandBase {
     liftClaw.closeClaw();
   }
 
+  private Command grabCycle(Command followCommand, Command nxt){
+    return slide.grabCommand().andThen(
+            followCommand
+                    .alongWith(
+                            fastHandoff()
+                                    .andThen(
+                                            upLiftArmOpen.get()
+                                                    .alongWith(slide.aimCommand(), slideExtendCommand.get())
+                                    )
+                    ).andThen(
+                            liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 0).alongWith(
+                                    nxt
+                            )
+                    )
+    );
+  }
+
   @Override
   public Command runAutoCommand() {
-    Supplier<Command> hangSpecimen =
-        () -> new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG));
-
-    Supplier<Command> stowLiftAndArm =
-        () ->
-            new SequentialCommandGroup(
-                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 100),
-                new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)));
-
-    Supplier<Command> upLiftArmOpen =
-        () ->
-            new SequentialCommandGroup(
-                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_BASKET, liftUpToOpen),
-                liftClaw.openClawCommand());
-
-    Supplier<Command> slideExtendCommand =
-        () -> new InstantCommand(() -> slide.forwardSlideExtension(350));
+//    Supplier<Command> hangSpecimen =
+//        () -> new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG));
+//
+//    Supplier<Command> stowLiftAndArm =
+//        () ->
+//            new SequentialCommandGroup(
+//                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 100),
+//                new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)));
 
     return new SequentialCommandGroup(
         new InstantCommand(
@@ -86,31 +104,37 @@ public class Chamber6 extends AutoCommandBase {
               drive.setPoseEstimate(startPose);
               drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);
             }),
-        slide.aimCommand(),
         new LineToLinearPathCommand(drive, S1.toPose2d())
             .alongWith(
-                new WaitCommand(pathToExtendSlide)
-                    .andThen(
-                        slideExtendCommand.get())),
+                slide.aimCommand(),
+                slideExtendCommand.get()),
 
         slide.grabCommand(),
         new LineToLinearPathCommand(drive, S2.toPose2d())
             .alongWith(
                 fastHandoff()
                     .andThen(
-                        upLiftArmOpen
-                            .get()
-                            .alongWith(slide.aimCommand(), slideExtendCommand.get())))
-            .andThen(
-                new WaitCommand(liftClawOpenToFold),
-                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 0)),
-        slide.grabCommand(),
+                        upLiftArmOpen.get()
+                        .alongWith(slide.aimCommand(), slideExtendCommand.get())
+                    )
+            ).andThen(
+                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 0).alongWith(
+                        slide.grabCommand()
+                )
+            ),
+
+        grabCycle(new LineToLinearPathCommand(drive, S2.toPose2d()),
+            new InstantCommand(() -> slide.setTurnServo(0.35)).andThen(
+                    grabCycle(new LineToLinearPathCommand(drive, S3.toPose2d()))
+            )
+        )
 
         new LineToLinearPathCommand(drive, S3.toPose2d())
             .alongWith(
                 fastHandoff()
                     .andThen(
-                        upLiftArmOpen.get().alongWith(slide.aimCommand(), slideExtendCommand.get()))
+                        upLiftArmOpen.get()
+                        .alongWith(slide.aimCommand(), slideExtendCommand.get()))
                     .andThen(
                         new WaitCommand(liftClawOpenToFold),
                         liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 0))),
