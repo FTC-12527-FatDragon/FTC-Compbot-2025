@@ -24,24 +24,24 @@ public class Chamber6 extends AutoCommandBase {
 
   public static Pose2dHelperClass S2 = new Pose2dHelperClass(57.5, -54, 90);
 
-  public static Pose2dHelperClass S3 = new Pose2dHelperClass(58, -55.44, Math.toDegrees(1.2));
+  public static Pose2dHelperClass S3 = new Pose2dHelperClass(58, -53.44, Math.toDegrees(1.2));
 
-  public static Pose2dHelperClass grabSpecPose = new Pose2dHelperClass(37.37, -62.6, 270);
+  public static Pose2dHelperClass grabSpecPose = new Pose2dHelperClass(35.46, -63.42, 270);
 
-  public static Pose2dHelperClass spec1Pose = new Pose2dHelperClass(4.118, -32.16, 270);
+  public static Pose2dHelperClass spec1Pose = new Pose2dHelperClass(4.118, -31.49, 270);
 
-  public static Pose2dHelperClass spec2Pose = new Pose2dHelperClass(3.118, -32.16, 270);
+  public static Pose2dHelperClass spec2Pose = new Pose2dHelperClass(3.118, -31.49, 270);
 
-  public static Pose2dHelperClass spec3Pose = new Pose2dHelperClass(2.118, -32.16, 270);
+  public static Pose2dHelperClass spec3Pose = new Pose2dHelperClass(2.118, -31.49, 270);
 
-  public static Pose2dHelperClass spec4Pose = new Pose2dHelperClass(1.118, -32.16, 270);
+  public static Pose2dHelperClass spec4Pose = new Pose2dHelperClass(1.118, -31.49, 270);
 
-  public static Pose2dHelperClass spec5Pose = new Pose2dHelperClass(0.118, -32.16, 270);
+  public static Pose2dHelperClass spec5Pose = new Pose2dHelperClass(0.118, -31.49, 270);
 
-  public static Pose2dHelperClass spec6Pose = new Pose2dHelperClass(-1.118, -32.16, 270);
+  public static Pose2dHelperClass spec6Pose = new Pose2dHelperClass(-1.118, -31.49, 270);
 
   public static long delayToUpLift = 300;
-  public static long hangToOpenClaw = 300;
+  public static long hangToOpenClaw = 500;
   public static long pathToStow = 0;
   public static long pathToExtendSlide = 0;
   public static long liftClawOpenToFold = 300;
@@ -89,47 +89,39 @@ public class Chamber6 extends AutoCommandBase {
 
   @Override
   public Command runAutoCommand() {
-//    Supplier<Command> hangSpecimen =
-//        () -> new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG));
-//
-//    Supplier<Command> stowLiftAndArm =
-//        () ->
-//            new SequentialCommandGroup(
-//                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 100),
-//                new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)));
+    Supplier<Command> hangSpecimen =
+        () -> new InstantCommand(() -> lift.setGoal(Lift.Goal.PRE_HANG));
+
+    Supplier<Command> stowLiftAndArm =
+        () ->
+            new SequentialCommandGroup(
+                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 100),
+                new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)));
 
     return new SequentialCommandGroup(
         new InstantCommand(
             () -> {
               drive.setPoseEstimate(startPose);
-              drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);
+              drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.MEDIUM);
             }),
-        new LineToLinearPathCommand(drive, S1.toPose2d())
-            .alongWith(
-                slide.aimCommand(),
-                slideExtendCommand.get()),
+
+        slide.aimCommand().beforeStarting(() -> slide.setTurnServo(0.35)),
+        new LineToLinearPathCommand(drive, S3.toPose2d())
+            .alongWith(new WaitCommand(pathToExtendSlide).andThen(slideExtendCommand.get())),
 
         slide.grabCommand(),
         new LineToLinearPathCommand(drive, S2.toPose2d())
             .alongWith(
                 fastHandoff()
                     .andThen(
-                        upLiftArmOpen.get()
-                        .alongWith(slide.aimCommand(), slideExtendCommand.get())
-                    )
-            ).andThen(
-                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 0).alongWith(
-                        slide.grabCommand()
-                )
-            ),
-
-        grabCycle(new LineToLinearPathCommand(drive, S2.toPose2d()),
-            new InstantCommand(() -> slide.setTurnServo(0.35)).andThen(
-                    grabCycle(new LineToLinearPathCommand(drive, S3.toPose2d()))
-            )
-        )
-
-        new LineToLinearPathCommand(drive, S3.toPose2d())
+                        upLiftArmOpen
+                            .get()
+                            .alongWith(slide.aimCommand(), slideExtendCommand.get())))
+            .andThen(
+                new WaitCommand(liftClawOpenToFold),
+                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 0)),
+        slide.grabCommand(),
+        new LineToLinearPathCommand(drive, S1.toPose2d())
             .alongWith(
                 fastHandoff()
                     .andThen(
@@ -138,13 +130,60 @@ public class Chamber6 extends AutoCommandBase {
                     .andThen(
                         new WaitCommand(liftClawOpenToFold),
                         liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 0))),
-        slide.grabCommand().beforeStarting(() -> slide.setTurnServo(0.35)),
+        slide.grabCommand(),
         fastHandoff(),
-        upLiftArmOpen.get().alongWith(slide.aimCommand()).andThen(
-                new WaitCommand(400), slide.foldSlideStructureCommand()),
-            new WaitCommand(200),
-            liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 0)
-    );
+        upLiftArmOpen
+            .get()
+            .alongWith(slide.aimCommand())
+            .andThen(
+                new LineToLinearPathCommand(drive, grabSpecPose.toPose2d())
+                    .alongWith(
+                        new WaitCommand(400)
+                            .andThen(
+                                slide.foldSlideStructureCommand(),
+                                new WaitCommand(200),
+                                liftClaw.setLiftClawServo(
+                                    LiftClaw.LiftClawState.GRAB_FROM_WALL, 0)))),
+        liftClaw.closeClawCommand(),
+        new LineToLinearPathCommand(drive, spec1Pose.toPose2d())
+            .alongWith(new WaitCommand(delayToUpLift).andThen(upLiftToHang())),
+        hangSpecimen.get(),
+        wait(drive, hangToOpenClaw),
+        liftClaw.openClawCommand(),
+        new LineToLinearPathCommand(drive, grabSpecPose.toPose2d())
+            .alongWith(new WaitCommand(delayToUpLift).andThen(stowLiftAndArm.get())),
+        liftClaw.closeClawCommand(),
+        new LineToLinearPathCommand(drive, spec2Pose.toPose2d())
+            .alongWith(new WaitCommand(delayToUpLift).andThen(upLiftToHang())),
+        hangSpecimen.get(),
+        wait(drive, hangToOpenClaw),
+        liftClaw.openClawCommand(),
+        new LineToLinearPathCommand(drive, grabSpecPose.toPose2d())
+            .alongWith(new WaitCommand(delayToUpLift).andThen(stowLiftAndArm.get())),
+        liftClaw.closeClawCommand(),
+        new LineToLinearPathCommand(drive, spec3Pose.toPose2d())
+            .alongWith(new WaitCommand(delayToUpLift).andThen(upLiftToHang())),
+        hangSpecimen.get(),
+        wait(drive, hangToOpenClaw),
+        liftClaw.openClawCommand(),
+        new LineToLinearPathCommand(drive, grabSpecPose.toPose2d())
+            .alongWith(new WaitCommand(delayToUpLift).andThen(stowLiftAndArm.get())),
+        liftClaw.closeClawCommand(),
+        new LineToLinearPathCommand(drive, spec4Pose.toPose2d())
+            .alongWith(new WaitCommand(delayToUpLift).andThen(upLiftToHang())),
+        hangSpecimen.get(),
+        wait(drive, hangToOpenClaw),
+        liftClaw.openClawCommand(),
+        new LineToLinearPathCommand(drive, grabSpecPose.toPose2d())
+            .alongWith(new WaitCommand(delayToUpLift).andThen(stowLiftAndArm.get())),
+        liftClaw.closeClawCommand(),
+        new LineToLinearPathCommand(drive, spec5Pose.toPose2d())
+            .alongWith(new WaitCommand(delayToUpLift).andThen(upLiftToHang())),
+        hangSpecimen.get(),
+        wait(drive, hangToOpenClaw),
+        liftClaw.openClawCommand(),
+        new LineToLinearPathCommand(drive, grabSpecPose.toPose2d())
+            .alongWith(stowLiftAndArm.get()));
 
     //        new LineToLinearPathCommand(drive, spec1Pose.toPose2d())
     //            .alongWith(new WaitCommand(delayToUpLift).andThen(upLiftToHang())),

@@ -55,8 +55,8 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   public static PIDCoefficients FAST_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.5);
   public static PIDCoefficients FAST_HEADING_PID = new PIDCoefficients(2, 0, 0.15);
 
-  public static PIDCoefficients MED_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0);
-  public static PIDCoefficients MED_HEADING_PID = new PIDCoefficients(2, 0, 0.15);
+  public static PIDCoefficients MED_TRANSLATIONAL_PID = new PIDCoefficients(5, 0, 0);
+  public static PIDCoefficients MED_HEADING_PID = new PIDCoefficients(1.8, 0, 0);
 
   public static PIDCoefficients SLOW_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.3);
   public static PIDCoefficients SLOW_HEADING_PID = new PIDCoefficients(2.3, 0, 0.15);
