@@ -328,7 +328,9 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   }
 
   public boolean isBusy() {
-    return fastTrajectorySequenceRunner.isBusy() || medTrajectorySequenceRunner.isBusy() || slowTrajectorySequenceRunner.isBusy();
+    return fastTrajectorySequenceRunner.isBusy()
+        || medTrajectorySequenceRunner.isBusy()
+        || slowTrajectorySequenceRunner.isBusy();
   }
 
   public void breakFollowing(boolean cancelAll) {

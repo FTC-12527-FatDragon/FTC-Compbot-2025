@@ -26,16 +26,16 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   // ---- Configs ----
   // SlideArmServo
   public static double SlideArmServo_AIM = 0.4;
-  public static double SlideArmServo_GRAB = 0.215;
-  public static double SlideArmServo_HANDOFF = 0.49;
-  public static double SlideArmServo_AIM_ = 0.33;
+  public static double SlideArmServo_GRAB = 0.32;
+  public static double SlideArmServo_HANDOFF = 0.59;
+  public static double SlideArmServo_AIM_ = 0.433;
   public static double SlideArmServo_PREAIM = 0.3;
-  public static double SlideArmServo_FOLD = 0.65;
+  public static double SlideArmServo_FOLD = 0.747;
 
   // intakeClawServo
-  public static double IntakeClawServo_OPEN = 0.87;
+  public static double IntakeClawServo_OPEN = 0.6;
   public static double IntakeClawServo_OPENWIDER = 0.2;
-  public static double IntakeClawServo_GRAB = 0.48;
+  public static double IntakeClawServo_GRAB = 0.445;
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;
@@ -67,7 +67,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   private final DcMotorEx slideMotor;
 
   private final PIDController pidController;
-  public static double kP = 0.02, kI = 0.0, kD = 0.0005;
+  public static double kP = 0.01, kI = 0.0, kD = 0;
   private final VoltageSensor batteryVoltageSensor;
 
   private static double slideExtensionVal = 0;

@@ -4,15 +4,19 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.TrajectoryManager;
 
-@Config
+import edu.wpi.first.math.MathUtil;
+
 public class LineToLinearPathCommand extends CommandBase {
   private final SampleMecanumDrive drive;
   private Pose2d goalPose;
+  private Pose2d currentPose;
   private TrajectorySequence trajectorySequence;
   private boolean isBack;
+  private boolean isAutoPick;
 
   public LineToLinearPathCommand(SampleMecanumDrive drive, Pose2d goalPose) {
     this.drive = drive;
@@ -20,14 +24,15 @@ public class LineToLinearPathCommand extends CommandBase {
     isBack = false;
   }
 
-  public LineToLinearPathCommand(SampleMecanumDrive drive, Pose2d goalPose, boolean isBack) {
+  public LineToLinearPathCommand(SampleMecanumDrive drive, Pose2d goalPose, boolean isAutoPick) {
     this.drive = drive;
     this.goalPose = goalPose;
-    this.isBack = isBack;
+    this.isAutoPick = isAutoPick;
   }
 
   @Override
   public void initialize() {
+    currentPose = new Pose2d();
     if (!isBack) {
       trajectorySequence =
           TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate())
@@ -44,13 +49,28 @@ public class LineToLinearPathCommand extends CommandBase {
     }
   }
 
+  private boolean isWithinRange() {
+    return MathUtil.isNear(goalPose.getX(), currentPose.getX(), DriveConstants.xPoseError)
+            && MathUtil.isNear(goalPose.getY(), currentPose.getY(), DriveConstants.yPoseError)
+            && MathUtil.isNear(goalPose.getHeading(), currentPose.getHeading(), DriveConstants.headingPoseError);
+  }
+
   @Override
   public void execute() {
     drive.update();
+    currentPose = drive.getPoseEstimate();
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    drive.breakFollowing(true);
   }
 
   @Override
   public boolean isFinished() {
+    if(isAutoPick) {
+      return isWithinRange();
+    }
     return !drive.isBusy();
   }
 }

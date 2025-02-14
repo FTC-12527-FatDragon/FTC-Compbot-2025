@@ -24,6 +24,10 @@ import org.firstinspires.ftc.teamcode.utils.Translation2dHelperClass;
 public class DriveConstants {
   public static final RobotType currentRobot = RobotType.GAMMA;
 
+  public static double xPoseError = 3;
+  public static double yPoseError = 3;
+  public static double headingPoseError = Math.toRadians(5);
+
   public enum RobotType {
     ALPHA,
     BETA,

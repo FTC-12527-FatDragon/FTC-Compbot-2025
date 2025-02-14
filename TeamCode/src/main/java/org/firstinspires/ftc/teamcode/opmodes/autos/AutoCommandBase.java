@@ -40,9 +40,11 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected SampleMecanumDrive drive;
   protected Climber climb;
   protected Vision vision;
+  protected Pose2d currentPose = new Pose2d();
 
   public static long handoff_slide2LiftCloseDelayMs = 200;
   public static long handoff_liftClose2OpenIntakeDelayMs = 50;
+  public static int liftClawScoreThreshold = 0;
 
   private static TrajectorySequence sequence = null;
 
@@ -69,7 +71,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected Command upLiftToBasket() {
     return new ParallelCommandGroup(
         new InstantCommand(() -> lift.setGoal(Lift.Goal.HIGH_BASKET)),
-        new WaitUntilCommand(() -> lift.getCurrentPosition() > 150)
+        new WaitUntilCommand(() -> lift.getCurrentPosition() > liftClawScoreThreshold)
             .andThen(liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_BASKET, 0)));
   }
 
@@ -80,9 +82,10 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected Command autoSamplePickCommand() {
     AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
     AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
+    AtomicReference<Pose2d> snapShotPoseSupplier = new AtomicReference<>();
     SampleAutoAlignCommand sampleAutoAlignCommand =
         new SampleAutoAlignCommand(
-            drive, slide, vision, telemetry, turnServoSupplier, slideExtensionSupplier);
+            drive, slide, vision, telemetry, turnServoSupplier, slideExtensionSupplier,snapShotPoseSupplier);
     return new SequentialCommandGroup(
         sampleAutoAlignCommand.alongWith(
             new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
@@ -191,6 +194,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
     CommandScheduler.getInstance().schedule(toRun);
 
     while (opModeIsActive() && !isStopRequested()) {
+      currentPose = drive.getPoseEstimate();
       lift.periodicAsync();
       CommandScheduler.getInstance().run();
     }

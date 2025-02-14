@@ -33,7 +33,7 @@ public class Vision extends SubsystemBase {
   public static double strafeConversionFactor = 6.6667;
   public static double cameraStrafeToBot = -20;
 
-  public static double sampleToRobotDistance = 145;
+  public static double sampleToRobotDistance = 149;
 
   Telemetry telemetry;
 

@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.utils.MathUtils;
 @Config
 public class Lift extends MotorPIDSlideSubsystem {
   public static double kP = 0.015, kI = 0.0, kD = 0.0, kV = 0.0003, kS = 0.12, kG = 0.12;
+  public static double autoBasketHeight = 750;
   private final PIDController pidController;
   private final Motor liftMotorUp;
   private final Motor liftMotorDown;
@@ -151,6 +152,7 @@ public class Lift extends MotorPIDSlideSubsystem {
 
   public enum Goal {
     HIGH_BASKET(770.0),
+    AUTO_BASKET(autoBasketHeight),
     LOW_BASKET(200),
     AUTO_TRANSFER(100),
     STOW(0.0),

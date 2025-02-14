@@ -74,9 +74,6 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
     AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
-    sampleAutoAlignCommand =
-        new SampleAutoAlignCommand(
-            drive, slide, vision, telemetry, turnServoSupplier, slideExtensionSupplier);
 
     initializeMode();
     vision.initializeCamera();
