@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import lombok.Getter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStucture;
+import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStructure;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.TrajectoryManager;
@@ -17,7 +17,7 @@ public class SampleAutoAlignCommand extends CommandBase {
   private final SampleMecanumDrive drive;
   private final Vision vision;
   private final Telemetry telemetry;
-  private final SlideSuperStucture slide;
+  private final SlideSuperStructure slide;
 
   private AtomicReference<Double> turnServo;
   private AtomicReference<Double> slideExtension;
@@ -30,7 +30,7 @@ public class SampleAutoAlignCommand extends CommandBase {
 
   public SampleAutoAlignCommand(
       SampleMecanumDrive drive,
-      SlideSuperStucture slide,
+      SlideSuperStructure slide,
       Vision vision,
       Telemetry telemetry,
       AtomicReference<Double> turnServoSupplier,

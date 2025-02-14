@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.MathUtils;
 
 @Config
-public class SlideSuperStucture extends MotorPIDSlideSubsystem {
+public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   // ---- Configs ----
   // SlideArmServo
   public static double SlideArmServo_AIM = 0.4;
@@ -83,7 +83,7 @@ public class SlideSuperStucture extends MotorPIDSlideSubsystem {
 
   public static double resetPower = -0.9;
 
-  public SlideSuperStucture(final HardwareMap hardwareMap, final Telemetry telemetry) {
+  public SlideSuperStructure(final HardwareMap hardwareMap, final Telemetry telemetry) {
     slideArmServo = hardwareMap.get(Servo.class, "slideArmServo");
 
     intakeClawServo = hardwareMap.get(Servo.class, "intakeClawServo"); // 0.3 close 0.7 open
