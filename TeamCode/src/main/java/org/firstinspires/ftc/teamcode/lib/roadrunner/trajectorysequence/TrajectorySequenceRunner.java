@@ -14,6 +14,7 @@ import com.acmerobotics.roadrunner.profile.MotionState;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryMarker;
 import com.acmerobotics.roadrunner.util.NanoClock;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,10 @@ import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.sequence
 import org.firstinspires.ftc.teamcode.lib.roadrunner.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.util.LogFiles;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
+import org.firstinspires.ftc.teamcode.utils.ProfiledPIDController;
+
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+
 
 @Config
 public class TrajectorySequenceRunner {
@@ -41,7 +46,8 @@ public class TrajectorySequenceRunner {
 
   private final TrajectoryFollower follower;
 
-  private final PIDFController turnController;
+  private final ProfiledPIDController turnController;
+//  private final PIDFController turnController;
 
   private final NanoClock clock;
 
@@ -74,8 +80,10 @@ public class TrajectorySequenceRunner {
       List<Integer> lastTrackingEncVels) {
     this.follower = follower;
 
-    turnController = new PIDFController(headingPIDCoefficients);
-    turnController.setInputBounds(0, 2 * Math.PI);
+    turnController = new ProfiledPIDController(
+            headingPIDCoefficients.kP, headingPIDCoefficients.kI, headingPIDCoefficients.kD,
+            new TrapezoidProfile.Constraints(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL));
+    turnController.enableContinuousInput(-Math.PI, Math.PI);
 
     this.voltageSensor = voltageSensor;
 
@@ -158,14 +166,12 @@ public class TrajectorySequenceRunner {
       } else if (currentSegment instanceof TurnSegment) {
         MotionState targetState = ((TurnSegment) currentSegment).getMotionProfile().get(deltaTime);
 
-        turnController.setTargetPosition(targetState.getX());
-
-        double correction = turnController.update(poseEstimate.getHeading());
+        double correction = turnController.calculate(poseEstimate.getHeading(), targetState.getX());
 
         double targetOmega = targetState.getV();
         double targetAlpha = targetState.getA();
 
-        lastPoseError = new Pose2d(0, 0, turnController.getLastError());
+        lastPoseError = new Pose2d(0, 0, turnController.getPositionError());
 
         Pose2d startPose = currentSegment.getStartPose();
         targetPose = startPose.copy(startPose.getX(), startPose.getY(), targetState.getX());
