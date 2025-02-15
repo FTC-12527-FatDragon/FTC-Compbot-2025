@@ -1,14 +1,12 @@
 package org.firstinspires.ftc.teamcode.commands;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandBase;
+import edu.wpi.first.math.MathUtil;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.TrajectoryManager;
-
-import edu.wpi.first.math.MathUtil;
 
 public class LineToLinearPathCommand extends CommandBase {
   private final SampleMecanumDrive drive;
@@ -17,6 +15,7 @@ public class LineToLinearPathCommand extends CommandBase {
   private TrajectorySequence trajectorySequence;
   private boolean isBack;
   private boolean isAutoPick;
+  private boolean shouldWithinRange;
 
   public LineToLinearPathCommand(SampleMecanumDrive drive, Pose2d goalPose) {
     this.drive = drive;
@@ -24,10 +23,10 @@ public class LineToLinearPathCommand extends CommandBase {
     isBack = false;
   }
 
-  public LineToLinearPathCommand(SampleMecanumDrive drive, Pose2d goalPose, boolean isAutoPick) {
+  public LineToLinearPathCommand(SampleMecanumDrive drive, Pose2d goalPose, boolean shouldWithinRange) {
     this.drive = drive;
     this.goalPose = goalPose;
-    this.isAutoPick = isAutoPick;
+    this.shouldWithinRange = shouldWithinRange;
   }
 
   @Override
@@ -51,8 +50,9 @@ public class LineToLinearPathCommand extends CommandBase {
 
   private boolean isWithinRange() {
     return MathUtil.isNear(goalPose.getX(), currentPose.getX(), DriveConstants.xPoseError)
-            && MathUtil.isNear(goalPose.getY(), currentPose.getY(), DriveConstants.yPoseError)
-            && MathUtil.isNear(goalPose.getHeading(), currentPose.getHeading(), DriveConstants.headingPoseError);
+        && MathUtil.isNear(goalPose.getY(), currentPose.getY(), DriveConstants.yPoseError)
+        && MathUtil.isNear(
+            goalPose.getHeading(), currentPose.getHeading(), DriveConstants.headingPoseError);
   }
 
   @Override
@@ -68,7 +68,7 @@ public class LineToLinearPathCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    if(isAutoPick) {
+    if (shouldWithinRange) {
       return isWithinRange();
     }
     return !drive.isBusy();

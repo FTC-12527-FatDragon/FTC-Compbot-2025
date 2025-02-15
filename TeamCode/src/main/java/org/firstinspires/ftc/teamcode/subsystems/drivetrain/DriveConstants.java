@@ -24,9 +24,9 @@ import org.firstinspires.ftc.teamcode.utils.Translation2dHelperClass;
 public class DriveConstants {
   public static final RobotType currentRobot = RobotType.GAMMA;
 
-  public static double xPoseError = 2;
-  public static double yPoseError = 2;
-  public static double headingPoseError = Math.toRadians(5);
+  public static double xPoseError = 1;
+  public static double yPoseError = 1;
+  public static double headingPoseError = Math.toRadians(3);
 
   public enum RobotType {
     ALPHA,
@@ -92,7 +92,7 @@ public class DriveConstants {
    * inches.
    */
   public static double MAX_VEL;
-  public static double MAX_ACCEL = 60;
+  public static double MAX_ACCEL = 75;
   public static double MAX_ANG_VEL;
   public static double MAX_ANG_ACCEL = Math.toRadians(180);
 
@@ -148,9 +148,9 @@ public class DriveConstants {
             GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD;
         GoBildaLocalizerPerpendicularOffset = new Translation2dHelperClass(0, -156);
         TRACK_WIDTH = 16.36;
-        kV = 0.0125;
+        kV = 0.01054;
         kA = 0.0025;
-        kStatic = 0.025;
+        kStatic = 0.07263;
         MAX_VEL = 70.59477340026181;
         MAX_ANG_VEL = Math.toRadians(139.1033922138209);
         break;

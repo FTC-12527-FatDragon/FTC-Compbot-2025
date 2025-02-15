@@ -242,7 +242,11 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   }
 
   public void runCharacterization(double output) {
-    
+    setWeightedDrivePower(new Pose2d(output, 0, 0));
+  }
+
+  public double getXVelocity() {
+    return od.getPoseVelocity().getX();
   }
 
   public void turn(double angle) {

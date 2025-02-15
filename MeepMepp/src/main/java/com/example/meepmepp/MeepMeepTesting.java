@@ -30,9 +30,9 @@ public class MeepMeepTesting {
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive -> 
-                    drive.trajectorySequenceBuilder(new Pose2d(-56, -52, Math.toRadians(60)))
-                        .splineToSplineHeading(new Pose2d(-23.44, -5, 0), Math.toRadians(0))
-                        .build()
+                    drive.trajectorySequenceBuilder(new Pose2d(-23.44, -5, 0)).setReversed(true)
+                        .splineToSplineHeading(new Pose2d(-56, -52, Math.toRadians(60)), Math.toRadians(250))
+                            .build()
                 );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)
