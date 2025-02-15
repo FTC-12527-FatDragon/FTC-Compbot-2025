@@ -44,7 +44,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
 
   public static long handoff_slide2LiftCloseDelayMs = 200;
   public static long handoff_liftClose2OpenIntakeDelayMs = 50;
-  public static int liftClawScoreThreshold = 0;
+  public static int liftClawScoreThreshold = 75;
 
   private static TrajectorySequence sequence = null;
 
@@ -94,7 +94,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
                     new WaitCommand(50),
                     new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)),
                     new InstantCommand(() -> slide.setTurnServo(turnServoSupplier)),
-                    new WaitCommand(200))),
+                    new WaitCommand(0))),
         slide.grabCommand());
   }
 

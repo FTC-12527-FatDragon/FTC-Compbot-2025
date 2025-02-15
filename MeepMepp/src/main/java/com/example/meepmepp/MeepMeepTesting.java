@@ -18,13 +18,22 @@ public class MeepMeepTesting {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
 
-        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep).setStartPose(new Pose2d(38, 71, 90))
+//        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep).setStartPose(new Pose2d(38, 71, 90))
+//                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+//                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+//                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-56, -56, -30))
+//                        .setReversed(false).splineToSplineHeading(new Pose2d(-23.44, -5, Math.toRadians(0)), Math.toRadians(0))
+//                        .build());
+
+        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
+                .setStartPose(new Pose2d(38, 71, 90))
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-23.44, 0, 0))
-                        .setReversed(true).splineToLinearHeading(new Pose2d(-56, -56, Math.toRadians(45)), Math.toRadians(210))
-                        .build());
-
+                .followTrajectorySequence(drive -> 
+                    drive.trajectorySequenceBuilder(new Pose2d(-56, -52, Math.toRadians(60)))
+                        .splineToSplineHeading(new Pose2d(-23.44, -5, 0), Math.toRadians(0))
+                        .build()
+                );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)
                 .setDarkMode(true)

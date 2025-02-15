@@ -241,6 +241,10 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
     }
   }
 
+  public void runCharacterization(double output) {
+    
+  }
+
   public void turn(double angle) {
     turnAsync(angle);
     waitForIdle();

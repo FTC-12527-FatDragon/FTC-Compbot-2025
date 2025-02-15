@@ -24,6 +24,8 @@ public class BasketUnlimited extends AutoCommandBase {
   // For Basket Scoring
   public static Pose2dHelperClass Basket = new Pose2dHelperClass(-56, -56, 45);
 
+  public static Pose2dHelperClass BasketForSpline = new Pose2dHelperClass(-55, -56, 60);
+
   public static Pose2dHelperClass S1Basket =
       new Pose2dHelperClass(-60.124, -54.577, Math.toDegrees(1.1506));
 
@@ -57,7 +59,7 @@ public class BasketUnlimited extends AutoCommandBase {
 
   public static long startStowToPath = 0;
 
-  public static long stowedToGrabDelay = 0;
+  public static long stowedToGrabDelay = 100;
 
   public static long stopLinearToLLM = 0;
 
@@ -101,7 +103,7 @@ public class BasketUnlimited extends AutoCommandBase {
         new LineToLinearPathCommand(drive, S1Basket.toPose2d())
             .alongWith(
                 slide.aimCommand().alongWith(new InstantCommand(() -> slide.setTurnServo(S1TurnPos))),
-                upLiftToBasket().alongWith(new InstantCommand(() -> slide.slideArmDown()))
+                upLiftToBasket()
                     .andThen(
                         wait(drive, firstBasketWaitMs),
                         stowArmFromBasket().alongWith(slideExtendCommand.get()))),
@@ -111,7 +113,7 @@ public class BasketUnlimited extends AutoCommandBase {
                         .andThen(new WaitCommand(stowedToGrabDelay), slide.grabCommand())),
 
         new LineToLinearPathCommand(drive, S1Basket.toPose2d())
-            .alongWith(fastHandoff().andThen(upLiftToBasket().alongWith(new InstantCommand(() -> slide.slideArmDown())))),
+            .alongWith(fastHandoff().andThen(upLiftToBasket())),
         wait(drive, basketWaitMs),
         stowArmFromBasket().alongWith(
                 slide.aimCommand().alongWith(new InstantCommand(() -> slide.setTurnServo(S2TurnPos))), slideExtendCommand.get()),
@@ -122,7 +124,7 @@ public class BasketUnlimited extends AutoCommandBase {
                         .andThen(new WaitCommand(stowedToGrabDelay), slide.grabCommand())),
 
         new LineToLinearPathCommand(drive, S2Basket.toPose2d())
-            .alongWith(fastHandoff().andThen(upLiftToBasket().alongWith(new InstantCommand(() -> slide.slideArmDown())))),
+            .alongWith(fastHandoff().andThen(upLiftToBasket())),
         wait(drive, basketWaitMs),
         stowArmFromBasket().alongWith(slide.aimCommand().alongWith(new InstantCommand(() -> slide.setTurnServo(S3TurnPos))), slideExtendCommand.get()),
 
@@ -131,31 +133,43 @@ public class BasketUnlimited extends AutoCommandBase {
                 new WaitUntilCommand(() -> lift.atHome(15))
                         .andThen(new WaitCommand(stowedToGrabDelay), slide.grabCommand())),
 
-        new LineToLinearPathCommand(drive, Basket.toPose2d())
-            .alongWith(fastHandoff().andThen(upLiftToBasket().alongWith(new InstantCommand(() -> slide.slideArmDown())))),
+        new LineToLinearPathCommand(drive, BasketForSpline.toPose2d())
+            .alongWith(fastHandoff().andThen(upLiftToBasket())),
         wait(drive, basketWaitMs),
-        stowArmFromBasket().alongWith(slowHandoff(), new WaitCommand(startStowToPath).andThen(new LineToLinearPathCommand(drive, splinePoint1.toPose2d(), true).andThen(new WaitCommand(stopLinearToLLM)))),
+        stowArmFromBasket().alongWith(slowHandoff(), new WaitCommand(startStowToPath).andThen(
+                new SplineToPathCommand(drive, splinePoint1.toPose2d(), 0)
+                        .andThen(
+                                new WaitCommand(stopLinearToLLM)))),
 
             //new SplineToPathCommand(drive, splinePoint1.toPose2d(), goPickTangent),
 //        wait(drive, 100),
         autoSamplePickCommand(),
-        new SplineToPathCommand(drive, Basket.toPose2d(), true)
-            .alongWith(new WaitCommand(pick2Handoff).andThen(slowHandoff(), upLiftToBasket().alongWith(new InstantCommand(() -> slide.slideArmDown())))),
+        new SplineToPathCommand(drive, BasketForSpline.toPose2d(), true)
+            .alongWith(
+                    new WaitCommand(pick2Handoff).andThen(slowHandoff(), upLiftToBasket())),
         wait(drive, basketWaitForAutoPickMs),
 
-        stowArmFromBasket().alongWith(slowHandoff(), new WaitCommand(startStowToPath).andThen(new LineToLinearPathCommand(drive, splinePoint1.toPose2d(), true).andThen(new WaitCommand(stopLinearToLLM)))),
+        stowArmFromBasket().alongWith(slowHandoff(), new WaitCommand(startStowToPath).andThen(
+                new SplineToPathCommand(drive, splinePoint2.toPose2d(), 0)
+                    .andThen(
+                            new WaitCommand(stopLinearToLLM)))),
         //new SplineToPathCommand(drive, splinePoint2.toPose2d(), goPickTangent),
 //        wait(drive, 100),
         autoSamplePickCommand(),
-        new SplineToPathCommand(drive, Basket.toPose2d(), true)
-            .alongWith(new WaitCommand(pick2Handoff).andThen(slowHandoff(), upLiftToBasket().alongWith(new InstantCommand(() -> slide.slideArmDown())))),
+        new SplineToPathCommand(drive, BasketForSpline.toPose2d(), true)
+            .alongWith(
+                    new WaitCommand(pick2Handoff).andThen(slowHandoff(), upLiftToBasket())),
         wait(drive, basketWaitForAutoPickMs),
-        stowArmFromBasket().alongWith(slowHandoff(), new WaitCommand(startStowToPath).andThen(new LineToLinearPathCommand(drive, splinePoint1.toPose2d(), true).andThen(new WaitCommand(stopLinearToLLM)))),
+        stowArmFromBasket().alongWith(slowHandoff(), new WaitCommand(startStowToPath).andThen(
+                new SplineToPathCommand(drive, splinePoint1.toPose2d(), 0)
+                        .andThen(
+                                new WaitCommand(stopLinearToLLM)))),
         //new SplineToPathCommand(drive, splinePoint1.toPose2d(), goPickTangent),
 //        wait(drive, 100),
         autoSamplePickCommand(),
-        new SplineToPathCommand(drive, Basket.toPose2d(), true)
-            .alongWith(new WaitCommand(pick2Handoff).andThen(slowHandoff(), upLiftToBasket().alongWith(new InstantCommand(() -> slide.slideArmDown())))),
+        new SplineToPathCommand(drive, BasketForSpline.toPose2d(), true)
+            .alongWith(
+                    new WaitCommand(pick2Handoff).andThen(slowHandoff(), upLiftToBasket())),
         wait(drive, basketWaitForAutoPickMs),
         stowArmFromBasket().alongWith(slowHandoff()));
   }

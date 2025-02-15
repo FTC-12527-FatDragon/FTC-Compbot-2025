@@ -47,7 +47,7 @@ public class SplineToPathCommand extends CommandBase {
     } else {
       Trajectory trajectory =
           TrajectoryManager.trajectoryBuilder(drive.getPoseEstimate(), true)
-              .splineToLinearHeading(goalPose, Math.toRadians(210))
+              .splineToSplineHeading(goalPose, Math.toRadians(250))
               .build();
       drive.followTrajectoryAsync(trajectory);
     }
@@ -61,7 +61,13 @@ public class SplineToPathCommand extends CommandBase {
 
   @Override
   public void execute() {
+    currentPose = drive.getPoseEstimate();
     drive.update();
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    drive.breakFollowing(true);
   }
 
   @Override
