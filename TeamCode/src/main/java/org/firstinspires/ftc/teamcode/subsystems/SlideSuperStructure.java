@@ -69,7 +69,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   private final Servo slideArmServo;
   private final DcMotorEx slideMotor;
 
-  private final ProfiledPIDController pidController;
+  private final PIDController pidController;
   public static double kP = 0.01, kI = 0.0, kD = 0;
   public static double maxVelocity = 7500;
   public static double maxAcceleration = 8000;
@@ -104,7 +104,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
     slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-    pidController = new ProfiledPIDController(kP, kI, kD, new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
+    pidController = new PIDController(kP, kI, kD);
     batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
     this.telemetry = telemetry;
@@ -392,7 +392,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
 
   public void resetEncoder() {
     runOpenLoop(0);
-    pidController.reset(slideMotor.getCurrentPosition());
+    pidController.reset();
     pidController.calculate(0);
     // TODO: does this work?
     slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
