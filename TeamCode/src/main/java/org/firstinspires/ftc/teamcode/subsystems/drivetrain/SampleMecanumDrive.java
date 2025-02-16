@@ -528,8 +528,8 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
 
   @Override
   public void periodic() {
-    telemetry.addData("Velocity", od.getPoseVelocity().getX());
-    telemetry.addData("Velocity", od.getPoseVelocity().getY());
-    telemetry.addData("Velocity", od.getPoseVelocity().getHeading());
+    telemetry.addData("Velocity X", od.getPoseVelocity().getX());
+    telemetry.addData("Velocity Y", od.getPoseVelocity().getY());
+    telemetry.addData("Velocity Heading", od.getPoseVelocity().getHeading());
   }
 }

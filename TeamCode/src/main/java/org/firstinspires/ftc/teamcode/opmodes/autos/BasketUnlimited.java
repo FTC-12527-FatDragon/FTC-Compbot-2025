@@ -75,6 +75,7 @@ public class BasketUnlimited extends AutoCommandBase {
 
   @Override
   public void initializeSuperStructure() {
+    drive.setPoseEstimate(startPose);
     drive.breakFollowing(true);
     slide.stow();
     slide.openIntakeClaw();

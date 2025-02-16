@@ -21,6 +21,7 @@ public class LineToLinearPathCommand extends CommandBase {
     this.drive = drive;
     this.goalPose = goalPose;
     isBack = false;
+    shouldWithinRange = false;
   }
 
   public LineToLinearPathCommand(
