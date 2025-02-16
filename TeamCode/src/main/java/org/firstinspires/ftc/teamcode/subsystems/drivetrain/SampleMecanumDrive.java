@@ -64,7 +64,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   public static PIDCoefficients MED_HEADING_PID = new PIDCoefficients(1.8, 0, 0);
 
   public static PIDCoefficients SLOW_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.3);
-  public static PIDCoefficients SLOW_HEADING_PID = new PIDCoefficients(2, 0, 0.05);
+  public static PIDCoefficients SLOW_HEADING_PID = new PIDCoefficients(2.13, 0, 0.15);
 
   @Setter public TrajectoryMode currentTrajectoryMode = TrajectoryMode.FAST;
 
