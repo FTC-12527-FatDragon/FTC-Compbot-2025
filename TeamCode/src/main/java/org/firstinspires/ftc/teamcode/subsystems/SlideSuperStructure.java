@@ -16,10 +16,13 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.Range;
 import edu.wpi.first.math.MathUtil;
 import java.util.concurrent.atomic.AtomicReference;
+
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import lombok.Getter;
 import lombok.Setter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.MathUtils;
+import org.firstinspires.ftc.teamcode.utils.ProfiledPIDController;
 
 @Config
 public class SlideSuperStructure extends MotorPIDSlideSubsystem {
@@ -66,8 +69,10 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   private final Servo slideArmServo;
   private final DcMotorEx slideMotor;
 
-  private final PIDController pidController;
+  private final ProfiledPIDController pidController;
   public static double kP = 0.01, kI = 0.0, kD = 0;
+  public static double maxVelocity = 7500;
+  public static double maxAcceleration = 8000;
   private final VoltageSensor batteryVoltageSensor;
 
   private static double slideExtensionVal = 0;
@@ -99,7 +104,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
     slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-    pidController = new PIDController(kP, kI, kD);
+    pidController = new ProfiledPIDController(kP, kI, kD, new TrapezoidProfile.Constraints(maxVelocity, maxAcceleration));
     batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
     this.telemetry = telemetry;
@@ -236,7 +241,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
     STOW(0, 0, 0.2, IntakeClawServo_OPEN),
     AIM(slideExtensionVal, SlideArmServo_AIM_, 0.2, IntakeClawServo_OPEN),
     GRAB(slideExtensionVal, SlideArmServo_GRAB, 0.2, IntakeClawServo_GRAB),
-    HANDOFF(0, SlideArmServo_HANDOFF, 0.81, IntakeClawServo_GRAB),
+    HANDOFF(-5, SlideArmServo_HANDOFF, 0.81, IntakeClawServo_GRAB),
     AUTOSWIPE(SlideMotor_extensionValue, 0.3, 0.45, IntakeClawServo_OPEN);
 
     public final double slideExtension;
@@ -269,7 +274,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   }
 
   public void backwardSlideExtension() {
-    slideExtensionVal = 0;
+    slideExtensionVal = -5;
   }
 
   public void leftTurnServo() {
@@ -387,7 +392,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
 
   public void resetEncoder() {
     runOpenLoop(0);
-    pidController.reset();
+    pidController.reset(slideMotor.getCurrentPosition());
     pidController.calculate(0);
     // TODO: does this work?
     slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

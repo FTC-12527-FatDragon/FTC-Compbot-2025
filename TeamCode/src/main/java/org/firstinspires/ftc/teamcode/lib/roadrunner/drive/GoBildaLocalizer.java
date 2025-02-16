@@ -57,8 +57,10 @@ public class GoBildaLocalizer implements Localizer {
   /** IMPORTANT: Requires *stationary* robot. */
   public void recalibrateIMU() {
     odometry.recalibrateIMU();
+    odometry.resetPosAndIMU();
   }
 
   @Override
   public void update() {}
+
 }

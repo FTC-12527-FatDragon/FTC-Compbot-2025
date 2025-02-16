@@ -13,7 +13,10 @@ import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstant
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.kV;
 
 import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
@@ -42,6 +45,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Setter;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.GoBildaLocalizer;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
@@ -94,6 +99,8 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   private List<Integer> lastEncVels = new ArrayList<>();
 
   private double yawHeading = 0;
+
+  private Telemetry telemetry;
 
   public SampleMecanumDrive(HardwareMap hardwareMap) {
     super(
@@ -205,6 +212,17 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
             lastTrackingEncVels);
 
     CommandScheduler.getInstance().registerSubsystem(this);
+    this.telemetry = FtcDashboard.getInstance().getTelemetry();
+  }
+
+
+  public SampleMecanumDrive(HardwareMap hardwareMap, Telemetry telemetry) {
+    this(hardwareMap);
+    this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+  }
+
+  public void resetPinpoint() {
+    od.recalibrateIMU();
   }
 
   public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
@@ -506,5 +524,12 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
     SLOW,
     MEDIUM,
     FAST
+  }
+
+  @Override
+  public void periodic() {
+    telemetry.addData("Velocity", od.getPoseVelocity().getX());
+    telemetry.addData("Velocity", od.getPoseVelocity().getY());
+    telemetry.addData("Velocity", od.getPoseVelocity().getHeading());
   }
 }

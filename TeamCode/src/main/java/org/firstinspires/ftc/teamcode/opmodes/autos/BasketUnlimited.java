@@ -48,13 +48,13 @@ public class BasketUnlimited extends AutoCommandBase {
 
   public static long basketWaitMs = 650;
 
-  public static long basketWaitForAutoPickMs = 180;
+  public static long basketWaitForAutoPickMs = 0;
 
   public static long firstBasketWaitMs = 500;
 
   public static long pick2Handoff = 0;
 
-  public static long startStowToPath = 0;
+  public static long startStowToPath = 200;
 
   public static long stowedToGrabDelay = 0;
 

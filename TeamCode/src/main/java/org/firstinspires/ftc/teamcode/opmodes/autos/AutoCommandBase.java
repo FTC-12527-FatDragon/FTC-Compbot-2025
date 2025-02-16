@@ -64,8 +64,9 @@ public abstract class AutoCommandBase extends LinearOpMode {
     liftClaw = new LiftClaw(hardwareMap);
     climb = new Climber(hardwareMap);
     slide = new SlideSuperStructure(hardwareMap, telemetry);
-    drive = new SampleMecanumDrive(hardwareMap);
+    drive = new SampleMecanumDrive(hardwareMap, telemetry);
     vision = new Vision(hardwareMap, telemetry);
+    drive.resetPinpoint();
   }
 
   protected Command upLiftToBasket() {
@@ -98,7 +99,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
                 .andThen(
                     slide.aimCommand(turnServoSupplier),
                     new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)))),
-        new WaitCommand(150),
+        new WaitCommand(50),
         slide.grabCommand());
   }
 
