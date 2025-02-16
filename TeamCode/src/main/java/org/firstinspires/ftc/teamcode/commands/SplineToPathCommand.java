@@ -54,9 +54,9 @@ public class SplineToPathCommand extends CommandBase {
 
   private boolean isWithinRange() {
     return MathUtil.isNear(goalPose.getX(), currentPose.getX(), DriveConstants.xPoseError)
-        && MathUtil.isNear(goalPose.getY(), currentPose.getY(), DriveConstants.yPoseError);
-//        && MathUtil.isNear(
-//            goalPose.getHeading(), currentPose.getHeading(), DriveConstants.headingPoseError);
+        && MathUtil.isNear(goalPose.getY(), currentPose.getY(), DriveConstants.yPoseError)
+        && MathUtil.isNear(
+            goalPose.getHeading(), currentPose.getHeading(), DriveConstants.headingPoseError);
   }
 
   @Override

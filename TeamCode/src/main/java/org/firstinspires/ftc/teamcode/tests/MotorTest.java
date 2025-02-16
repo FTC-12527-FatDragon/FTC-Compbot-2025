@@ -8,8 +8,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "motor test")
@@ -25,7 +23,6 @@ public class MotorTest extends LinearOpMode {
   public static boolean reset = true;
   public static boolean set_power_mode = true;
   public static String motor_name_0 = "leftFrontMotor";
-  private boolean timeStart = false;
 
   @Override
   public void runOpMode() {
@@ -41,23 +38,12 @@ public class MotorTest extends LinearOpMode {
       motor0.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
-
     while (opModeIsActive()) {
-      if(!timeStart) {
-        timer.reset();
-        timeStart = true;
-      }
       if (set_power_mode) {
         if (read_only) {
           motor0.setPower(0);
         } else {
-          if(timer.time() < 10) {
-            motor0.setPower(max_power);
-          }
-          else {
-            motor0.setPower(0);
-          }
+          motor0.setPower(max_power);
         }
         motor0.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
