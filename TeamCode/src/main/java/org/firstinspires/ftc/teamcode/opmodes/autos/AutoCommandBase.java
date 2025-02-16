@@ -42,7 +42,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected Vision vision;
   protected Pose2d currentPose = new Pose2d();
 
-  public static long handoff_slide2LiftCloseDelayMs = 100;
+  public static long handoff_slide2LiftCloseDelayMs = 200;
   public static long handoff_liftClose2OpenIntakeDelayMs = 50;
   public static int liftClawScoreThreshold = 75;
 
@@ -96,11 +96,9 @@ public abstract class AutoCommandBase extends LinearOpMode {
         sampleAutoAlignCommand.alongWith(
             new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
                 .andThen(
-                    slide.aimCommand(),
-                    new WaitCommand(50),
-                    new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)),
-                    new InstantCommand(() -> slide.setTurnServo(turnServoSupplier)),
-                    new WaitCommand(0))),
+                    slide.aimCommand(turnServoSupplier),
+                    new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)))),
+        new WaitCommand(150),
         slide.grabCommand());
   }
 

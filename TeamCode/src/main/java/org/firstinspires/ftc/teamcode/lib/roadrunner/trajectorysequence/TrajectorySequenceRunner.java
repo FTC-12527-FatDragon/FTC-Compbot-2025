@@ -6,7 +6,6 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
-import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -14,8 +13,8 @@ import com.acmerobotics.roadrunner.profile.MotionState;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryMarker;
 import com.acmerobotics.roadrunner.util.NanoClock;
-import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -28,9 +27,6 @@ import org.firstinspires.ftc.teamcode.lib.roadrunner.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.util.LogFiles;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 import org.firstinspires.ftc.teamcode.utils.ProfiledPIDController;
-
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-
 
 @Config
 public class TrajectorySequenceRunner {
@@ -47,7 +43,7 @@ public class TrajectorySequenceRunner {
   private final TrajectoryFollower follower;
 
   private final ProfiledPIDController turnController;
-//  private final PIDFController turnController;
+  //  private final PIDFController turnController;
 
   private final NanoClock clock;
 
@@ -80,10 +76,14 @@ public class TrajectorySequenceRunner {
       List<Integer> lastTrackingEncVels) {
     this.follower = follower;
 
-    turnController = new ProfiledPIDController(
-            headingPIDCoefficients.kP, headingPIDCoefficients.kI, headingPIDCoefficients.kD,
-            new TrapezoidProfile.Constraints(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL));
-    turnController.enableContinuousInput(-Math.PI, Math.PI);
+    turnController =
+        new ProfiledPIDController(
+            headingPIDCoefficients.kP,
+            headingPIDCoefficients.kI,
+            headingPIDCoefficients.kD,
+            new TrapezoidProfile.Constraints(
+                DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL));
+    turnController.enableContinuousInput(0, 2 * Math.PI);
 
     this.voltageSensor = voltageSensor;
 

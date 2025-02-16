@@ -119,6 +119,15 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
         new InstantCommand(() -> intakeClawServo.setPosition(Goal.AIM.clawAngle)));
   }
 
+  public Command aimCommand(AtomicReference<Double> turnServoRef) {
+    return new SequentialCommandGroup(
+        setGoalCommand(Goal.AIM),
+        new InstantCommand(() -> setTurnServo(turnServoRef)),
+        setServoPosCommand(slideArmServo, Goal.AIM.slideArmPos, aimCommand_Arm2OpenDelayMs),
+        new InstantCommand(() -> wristServo.setPosition(Goal.AIM.wristPos)),
+        new InstantCommand(() -> intakeClawServo.setPosition(Goal.AIM.clawAngle)));
+  }
+
   //  public Command preAimCommand() {
   //    return new SequentialCommandGroup(
   //        setGoalCommand(Goal.PRE_AIM), setServoPosCommand(slideArmServo, SlideArmServo_PREAIM,

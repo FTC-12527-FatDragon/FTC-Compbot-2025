@@ -72,9 +72,9 @@ public class SplineToPathCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    if (isBack) {
-      return isWithinRange();
-    }
+//    if (isBack) {
+//      return isWithinRange();
+//    }
     return !drive.isBusy();
   }
 }

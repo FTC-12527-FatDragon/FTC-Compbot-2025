@@ -23,7 +23,8 @@ public class LineToLinearPathCommand extends CommandBase {
     isBack = false;
   }
 
-  public LineToLinearPathCommand(SampleMecanumDrive drive, Pose2d goalPose, boolean shouldWithinRange) {
+  public LineToLinearPathCommand(
+      SampleMecanumDrive drive, Pose2d goalPose, boolean shouldWithinRange) {
     this.drive = drive;
     this.goalPose = goalPose;
     this.shouldWithinRange = shouldWithinRange;
