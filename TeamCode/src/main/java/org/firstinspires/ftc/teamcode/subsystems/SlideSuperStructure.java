@@ -67,7 +67,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   private final DcMotorEx slideMotor;
 
   private final PIDController pidController;
-  public static double kP = 0.01, kI = 0.0, kD = 0;
+  public static double kP = 0.008, kI = 0.0, kD = 0;
   public static double maxVelocity = 7500;
   public static double maxAcceleration = 8000;
   private final VoltageSensor batteryVoltageSensor;

@@ -35,10 +35,10 @@ public class BasketUnlimited extends AutoCommandBase {
 
   // The middle sample
   public static Pose2dHelperClass S2 =
-      new Pose2dHelperClass(-62.8178, -50.8168, Math.toDegrees(1.4281));
+      new Pose2dHelperClass(-63, -50.8168, Math.toDegrees(1.4281));
 
   // The left sample
-  public static Pose2dHelperClass S3 = new Pose2dHelperClass(-63.25, -48.5, 113);
+  public static Pose2dHelperClass S3 = new Pose2dHelperClass(-63, -48.5, 113);
 
   // Middle point for spline
   public static Pose2dHelperClass splinePoint1 = new Pose2dHelperClass(-24.44, -10, 0);
