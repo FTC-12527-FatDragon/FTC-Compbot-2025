@@ -34,8 +34,7 @@ public class BasketUnlimited extends AutoCommandBase {
       new Pose2dHelperClass(-59.8, -48.99884, Math.toDegrees(1.12748));
 
   // The middle sample
-  public static Pose2dHelperClass S2 =
-      new Pose2dHelperClass(-63, -50.8168, Math.toDegrees(1.4281));
+  public static Pose2dHelperClass S2 = new Pose2dHelperClass(-63, -50.8168, Math.toDegrees(1.4281));
 
   // The left sample
   public static Pose2dHelperClass S3 = new Pose2dHelperClass(-63, -48.5, 113);

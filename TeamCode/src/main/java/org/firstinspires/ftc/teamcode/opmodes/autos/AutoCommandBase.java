@@ -6,12 +6,10 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
 import com.arcrobotics.ftclib.command.RunCommand;
-import com.arcrobotics.ftclib.command.ScheduleCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -19,7 +17,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.Getter;
 import org.firstinspires.ftc.teamcode.commands.AutoDriveCommand;
-import org.firstinspires.ftc.teamcode.commands.LineToLinearPathCommand;
 import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
@@ -97,12 +94,12 @@ public abstract class AutoCommandBase extends LinearOpMode {
                     new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)))),
         new WaitCommand(50),
         slide.grabCommand());
-//        new ConditionalCommand(
-//            new ScheduleCommand(
-//                new LineToLinearPathCommand(drive, goalPose)
-//                    .andThen(autoSamplePickCommand(goalPose))),
-//            new InstantCommand(),
-//            () -> !slide.isClawGrabSample()));
+    //        new ConditionalCommand(
+    //            new ScheduleCommand(
+    //                new LineToLinearPathCommand(drive, goalPose)
+    //                    .andThen(autoSamplePickCommand(goalPose))),
+    //            new InstantCommand(),
+    //            () -> !slide.isClawGrabSample()));
   }
 
   protected Command stowArmFromBasket() {

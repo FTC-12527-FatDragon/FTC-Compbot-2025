@@ -28,7 +28,8 @@ public class SplineToPathCommand extends CommandBase {
     this(drive, goalPose, endHeading, false);
   }
 
-  public SplineToPathCommand(SampleMecanumDrive drive, Pose2d goalPose, boolean reversed, double endHeading) {
+  public SplineToPathCommand(
+      SampleMecanumDrive drive, Pose2d goalPose, boolean reversed, double endHeading) {
     this(drive, goalPose, endHeading, reversed);
   }
 

@@ -3,13 +3,17 @@ package org.firstinspires.ftc.teamcode.opmodes.autos;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.Command;
+import com.arcrobotics.ftclib.command.FunctionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import java.util.function.Supplier;
+import org.firstinspires.ftc.teamcode.commands.LineToLinearPathCommand;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.utils.MathUtils;
 import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 
 @Config
@@ -67,20 +71,6 @@ public class Chamber6 extends AutoCommandBase {
     liftClaw.closeClaw();
   }
 
-  private Command grabCycle(Command followCommand, Command nxt) {
-    return slide
-        .grabCommand()
-        .andThen(
-            followCommand
-                .alongWith(
-                    fastHandoff()
-                        .andThen(
-                            upLiftArmOpen
-                                .get()
-                                .alongWith(slide.aimCommand(), slideExtendCommand.get())))
-                .andThen(liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 0).alongWith(nxt)));
-  }
-
   @Override
   public Command runAutoCommand() {
     Supplier<Command> hangSpecimen =
@@ -97,6 +87,26 @@ public class Chamber6 extends AutoCommandBase {
             () -> {
               drive.setPoseEstimate(startPose);
               drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.MEDIUM);
-            }));
+            }),
+        new LineToLinearPathCommand(drive, spec1Pose.toPose2d()),
+        turnCommand(100),
+        new LineToLinearPathCommand(drive, spec2Pose.toPose2d()),
+        turnCommand(100),
+        new LineToLinearPathCommand(drive, spec3Pose.toPose2d()),
+        turnCommand(100));
+  }
+
+  private Command turnCommand(double turnDegrees) {
+    return new FunctionalCommand(
+        () -> drive.turnAsync(Math.toRadians(turnDegrees)),
+        () -> drive.update(),
+        (interrupted) -> {},
+        () ->
+            !drive.isBusy()
+                || MathUtils.isNear(
+                    turnDegrees,
+                    drive.getPoseEstimate().getHeading(),
+                    DriveConstants.headingPoseError),
+        drive);
   }
 }
