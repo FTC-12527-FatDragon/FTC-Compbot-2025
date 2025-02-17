@@ -96,13 +96,13 @@ public abstract class AutoCommandBase extends LinearOpMode {
                     slide.aimCommand(turnServoSupplier),
                     new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)))),
         new WaitCommand(50),
-        slide.grabCommand(),
-        new ConditionalCommand(
-            new ScheduleCommand(
-                new LineToLinearPathCommand(drive, goalPose)
-                    .andThen(autoSamplePickCommand(goalPose))),
-            new InstantCommand(),
-            () -> !slide.isClawGrabSample()));
+        slide.grabCommand());
+//        new ConditionalCommand(
+//            new ScheduleCommand(
+//                new LineToLinearPathCommand(drive, goalPose)
+//                    .andThen(autoSamplePickCommand(goalPose))),
+//            new InstantCommand(),
+//            () -> !slide.isClawGrabSample()));
   }
 
   protected Command stowArmFromBasket() {
