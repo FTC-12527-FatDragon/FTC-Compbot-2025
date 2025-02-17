@@ -1,19 +1,19 @@
-//package org.firstinspires.ftc.teamcode.controllers;
+// package org.firstinspires.ftc.teamcode.controllers;
 //
-//import androidx.annotation.NonNull;
-//import androidx.annotation.Nullable;
+// import androidx.annotation.NonNull;
+// import androidx.annotation.Nullable;
 //
-//import com.acmerobotics.roadrunner.control.PIDCoefficients;
-//import com.acmerobotics.roadrunner.drive.DriveSignal;
-//import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
-//import com.acmerobotics.roadrunner.geometry.Pose2d;
-//import com.acmerobotics.roadrunner.kinematics.Kinematics;
-//import com.acmerobotics.roadrunner.trajectory.Trajectory;
-//import com.acmerobotics.roadrunner.util.NanoClock;
+// import com.acmerobotics.roadrunner.control.PIDCoefficients;
+// import com.acmerobotics.roadrunner.drive.DriveSignal;
+// import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
+// import com.acmerobotics.roadrunner.geometry.Pose2d;
+// import com.acmerobotics.roadrunner.kinematics.Kinematics;
+// import com.acmerobotics.roadrunner.trajectory.Trajectory;
+// import com.acmerobotics.roadrunner.util.NanoClock;
 //
-//import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
+// import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 //
-//public class HolonomicProfileFollower extends TrajectoryFollower {
+// public class HolonomicProfileFollower extends TrajectoryFollower {
 //    private final AsymmetricProfiledController axialController;
 //    private final AsymmetricProfiledController lateralController;
 //    private final AsymmetricProfiledController headingController;
@@ -28,21 +28,26 @@
 //        super(admissibleError, timeout, NanoClock.system());
 //
 //        this.axialController = new AsymmetricProfiledController(
-//                axialCoeffs.kP, axialCoeffs.kI, axialCoeffs.kD, new AsymmetricTrapezoidProfile.Constraints(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ACCEL));
+//                axialCoeffs.kP, axialCoeffs.kI, axialCoeffs.kD, new
+// AsymmetricTrapezoidProfile.Constraints(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ACCEL));
 //
 //        this.lateralController =
-//                new AsymmetricProfiledController(lateralCoeffs.kP, lateralCoeffs.kI, lateralCoeffs.kD);
+//                new AsymmetricProfiledController(lateralCoeffs.kP, lateralCoeffs.kI,
+// lateralCoeffs.kD);
 //
 //        this.headingController =
-//                new AsymmetricProfiledController(headingCoeffs.kP, headingCoeffs.kI, headingCoeffs.kD);
+//                new AsymmetricProfiledController(headingCoeffs.kP, headingCoeffs.kI,
+// headingCoeffs.kD);
 //
 //        // Set heading controller to wrap around ±π
 //        this.headingController.enableContinuousInput(-Math.PI, Math.PI);
 //    }
 //
 //    public SQPIDHolonomicFollower(
-//            PIDCoefficients axialCoeffs, PIDCoefficients lateralCoeffs, PIDCoefficients headingCoeffs) {
-//        this(axialCoeffs, lateralCoeffs, headingCoeffs, new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
+//            PIDCoefficients axialCoeffs, PIDCoefficients lateralCoeffs, PIDCoefficients
+// headingCoeffs) {
+//        this(axialCoeffs, lateralCoeffs, headingCoeffs, new Pose2d(0.5, 0.5, Math.toRadians(5.0)),
+// 0.5);
 //    }
 //
 //    @Override
@@ -93,8 +98,10 @@
 //
 //        // Calculate corrections using SQPID
 //        double axialCorrection = axialController.calculate(0.0, poseError.getX(), currentVelX);
-//        double lateralCorrection = lateralController.calculate(0.0, poseError.getY(), currentVelY);
-//        double headingCorrection = headingController.calculate(0.0, poseError.getHeading(), currentVelHeading);
+//        double lateralCorrection = lateralController.calculate(0.0, poseError.getY(),
+// currentVelY);
+//        double headingCorrection = headingController.calculate(0.0, poseError.getHeading(),
+// currentVelHeading);
 //
 //        // Combine feed-forward and feedback
 //        Pose2d correctedVelocity =
@@ -107,4 +114,4 @@
 //
 //        return new DriveSignal(correctedVelocity, targetRobotAccel);
 //    }
-//}
+// }

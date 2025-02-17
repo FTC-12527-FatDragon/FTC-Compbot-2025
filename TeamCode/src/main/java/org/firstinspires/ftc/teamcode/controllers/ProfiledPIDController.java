@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.controllers;
 
-import org.firstinspires.ftc.teamcode.utils.PIDController;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import org.firstinspires.ftc.teamcode.utils.PIDController;
 
 /**
  * Implements a PID control loop whose setpoint is constrained by a trapezoid profile. Users should

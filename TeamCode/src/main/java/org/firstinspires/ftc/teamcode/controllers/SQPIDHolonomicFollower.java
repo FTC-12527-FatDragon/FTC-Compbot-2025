@@ -9,7 +9,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.kinematics.Kinematics;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.util.NanoClock;
-
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 
 public class SQPIDHolonomicFollower extends TrajectoryFollower {
@@ -26,8 +25,14 @@ public class SQPIDHolonomicFollower extends TrajectoryFollower {
       double timeout) {
     super(admissibleError, timeout, NanoClock.system());
 
-    this.axialController = new SQPIDController(
-            axialCoeffs.kP, axialCoeffs.kI, axialCoeffs.kD, DriveConstants.kV, DriveConstants.kA, DriveConstants.kStatic);
+    this.axialController =
+        new SQPIDController(
+            axialCoeffs.kP,
+            axialCoeffs.kI,
+            axialCoeffs.kD,
+            DriveConstants.kV,
+            DriveConstants.kA,
+            DriveConstants.kStatic);
 
     this.lateralController =
         new SQPIDController(lateralCoeffs.kP, lateralCoeffs.kI, lateralCoeffs.kD);
@@ -81,9 +86,9 @@ public class SQPIDHolonomicFollower extends TrajectoryFollower {
     Pose2d poseError = Kinematics.calculateRobotPoseError(targetPose, currentPose);
 
     // Set the setpoint as the error and use 0 as measurement for SQPID control
-//    axialController.setSetpoint(poseError.getX());
-//    lateralController.setSetpoint(poseError.getY());
-//    headingController.setSetpoint(poseError.getHeading());
+    //    axialController.setSetpoint(poseError.getX());
+    //    lateralController.setSetpoint(poseError.getY());
+    //    headingController.setSetpoint(poseError.getHeading());
 
     // Update velocity targets for feed-forward
     double currentVelX = currentRobotVel != null ? currentRobotVel.getX() : 0.0;
@@ -93,7 +98,8 @@ public class SQPIDHolonomicFollower extends TrajectoryFollower {
     // Calculate corrections using SQPID
     double axialCorrection = axialController.calculate(0.0, poseError.getX(), currentVelX);
     double lateralCorrection = lateralController.calculate(0.0, poseError.getY(), currentVelY);
-    double headingCorrection = headingController.calculate(0.0, poseError.getHeading(), currentVelHeading);
+    double headingCorrection =
+        headingController.calculate(0.0, poseError.getHeading(), currentVelHeading);
 
     // Combine feed-forward and feedback
     Pose2d correctedVelocity =

@@ -15,7 +15,6 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryMarker;
 import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -27,7 +26,6 @@ import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.sequence
 import org.firstinspires.ftc.teamcode.lib.roadrunner.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.util.LogFiles;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
-import org.firstinspires.ftc.teamcode.controllers.ProfiledPIDController;
 
 @Config
 public class TrajectorySequenceRunner {
@@ -77,13 +75,13 @@ public class TrajectorySequenceRunner {
       List<Integer> lastTrackingEncVels) {
     this.follower = follower;
 
-//    turnController =
-//        new ProfiledPIDController(
-//            headingPIDCoefficients.kP,
-//            headingPIDCoefficients.kI,
-//            headingPIDCoefficients.kD,
-//            new TrapezoidProfile.Constraints(
-//                DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL));
+    //    turnController =
+    //        new ProfiledPIDController(
+    //            headingPIDCoefficients.kP,
+    //            headingPIDCoefficients.kI,
+    //            headingPIDCoefficients.kD,
+    //            new TrapezoidProfile.Constraints(
+    //                DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL));
     turnController = new PIDFController(headingPIDCoefficients);
     turnController.setInputBounds(0, 2 * Math.PI);
 

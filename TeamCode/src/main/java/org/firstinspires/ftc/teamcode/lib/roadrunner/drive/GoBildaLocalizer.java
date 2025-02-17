@@ -22,7 +22,7 @@ public class GoBildaLocalizer implements Localizer {
         DriveConstants.GoBildaXLocalizerDirection, DriveConstants.GoBildaYLocalizerDirection);
     odometry.setEncoderResolution(DriveConstants.GoBildaLocalizerEncoderResolution);
     odometry.setOffsets(mountOffsets.getX(), mountOffsets.getY());
-    odometry.resetPosAndIMU();
+    // odometry.resetPosAndIMU();
   }
 
   @NonNull
@@ -56,7 +56,6 @@ public class GoBildaLocalizer implements Localizer {
 
   /** IMPORTANT: Requires *stationary* robot. */
   public void recalibrateIMU() {
-    odometry.recalibrateIMU();
     odometry.resetPosAndIMU();
   }
 

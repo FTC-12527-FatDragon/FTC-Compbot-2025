@@ -27,15 +27,15 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   // SlideArmServo
   public static double SlideArmServo_AIM = 0.4;
   public static double SlideArmServo_GRAB = 0.3;
-  public static double SlideArmServo_HANDOFF = 0.58;
-  public static double SlideArmServo_AIM_ = 0.433;
+  public static double SlideArmServo_HANDOFF = 0.57;
+  public static double SlideArmServo_AIM_ = 0.428;
   public static double SlideArmServo_PREAIM = 0.3;
-  public static double SlideArmServo_FOLD = 0.747;
+  public static double SlideArmServo_FOLD = 0.731;
 
   // intakeClawServo
-  public static double IntakeClawServo_OPEN = 0.63;
+  public static double IntakeClawServo_OPEN = 0.71;
   public static double IntakeClawServo_OPENWIDER = 0.2;
-  public static double IntakeClawServo_GRAB = 0.32;
+  public static double IntakeClawServo_GRAB = 0.305;
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;

@@ -89,8 +89,7 @@ public class SQPIDController {
    * @throws IllegalArgumentException if period &lt;= 0
    */
   @SuppressWarnings("this-escape")
-  public SQPIDController(
-      double kp, double ki, double kd, double kS, double kV, double kA) {
+  public SQPIDController(double kp, double ki, double kd, double kS, double kV, double kA) {
     m_kp = kp;
     m_ki = ki;
     m_kd = kd;
@@ -394,14 +393,14 @@ public class SQPIDController {
   }
 
   private void updatePeriod() {
-      double currentTimeStamp = (double) System.nanoTime() / 1E9;
-      if (lastTimeStamp == 0) lastTimeStamp = currentTimeStamp;
-      m_period = currentTimeStamp - lastTimeStamp;
-      lastTimeStamp = currentTimeStamp;
+    double currentTimeStamp = (double) System.nanoTime() / 1E9;
+    if (lastTimeStamp == 0) lastTimeStamp = currentTimeStamp;
+    m_period = currentTimeStamp - lastTimeStamp;
+    lastTimeStamp = currentTimeStamp;
   }
 
   public double calculate(double measurement) {
-      updatePeriod();
+    updatePeriod();
 
     m_measurement = measurement;
     m_prevError = m_error;

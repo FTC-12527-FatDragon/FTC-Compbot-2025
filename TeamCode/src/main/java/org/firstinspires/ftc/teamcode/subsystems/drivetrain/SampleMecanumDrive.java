@@ -45,11 +45,11 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Setter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.controllers.SQPIDHolonomicFollower;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.GoBildaLocalizer;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequenceRunner;
-import org.firstinspires.ftc.teamcode.controllers.SQPIDHolonomicFollower;
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
@@ -62,8 +62,8 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   public static PIDCoefficients MED_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.3);
   public static PIDCoefficients MED_HEADING_PID = new PIDCoefficients(2, 0, 0);
 
-  public static PIDCoefficients SLOW_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.3);
-  public static PIDCoefficients SLOW_HEADING_PID = new PIDCoefficients(2.13, 0, 0.15);
+  public static PIDCoefficients SLOW_TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 0.3);
+  public static PIDCoefficients SLOW_HEADING_PID = new PIDCoefficients(2.3, 0, 0);
 
   @Setter public TrajectoryMode currentTrajectoryMode = TrajectoryMode.FAST;
 

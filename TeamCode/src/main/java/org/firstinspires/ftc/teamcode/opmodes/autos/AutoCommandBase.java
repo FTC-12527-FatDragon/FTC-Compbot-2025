@@ -66,7 +66,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
     slide = new SlideSuperStructure(hardwareMap, telemetry);
     drive = new SampleMecanumDrive(hardwareMap, telemetry);
     vision = new Vision(hardwareMap, telemetry);
-    drive.resetPinpoint();
+    // drive.resetPinpoint();
   }
 
   protected Command upLiftToBasket() {
@@ -186,13 +186,11 @@ public abstract class AutoCommandBase extends LinearOpMode {
 
   @Override
   public void runOpMode() throws InterruptedException {
-    double origval = SlideSuperStructure.IntakeClawServo_OPEN;
-
     initialize();
     initializeSuperStructure();
 
-    SlideSuperStructure.IntakeClawServo_OPEN = SlideSuperStructure.IntakeClawServo_OPENWIDER;
     drive.setPoseEstimate(getStartPose());
+    telemetry.addData("Init Complete", "Start Now");
     Command toRun = runAutoCommand().andThen(autoFinish());
     waitForStart();
 
@@ -203,6 +201,5 @@ public abstract class AutoCommandBase extends LinearOpMode {
       lift.periodicAsync();
       CommandScheduler.getInstance().run();
     }
-    SlideSuperStructure.IntakeClawServo_OPEN = origval;
   }
 }

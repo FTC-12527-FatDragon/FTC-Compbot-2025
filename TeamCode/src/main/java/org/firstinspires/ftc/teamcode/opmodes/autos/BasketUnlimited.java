@@ -55,7 +55,7 @@ public class BasketUnlimited extends AutoCommandBase {
 
   public static long startStowToPath = 200;
 
-  public static long stowedToGrabDelay = 0;
+  public static long stowedToGrabDelay = 200;
 
   public static long stopLinearToLLM = 0;
 
@@ -69,12 +69,13 @@ public class BasketUnlimited extends AutoCommandBase {
 
   @Override
   public Pose2d getStartPose() {
-    return drive.getPoseEstimate();
+    return startPose;
   }
 
   @Override
   public void initializeSuperStructure() {
     drive.setPoseEstimate(startPose);
+    drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);
     drive.breakFollowing(true);
     slide.stow();
     slide.openIntakeClaw();
@@ -93,11 +94,10 @@ public class BasketUnlimited extends AutoCommandBase {
 
     return new SequentialCommandGroup(
         new InstantCommand(
-                () -> {
-                  drive.setPoseEstimate(startPose);
-                  drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.MEDIUM);
-                })
-            .beforeStarting(liftClaw::closeClaw),
+            () -> {
+              drive.setPoseEstimate(startPose);
+              drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);
+            }),
         new LineToLinearPathCommand(drive, S1Basket.toPose2d(), false)
             .alongWith(
                 slide
