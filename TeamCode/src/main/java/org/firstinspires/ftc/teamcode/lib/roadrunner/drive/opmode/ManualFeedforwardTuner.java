@@ -82,6 +82,7 @@ public class ManualFeedforwardTuner extends LinearOpMode {
     telemetry.addLine("Ready!");
     telemetry.update();
     telemetry.clearAll();
+    drive.setPoseEstimate(new Pose2d());
 
     waitForStart();
 

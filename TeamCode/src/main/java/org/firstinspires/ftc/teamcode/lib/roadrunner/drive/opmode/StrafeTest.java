@@ -41,16 +41,16 @@ public class StrafeTest extends LinearOpMode {
 
     if (isStopRequested()) return;
 
-    drive.followTrajectory(trajectory);
+    drive.followTrajectoryAsync(trajectory);
 
+    while (!isStopRequested() && opModeIsActive()){
+      telemetry.addData("Speed", drive.getPoseVelocity().vec().norm());
+      telemetry.update();
+    }
     Pose2d poseEstimate = drive.getPoseEstimate();
     telemetry.addData("finalX", poseEstimate.getX());
     telemetry.addData("finalY", poseEstimate.getY());
     telemetry.addData("finalHeading", poseEstimate.getHeading());
-    telemetry.addData("Speed", drive.getPoseVelocity().vec().norm());
     telemetry.update();
-
-    while (!isStopRequested() && opModeIsActive())
-      ;
   }
 }

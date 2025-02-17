@@ -150,9 +150,9 @@ public class DriveConstants {
             GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD;
         GoBildaLocalizerPerpendicularOffset = new Translation2dHelperClass(0, -156);
         TRACK_WIDTH = 13;
-        kV = 0.01054;
+        kV = 0.0113;
         kA = 0.0025;
-        kStatic = 0.07263;
+        kStatic = 0.04;
         MAX_VEL = 70.59477340026181;
         MAX_ANG_VEL = Math.toRadians(139.1033922138209);
         break;
