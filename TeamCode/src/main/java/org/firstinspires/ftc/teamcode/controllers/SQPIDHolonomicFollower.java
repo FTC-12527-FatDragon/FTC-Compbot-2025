@@ -9,7 +9,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.kinematics.Kinematics;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.util.NanoClock;
-import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 
 public class SQPIDHolonomicFollower extends TrajectoryFollower {
   private final SQPIDController axialController;
@@ -25,14 +24,7 @@ public class SQPIDHolonomicFollower extends TrajectoryFollower {
       double timeout) {
     super(admissibleError, timeout, NanoClock.system());
 
-    this.axialController =
-        new SQPIDController(
-            axialCoeffs.kP,
-            axialCoeffs.kI,
-            axialCoeffs.kD,
-            DriveConstants.kV,
-            DriveConstants.kA,
-            DriveConstants.kStatic);
+    this.axialController = new SQPIDController(axialCoeffs.kP, axialCoeffs.kI, axialCoeffs.kD);
 
     this.lateralController =
         new SQPIDController(lateralCoeffs.kP, lateralCoeffs.kI, lateralCoeffs.kD);
