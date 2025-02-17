@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 
 /*
@@ -24,6 +25,15 @@ public class StrafeTest extends LinearOpMode {
         new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
     SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
+    if(DriveConstants.isSquid) {
+      drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);
+    }
+    else {
+      drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.MEDIUM);
+    }
+
+    drive.setPoseEstimate(new Pose2d());
 
     Trajectory trajectory = drive.trajectoryBuilder(new Pose2d()).strafeRight(DISTANCE).build();
 

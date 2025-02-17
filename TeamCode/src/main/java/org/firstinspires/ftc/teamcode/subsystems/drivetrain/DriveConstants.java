@@ -24,6 +24,8 @@ import org.firstinspires.ftc.teamcode.utils.Translation2dHelperClass;
 public class DriveConstants {
   public static final RobotType currentRobot = RobotType.GAMMA;
 
+  public static boolean isSquid = false;
+
   public static double xPoseError = 2;
   public static double yPoseError = 2;
   public static double headingPoseError = Math.toRadians(3);
