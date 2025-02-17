@@ -13,15 +13,10 @@ public class LineToLinearPathCommand extends CommandBase {
   private Pose2d goalPose;
   private Pose2d currentPose;
   private TrajectorySequence trajectorySequence;
-  private boolean isBack;
-  private boolean isAutoPick;
   private boolean shouldWithinRange;
 
   public LineToLinearPathCommand(SampleMecanumDrive drive, Pose2d goalPose) {
-    this.drive = drive;
-    this.goalPose = goalPose;
-    isBack = false;
-    shouldWithinRange = false;
+    this(drive, goalPose, false);
   }
 
   public LineToLinearPathCommand(
@@ -34,20 +29,11 @@ public class LineToLinearPathCommand extends CommandBase {
   @Override
   public void initialize() {
     currentPose = new Pose2d();
-    if (!isBack) {
-      trajectorySequence =
-          TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate())
-              .lineToLinearHeading(goalPose)
-              .build();
-      drive.followTrajectorySequenceAsync(trajectorySequence);
-    } else {
-      trajectorySequence =
-          TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate())
-              .forward(-12)
-              .lineToLinearHeading(goalPose)
-              .build();
-      drive.followTrajectorySequenceAsync(trajectorySequence);
-    }
+    trajectorySequence =
+        TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate())
+            .lineToLinearHeading(goalPose)
+            .build();
+    drive.followTrajectorySequenceAsync(trajectorySequence);
   }
 
   private boolean isWithinRange() {

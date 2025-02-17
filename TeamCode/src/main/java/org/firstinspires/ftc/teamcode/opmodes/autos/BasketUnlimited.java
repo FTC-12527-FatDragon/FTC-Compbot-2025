@@ -98,7 +98,7 @@ public class BasketUnlimited extends AutoCommandBase {
               drive.setPoseEstimate(startPose);
               drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);
             }),
-        new LineToLinearPathCommand(drive, S1Basket.toPose2d(), false)
+        new LineToLinearPathCommand(drive, S1Basket.toPose2d())
             .alongWith(
                 slide
                     .aimCommand()
@@ -151,7 +151,7 @@ public class BasketUnlimited extends AutoCommandBase {
         // new SplineToPathCommand(drive, splinePoint1.toPose2d(), goPickTangent),
         //        wait(drive, 100),
         autoSamplePickCommand(splinePoint1.toPose2d()),
-        new SplineToPathCommand(drive, BasketForSpline.toPose2d(), true)
+        new SplineToPathCommand(drive, BasketForSpline.toPose2d(), true, 250)
             .alongWith(new WaitCommand(pick2Handoff).andThen(slowHandoff(), upLiftToBasket())),
         wait(drive, basketWaitForAutoPickMs),
         stowArmFromBasket()
@@ -164,7 +164,7 @@ public class BasketUnlimited extends AutoCommandBase {
         // new SplineToPathCommand(drive, splinePoint2.toPose2d(), goPickTangent),
         //        wait(drive, 100),
         autoSamplePickCommand(splinePoint1.toPose2d()),
-        new SplineToPathCommand(drive, BasketForSpline.toPose2d(), true)
+        new SplineToPathCommand(drive, BasketForSpline.toPose2d(), true, 250)
             .alongWith(new WaitCommand(pick2Handoff).andThen(slowHandoff(), upLiftToBasket())),
         wait(drive, basketWaitForAutoPickMs),
         stowArmFromBasket());
