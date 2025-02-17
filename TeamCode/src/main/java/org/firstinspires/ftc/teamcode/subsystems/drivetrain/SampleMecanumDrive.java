@@ -13,7 +13,6 @@ import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstant
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.kV;
 
 import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -45,12 +44,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Setter;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.GoBildaLocalizer;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequenceRunner;
+import org.firstinspires.ftc.teamcode.controllers.SQPIDHolonomicFollower;
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
@@ -60,8 +59,8 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   public static PIDCoefficients FAST_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.5);
   public static PIDCoefficients FAST_HEADING_PID = new PIDCoefficients(2, 0, 0.15);
 
-  public static PIDCoefficients MED_TRANSLATIONAL_PID = new PIDCoefficients(5, 0, 0);
-  public static PIDCoefficients MED_HEADING_PID = new PIDCoefficients(1.8, 0, 0);
+  public static PIDCoefficients MED_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.3);
+  public static PIDCoefficients MED_HEADING_PID = new PIDCoefficients(2, 0, 0);
 
   public static PIDCoefficients SLOW_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.3);
   public static PIDCoefficients SLOW_HEADING_PID = new PIDCoefficients(2.13, 0, 0.15);
@@ -74,7 +73,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   public static double VY_WEIGHT = 1;
   public static double OMEGA_WEIGHT = 1;
 
-  public static double ADMISSIBLE_TIMEOUT = 0.1;
+  public static double ADMISSIBLE_TIMEOUT = 0.3;
 
   private TrajectorySequenceRunner fastTrajectorySequenceRunner;
   private TrajectorySequenceRunner medTrajectorySequenceRunner;
@@ -121,18 +120,18 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
 
     medFollower =
         new HolonomicPIDVAFollower(
-            MED_TRANSLATIONAL_PID,
-            MED_TRANSLATIONAL_PID,
-            MED_HEADING_PID,
-            new Pose2d(1.5, 1.5, Math.toRadians(2)), // Pose Error
-            ADMISSIBLE_TIMEOUT);
-
-    slowFollower =
-        new HolonomicPIDVAFollower(
             SLOW_TRANSLATIONAL_PID,
             SLOW_TRANSLATIONAL_PID,
             SLOW_HEADING_PID,
-            new Pose2d(1.5, 1.5, Math.toRadians(2)), // Pose Error
+            new Pose2d(0.5, 0.5, Math.toRadians(2)), // Pose Error
+            ADMISSIBLE_TIMEOUT);
+
+    slowFollower =
+        new SQPIDHolonomicFollower(
+            SLOW_TRANSLATIONAL_PID,
+            SLOW_TRANSLATIONAL_PID,
+            SLOW_HEADING_PID,
+            new Pose2d(0.5, 0.5, Math.toRadians(2)), // Pose Error
             ADMISSIBLE_TIMEOUT);
 
     // LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
@@ -214,7 +213,6 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
     CommandScheduler.getInstance().registerSubsystem(this);
     this.telemetry = FtcDashboard.getInstance().getTelemetry();
   }
-
 
   public SampleMecanumDrive(HardwareMap hardwareMap, Telemetry telemetry) {
     this(hardwareMap);
@@ -531,5 +529,9 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
     telemetry.addData("Velocity X", od.getPoseVelocity().getX());
     telemetry.addData("Velocity Y", od.getPoseVelocity().getY());
     telemetry.addData("Velocity Heading", od.getPoseVelocity().getHeading());
+
+    telemetry.addData("Error X", getLastError().getX());
+    telemetry.addData("Error Y", getLastError().getY());
+    telemetry.addData("Error Heading", getLastError().getHeading());
   }
 }

@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -26,7 +27,7 @@ import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.sequence
 import org.firstinspires.ftc.teamcode.lib.roadrunner.util.DashboardUtil;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.util.LogFiles;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
-import org.firstinspires.ftc.teamcode.utils.ProfiledPIDController;
+import org.firstinspires.ftc.teamcode.controllers.ProfiledPIDController;
 
 @Config
 public class TrajectorySequenceRunner {
@@ -42,7 +43,7 @@ public class TrajectorySequenceRunner {
 
   private final TrajectoryFollower follower;
 
-  private final ProfiledPIDController turnController;
+  private final PIDFController turnController;
   //  private final PIDFController turnController;
 
   private final NanoClock clock;
@@ -76,14 +77,15 @@ public class TrajectorySequenceRunner {
       List<Integer> lastTrackingEncVels) {
     this.follower = follower;
 
-    turnController =
-        new ProfiledPIDController(
-            headingPIDCoefficients.kP,
-            headingPIDCoefficients.kI,
-            headingPIDCoefficients.kD,
-            new TrapezoidProfile.Constraints(
-                DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL));
-    turnController.enableContinuousInput(0, 2 * Math.PI);
+//    turnController =
+//        new ProfiledPIDController(
+//            headingPIDCoefficients.kP,
+//            headingPIDCoefficients.kI,
+//            headingPIDCoefficients.kD,
+//            new TrapezoidProfile.Constraints(
+//                DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL));
+    turnController = new PIDFController(headingPIDCoefficients);
+    turnController.setInputBounds(0, 2 * Math.PI);
 
     this.voltageSensor = voltageSensor;
 
@@ -166,12 +168,13 @@ public class TrajectorySequenceRunner {
       } else if (currentSegment instanceof TurnSegment) {
         MotionState targetState = ((TurnSegment) currentSegment).getMotionProfile().get(deltaTime);
 
-        double correction = turnController.calculate(poseEstimate.getHeading(), targetState.getX());
+        turnController.setTargetPosition(targetState.getX());
+        double correction = turnController.update(poseEstimate.getHeading());
 
         double targetOmega = targetState.getV();
         double targetAlpha = targetState.getA();
 
-        lastPoseError = new Pose2d(0, 0, turnController.getPositionError());
+        lastPoseError = new Pose2d(0, 0, turnController.getLastError());
 
         Pose2d startPose = currentSegment.getStartPose();
         targetPose = startPose.copy(startPose.getX(), startPose.getY(), targetState.getX());

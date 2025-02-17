@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode.utils;
+package org.firstinspires.ftc.teamcode.controllers;
+
+import org.firstinspires.ftc.teamcode.utils.PIDController;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;

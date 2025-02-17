@@ -16,13 +16,10 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.Range;
 import edu.wpi.first.math.MathUtil;
 import java.util.concurrent.atomic.AtomicReference;
-
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import lombok.Getter;
 import lombok.Setter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.MathUtils;
-import org.firstinspires.ftc.teamcode.utils.ProfiledPIDController;
 
 @Config
 public class SlideSuperStructure extends MotorPIDSlideSubsystem {

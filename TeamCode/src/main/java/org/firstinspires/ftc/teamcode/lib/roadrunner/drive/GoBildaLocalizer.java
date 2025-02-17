@@ -62,5 +62,4 @@ public class GoBildaLocalizer implements Localizer {
 
   @Override
   public void update() {}
-
 }

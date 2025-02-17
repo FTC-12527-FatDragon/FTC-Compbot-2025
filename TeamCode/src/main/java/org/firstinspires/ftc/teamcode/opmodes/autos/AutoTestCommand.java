@@ -7,21 +7,17 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name = "Auto Test Log")
-public class AutoTestCommand extends AutoCommandBase{
-    @Override
-    public Command runAutoCommand() {
-        return new SequentialCommandGroup(
-                new WaitCommand(100000000)
-        );
-    }
+public class AutoTestCommand extends AutoCommandBase {
+  @Override
+  public Command runAutoCommand() {
+    return new SequentialCommandGroup(new WaitCommand(100000000));
+  }
 
-    @Override
-    public Pose2d getStartPose() {
-        return new Pose2d();
-    }
+  @Override
+  public Pose2d getStartPose() {
+    return new Pose2d();
+  }
 
-    @Override
-    public void initializeSuperStructure() {
-
-    }
+  @Override
+  public void initializeSuperStructure() {}
 }
