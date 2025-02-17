@@ -39,7 +39,7 @@ public class SplineToPathCommand extends CommandBase {
         TrajectoryManager.trajectoryBuilder(drive.getPoseEstimate(), reversed)
             .splineToLinearHeading(goalPose, endHeading)
             .build();
-    drive.followTrajectory(trajectory);
+    drive.followTrajectoryAsync(trajectory);
   }
 
   private boolean isWithinRange() {
