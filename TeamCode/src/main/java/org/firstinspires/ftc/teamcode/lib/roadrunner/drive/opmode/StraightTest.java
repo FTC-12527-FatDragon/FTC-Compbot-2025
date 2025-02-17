@@ -28,10 +28,9 @@ public class StraightTest extends LinearOpMode {
 
     drive.setPoseEstimate(new Pose2d());
 
-    if(DriveConstants.isSquid) {
+    if (DriveConstants.isSquid) {
       drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);
-    }
-    else {
+    } else {
       drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.MEDIUM);
     }
 
