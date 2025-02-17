@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import lombok.Getter;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStructure;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.TrajectoryManager;
@@ -17,11 +16,9 @@ public class SampleAutoAlignCommand extends CommandBase {
   private final SampleMecanumDrive drive;
   private final Vision vision;
   private final Telemetry telemetry;
-  private final SlideSuperStructure slide;
 
   private AtomicReference<Double> turnServo;
   private AtomicReference<Double> slideExtension;
-  private AtomicReference<Pose2d> snapShotPoseSupplier;
 
   private final double tickPerUnit = 422 / (440 / 25.4); // tick per inches
   private TrajectorySequence trajectorySequence;
@@ -31,19 +28,15 @@ public class SampleAutoAlignCommand extends CommandBase {
 
   public SampleAutoAlignCommand(
       SampleMecanumDrive drive,
-      SlideSuperStructure slide,
       Vision vision,
       Telemetry telemetry,
       AtomicReference<Double> turnServoSupplier,
-      AtomicReference<Double> slideExtensionSupplier,
-      AtomicReference<Pose2d> snapShotPoseSupplier) {
+      AtomicReference<Double> slideExtensionSupplier) {
     this.drive = drive;
-    this.slide = slide;
     this.vision = vision;
     this.telemetry = telemetry;
     this.turnServo = turnServoSupplier;
     this.slideExtension = slideExtensionSupplier;
-    this.snapShotPoseSupplier = snapShotPoseSupplier;
     addRequirements(drive);
   }
 
@@ -58,7 +51,6 @@ public class SampleAutoAlignCommand extends CommandBase {
 
     Pose2d currentPoseRelativeToField = drive.getPoseEstimate();
     telemetry.addData("Current Pose", currentPoseRelativeToField);
-    snapShotPoseSupplier.set(currentPoseRelativeToField);
 
     double distanceOffset = vision.getDistance() / 25.4; // inches
     double slideExtensionValue = 0;

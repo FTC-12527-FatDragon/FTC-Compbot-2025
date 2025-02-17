@@ -42,7 +42,7 @@ public class StrafeTest extends LinearOpMode {
 
     drive.followTrajectoryAsync(trajectory);
 
-    while (!isStopRequested() && opModeIsActive()){
+    while (!isStopRequested() && opModeIsActive()) {
       telemetry.addData("Speed", drive.getPoseVelocity().vec().norm());
       telemetry.update();
     }

@@ -373,6 +373,10 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
     return MathUtils.isNear(0, getCurrentPosition(), SlideMotor_atSetPointTolerance);
   }
 
+  public boolean isClawGrabSample() {
+    return true;
+  }
+
   public long getCurrentPosition() {
     return slideMotor.getCurrentPosition();
   }
