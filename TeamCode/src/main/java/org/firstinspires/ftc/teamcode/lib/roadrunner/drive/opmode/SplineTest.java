@@ -5,6 +5,8 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 
 /*
@@ -14,7 +16,17 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 public class SplineTest extends LinearOpMode {
   @Override
   public void runOpMode() throws InterruptedException {
+
     SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
+    if(DriveConstants.isSquid) {
+      drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);
+    }
+    else {
+      drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.MEDIUM);
+    }
+
+    drive.setPoseEstimate(new Pose2d());
 
     waitForStart();
 
