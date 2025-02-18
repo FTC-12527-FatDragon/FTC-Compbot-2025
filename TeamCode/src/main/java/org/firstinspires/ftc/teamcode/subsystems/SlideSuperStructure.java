@@ -33,9 +33,9 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   public static double SlideArmServo_FOLD = 0.731;
 
   // intakeClawServo
-  public static double IntakeClawServo_OPEN = 0.71;
+  public static double IntakeClawServo_OPEN = 0.66;
   public static double IntakeClawServo_OPENWIDER = 0.2;
-  public static double IntakeClawServo_GRAB = 0.305;
+  public static double IntakeClawServo_GRAB = 0.27;
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;
@@ -193,8 +193,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
               forwardSlideExtension(Goal.AUTOSWIPE.slideExtension);
               slideArmServo.setPosition(Goal.AUTOSWIPE.slideArmPos);
               intakeClawServo.setPosition(Goal.AUTOSWIPE.clawAngle);
-            }),
-        new WaitUntilCommand(this::slideMotorAtGoal));
+            }));
   }
 
   public void openIntakeClaw() {
@@ -239,7 +238,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
     AIM(slideExtensionVal, SlideArmServo_AIM_, 0.2, IntakeClawServo_OPEN),
     GRAB(slideExtensionVal, SlideArmServo_GRAB, 0.2, IntakeClawServo_GRAB),
     HANDOFF(-5, SlideArmServo_HANDOFF, 0.81, IntakeClawServo_GRAB),
-    AUTOSWIPE(SlideMotor_extensionValue, 0.3, 0.45, IntakeClawServo_OPEN);
+    AUTOSWIPE(SlideMotor_extensionValue, 0.2, 0.55, IntakeClawServo_GRAB);
 
     public final double slideExtension;
     public final double slideArmPos;
@@ -355,7 +354,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
     DEG_05(0.4),
     DEG_07(0.6),
     DEG_08(0.8),
-    DEG_INVERTED_HORIZ(0.925),
+    DEG_INVERTED_HORIZ(0.97),
     UNKNOWN(-1);
     public final double turnAngleDeg;
 

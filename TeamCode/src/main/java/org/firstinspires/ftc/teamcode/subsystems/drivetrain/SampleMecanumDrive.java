@@ -122,7 +122,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
             ADMISSIBLE_TIMEOUT);
 
     medFollower =
-        new HolonomicPIDVAFollower(
+        new SQPIDHolonomicFollower(
             SLOW_TRANSLATIONAL_PID,
             SLOW_TRANSLATIONAL_PID,
             SLOW_HEADING_PID,

@@ -19,13 +19,11 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import edu.wpi.first.math.MathUtil;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.opmode.LocalizationTest;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
-import org.firstinspires.ftc.teamcode.opmodes.autos.BasketUnlimited;
 import org.firstinspires.ftc.teamcode.opmodes.autos.Chamber6;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
@@ -53,7 +51,7 @@ public class TXBetaBotSolo extends CommandOpMode {
 
   public static boolean setPose = false;
   public static Pose2dHelperClass Pose = new Pose2dHelperClass();
-  public static boolean shouldClimb = false;
+  public static boolean shouldClimb = true;
   private boolean isTimerStart = false;
   private boolean lowBasketMode = false;
 
@@ -72,9 +70,6 @@ public class TXBetaBotSolo extends CommandOpMode {
     drive = new SampleMecanumDrive(hardwareMap);
     vision = new Vision(hardwareMap, telemetry);
 
-    AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
-    AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
-
     initializeMode();
     vision.initializeCamera();
     vision.setLEDPWM();
@@ -85,7 +80,7 @@ public class TXBetaBotSolo extends CommandOpMode {
     drive.breakFollowing(true);
 
     // climber = new Climber(hardwareMap);
-    drive.setPoseEstimate(BasketUnlimited.startPose);
+    drive.setPoseEstimate(Chamber6.startPose);
 
     // Teleop Drive Command
     drive.setDefaultCommand(
@@ -100,6 +95,8 @@ public class TXBetaBotSolo extends CommandOpMode {
     // =================================================================================
 
     // SAMPLE MODE
+
+    gamepadEx1.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(slide.swipeCommand());
 
     new FunctionalButton(
             () ->
@@ -243,7 +240,7 @@ public class TXBetaBotSolo extends CommandOpMode {
                     new InstantCommand(),
                     () -> slide.getGoal() == SlideSuperStructure.Goal.HANDOFF),
                 new InstantCommand(() -> currentMode = DriverMode.SPECIMEN),
-                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.AVOID_COLLISION, 200),
+                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.AVOID_COLLISION, 100),
                 slide.foldSlideStructureCommand(),
                 new WaitCommand(200),
                 liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 0),
@@ -337,24 +334,6 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3) && shouldClimb)
         .whenPressed(climber.elevateCommand().withTimeout(2000));
-
-    //        gamepadEx1
-    //            .getGamepadButton(GamepadKeys.Button.BACK)
-    //            .whenPressed(
-    //                new SequentialCommandGroup(
-    //                    slowHandoffSCommand.get(),
-    //                    sampleAutoAlignCommand.alongWith(
-    //                        new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
-    //                            .andThen(
-    //                                slide.aimCommand(),
-    //                                new WaitCommand(50),
-    //                                new InstantCommand(
-    //                                    () ->
-    // slide.forwardSlideExtension(slideExtensionSupplier)),
-    //                                new InstantCommand(() ->
-    // slide.setTurnServo(turnServoSupplier)),
-    //                                new WaitCommand(100))),
-    //                    slide.grabCommand()));
 
     gamepadEx1
         .getGamepadButton(GamepadKeys.Button.BACK)

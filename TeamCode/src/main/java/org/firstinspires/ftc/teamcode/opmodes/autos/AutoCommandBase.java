@@ -167,6 +167,15 @@ public abstract class AutoCommandBase extends LinearOpMode {
         new InstantCommand(() -> lift.setGoal(Lift.Goal.HANG)));
   }
 
+  public Command switchToSpecimenMode() {
+    return new SequentialCommandGroup(
+        liftClaw.setLiftClawServo(LiftClaw.LiftClawState.AVOID_COLLISION, 100),
+        slide.foldSlideStructureCommand(),
+        new WaitCommand(200),
+        liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 0),
+        liftClaw.openClawCommand());
+  }
+
   /**
    * Gets the command to run in auto, this should be implemented in each auto.
    *

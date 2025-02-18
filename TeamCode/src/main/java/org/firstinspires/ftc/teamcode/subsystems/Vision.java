@@ -26,7 +26,7 @@ public class Vision extends SubsystemBase {
   @Getter @Setter private SampleColor detectionColor = SampleColor.BLUE;
   @Getter private LLResult result;
 
-  public static double CAMERA_HEIGHT = 307.0;
+  public static double CAMERA_HEIGHT = 307.0 - 16;
   public static double CAMERA_ANGLE = -45.0;
   public static double TARGET_HEIGHT = 19.05;
 
