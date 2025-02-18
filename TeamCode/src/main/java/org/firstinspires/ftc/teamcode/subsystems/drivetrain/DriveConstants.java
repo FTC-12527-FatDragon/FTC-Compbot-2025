@@ -26,9 +26,9 @@ public class DriveConstants {
 
   public static boolean isSquid = false;
 
-  public static double xPoseError = 2;
-  public static double yPoseError = 2;
-  public static double headingPoseError = Math.toRadians(3);
+  public static double xPoseError = 0.15;
+  public static double yPoseError = 0.15;
+  public static double headingPoseError = Math.toRadians(1);
 
   public enum RobotType {
     ALPHA,

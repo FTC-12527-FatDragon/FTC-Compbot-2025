@@ -8,9 +8,12 @@ import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstant
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.RUN_USING_ENCODER;
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.TRACK_WIDTH;
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.encoderTicksToInches;
+import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.headingPoseError;
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.kV;
+import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.xPoseError;
+import static org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants.yPoseError;
 
 import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -73,8 +76,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   public static double VY_WEIGHT = 1;
   public static double OMEGA_WEIGHT = 1;
 
-  public static double SLOW_ADMISSIBLE_TIMEOUT = 0.3;
-  public static double MED_ADMISSIBLE_TIMEOUT = 0.2;
+  public static double ADMISSIBLE_TIMEOUT = 0.3;
 
   private TrajectorySequenceRunner fastTrajectorySequenceRunner;
   private TrajectorySequenceRunner medTrajectorySequenceRunner;
@@ -117,23 +119,23 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
             FAST_TRANSLATIONAL_PID,
             FAST_HEADING_PID,
             new Pose2d(1.5, 1.5, Math.toRadians(2)), // Pose Error
-            SLOW_ADMISSIBLE_TIMEOUT);
+            ADMISSIBLE_TIMEOUT);
 
     medFollower =
-        new SQPIDHolonomicFollower(
-            MED_TRANSLATIONAL_PID,
-            MED_TRANSLATIONAL_PID,
-            MED_HEADING_PID,
-            new Pose2d(1, 1, Math.toRadians(2)), // Pose Error
-            MED_ADMISSIBLE_TIMEOUT);
+        new HolonomicPIDVAFollower(
+            SLOW_TRANSLATIONAL_PID,
+            SLOW_TRANSLATIONAL_PID,
+            SLOW_HEADING_PID,
+            new Pose2d(0.5, 0.5, Math.toRadians(2)), // Pose Error
+            ADMISSIBLE_TIMEOUT);
 
     slowFollower =
         new SQPIDHolonomicFollower(
             SLOW_TRANSLATIONAL_PID,
             SLOW_TRANSLATIONAL_PID,
             SLOW_HEADING_PID,
-            new Pose2d(0.5, 0.5, Math.toRadians(2)), // Pose Error
-            SLOW_ADMISSIBLE_TIMEOUT);
+            new Pose2d(xPoseError, yPoseError, Math.toRadians(headingPoseError)), // Pose Error
+            ADMISSIBLE_TIMEOUT);
 
     // LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -534,5 +536,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
     telemetry.addData("Error X", getLastError().getX());
     telemetry.addData("Error Y", getLastError().getY());
     telemetry.addData("Error Heading", getLastError().getHeading());
+
+    telemetry.addData("Current Mode", currentTrajectoryMode);
   }
 }

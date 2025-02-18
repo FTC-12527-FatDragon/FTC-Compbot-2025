@@ -24,7 +24,7 @@ public class StrafeTest extends LinearOpMode {
     Telemetry telemetry =
         new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
-    SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+    SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap, telemetry);
 
     if (DriveConstants.isSquid) {
       drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);
@@ -45,6 +45,7 @@ public class StrafeTest extends LinearOpMode {
     while (!isStopRequested() && opModeIsActive()) {
       telemetry.addData("Speed", drive.getPoseVelocity().vec().norm());
       telemetry.update();
+      drive.update();
     }
     Pose2d poseEstimate = drive.getPoseEstimate();
     telemetry.addData("finalX", poseEstimate.getX());

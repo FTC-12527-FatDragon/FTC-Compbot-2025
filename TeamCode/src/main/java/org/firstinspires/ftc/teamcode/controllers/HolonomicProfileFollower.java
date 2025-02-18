@@ -19,7 +19,7 @@
 //    private final AsymmetricProfiledController headingController;
 //    private Pose2d lastError;
 //
-//    public SQPIDHolonomicFollower(
+//    public HolonomicProfileFollower(
 //            PIDCoefficients axialCoeffs,
 //            PIDCoefficients lateralCoeffs,
 //            PIDCoefficients headingCoeffs,
@@ -29,21 +29,25 @@
 //
 //        this.axialController = new AsymmetricProfiledController(
 //                axialCoeffs.kP, axialCoeffs.kI, axialCoeffs.kD, new
-// AsymmetricTrapezoidProfile.Constraints(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ACCEL));
+// AsymmetricTrapezoidProfile.Constraints(DriveConstants.MAX_VEL, DriveConstants.MAX_ACCEL));
 //
 //        this.lateralController =
 //                new AsymmetricProfiledController(lateralCoeffs.kP, lateralCoeffs.kI,
-// lateralCoeffs.kD);
+// lateralCoeffs.kD,  new
+//                        AsymmetricTrapezoidProfile.Constraints(DriveConstants.MAX_VEL,
+// DriveConstants.MAX_ACCEL));
 //
 //        this.headingController =
 //                new AsymmetricProfiledController(headingCoeffs.kP, headingCoeffs.kI,
-// headingCoeffs.kD);
+// headingCoeffs.kD,  new
+//                        AsymmetricTrapezoidProfile.Constraints(DriveConstants.MAX_ANG_VEL,
+// DriveConstants.MAX_ANG_ACCEL));
 //
 //        // Set heading controller to wrap around ±π
 //        this.headingController.enableContinuousInput(-Math.PI, Math.PI);
 //    }
 //
-//    public SQPIDHolonomicFollower(
+//    public HolonomicProfileFollower(
 //            PIDCoefficients axialCoeffs, PIDCoefficients lateralCoeffs, PIDCoefficients
 // headingCoeffs) {
 //        this(axialCoeffs, lateralCoeffs, headingCoeffs, new Pose2d(0.5, 0.5, Math.toRadians(5.0)),
@@ -97,11 +101,10 @@
 //        double currentVelHeading = currentRobotVel != null ? currentRobotVel.getHeading() : 0.0;
 //
 //        // Calculate corrections using SQPID
-//        double axialCorrection = axialController.calculate(0.0, poseError.getX(), currentVelX);
-//        double lateralCorrection = lateralController.calculate(0.0, poseError.getY(),
+//        double axialCorrection = axialController.calculate();
+//        double lateralCorrection = lateralController.calculate(0.0),
 // currentVelY);
-//        double headingCorrection = headingController.calculate(0.0, poseError.getHeading(),
-// currentVelHeading);
+//        double headingCorrection = headingController.calculate(0.0, poseError.getHeading());
 //
 //        // Combine feed-forward and feedback
 //        Pose2d correctedVelocity =

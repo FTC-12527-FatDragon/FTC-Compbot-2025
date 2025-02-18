@@ -42,8 +42,8 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected Vision vision;
   protected Pose2d currentPose = new Pose2d();
 
-  public static long handoff_slide2LiftCloseDelayMs = 200;
-  public static long handoff_liftClose2OpenIntakeDelayMs = 50;
+  public static long handoff_slide2LiftCloseDelayMs = 50;
+  public static long handoff_liftClose2OpenIntakeDelayMs = 100;
   public static int liftClawScoreThreshold = 75;
 
   private static TrajectorySequence sequence = null;

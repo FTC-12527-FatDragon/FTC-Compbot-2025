@@ -24,7 +24,7 @@ public class StraightTest extends LinearOpMode {
     Telemetry telemetry =
         new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
-    SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+    SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap, telemetry);
 
     drive.setPoseEstimate(new Pose2d());
 

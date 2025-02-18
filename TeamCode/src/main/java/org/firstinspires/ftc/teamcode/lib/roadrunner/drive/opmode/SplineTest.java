@@ -16,7 +16,7 @@ public class SplineTest extends LinearOpMode {
   @Override
   public void runOpMode() throws InterruptedException {
 
-    SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+    SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap, telemetry);
 
     if (DriveConstants.isSquid) {
       drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);

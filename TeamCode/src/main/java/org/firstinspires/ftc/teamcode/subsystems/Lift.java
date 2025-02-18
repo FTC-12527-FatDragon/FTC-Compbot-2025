@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.utils.MathUtils;
 
 @Config
 public class Lift extends MotorPIDSlideSubsystem {
-  public static double kP = 0.01, kI = 0.0, kD = 0.0, kV = 0, kS = 0.12, kG = 0.12;
+  public static double kP = 0.007, kI = 0.0, kD = 0.0, kV = 0, kS = 0, kG = 0.04;
   public static double autoBasketHeight = 750;
   private final PIDController pidController;
   private final Motor liftMotorUp;
@@ -137,7 +137,7 @@ public class Lift extends MotorPIDSlideSubsystem {
     if (goal == Goal.HANG) {
       output += hangAddtionalPower;
     }
-    output *= 12 / batteryVoltageSensor.getVoltage();
+    //    output *= 12 / batteryVoltageSensor.getVoltage();
     output = Range.clip(output, -1, 1);
     liftMotorUp.set(output);
     liftMotorDown.set(output);
