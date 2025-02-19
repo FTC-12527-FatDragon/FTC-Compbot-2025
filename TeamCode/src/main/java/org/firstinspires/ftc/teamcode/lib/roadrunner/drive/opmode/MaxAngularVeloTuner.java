@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
  * <p>Further fine tuning of MAX_ANG_VEL may be desired.
  */
 @Config
-@Autonomous(group = "drive")
+//@Autonomous(group = "drive")
 public class MaxAngularVeloTuner extends LinearOpMode {
   public static double RUNTIME = 4.0;
 

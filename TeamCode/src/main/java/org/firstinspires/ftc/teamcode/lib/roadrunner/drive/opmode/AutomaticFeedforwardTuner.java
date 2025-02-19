@@ -31,7 +31,7 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
  *      regression.
  */
 @Config
-@Autonomous(group = "drive")
+//@Autonomous(group = "drive")
 public class AutomaticFeedforwardTuner extends LinearOpMode {
   public static double MAX_POWER = 0.7;
   public static double DISTANCE = 100; // in

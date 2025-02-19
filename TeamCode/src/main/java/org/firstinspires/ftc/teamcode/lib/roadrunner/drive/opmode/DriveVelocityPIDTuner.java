@@ -47,7 +47,7 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
  * Pressing B/O (Xbox/PS4) will cede control back to the tuning process.
  */
 @Config
-@Autonomous(group = "drive")
+//@Autonomous(group = "drive")
 public class DriveVelocityPIDTuner extends LinearOpMode {
   public static double DISTANCE = 72; // in
 
