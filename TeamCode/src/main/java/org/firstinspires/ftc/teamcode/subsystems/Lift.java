@@ -139,8 +139,11 @@ public class Lift extends MotorPIDSlideSubsystem {
 
     lastTime = timer.time(TimeUnit.MILLISECONDS);
 
-
     // telemetry.update();
+  }
+
+  public boolean isPreHang() {
+    return liftMotorUp.getCurrentPosition() > 200;
   }
 
   public enum Goal {

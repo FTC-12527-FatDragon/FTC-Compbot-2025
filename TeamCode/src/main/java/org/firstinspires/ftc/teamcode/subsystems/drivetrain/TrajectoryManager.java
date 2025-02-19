@@ -39,6 +39,14 @@ public class TrajectoryManager {
     return new TrajectoryBuilder(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
   }
 
+  public static TrajectoryBuilder trajectoryBuilder(
+      Pose2d startPose, double maxVel, double maxAccel) {
+    return new TrajectoryBuilder(
+        startPose,
+        getVelocityConstraint(maxVel, MAX_ANG_VEL, TRACK_WIDTH),
+        getAccelerationConstraint(maxAccel));
+  }
+
   public static TrajectoryBuilder trajectoryBuilder(Pose2d startPose, boolean reversed) {
     return new TrajectoryBuilder(startPose, reversed, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
   }

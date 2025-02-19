@@ -199,6 +199,8 @@ public abstract class AutoCommandBase extends LinearOpMode {
       currentPose = drive.getPoseEstimate();
       lift.periodicAsync();
       CommandScheduler.getInstance().run();
+      telemetry.addData("Y Velocity", drive.getPoseVelocity().getY());
+      telemetry.update();
     }
   }
 }

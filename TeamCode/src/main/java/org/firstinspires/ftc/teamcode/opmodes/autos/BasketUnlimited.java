@@ -9,14 +9,12 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.LineToLinearPathCommand;
-import org.firstinspires.ftc.teamcode.commands.SplineToPathCommand;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 
 @Config
 @Autonomous(name = "Basket ∞", group = "Autos")
 public class BasketUnlimited extends AutoCommandBase {
-
   // For Basket Scoring
   public static Pose2dHelperClass Basket = new Pose2dHelperClass(-56, -56, 45);
 
@@ -26,14 +24,13 @@ public class BasketUnlimited extends AutoCommandBase {
       new Pose2dHelperClass(-60.124, -54, Math.toDegrees(1.1506));
 
   public static Pose2dHelperClass PreloadBasket =
-          new Pose2dHelperClass(-58, -53, Math.toDegrees(1.1506));
+      new Pose2dHelperClass(-58, -53, Math.toDegrees(1.1506));
 
   public static Pose2dHelperClass S2Basket =
       new Pose2dHelperClass(-64.694, -53, Math.toDegrees(1.621));
 
   // The right sample
-  public static Pose2dHelperClass S1 =
-      new Pose2dHelperClass(-59.7, -48.5, Math.toDegrees(1.12748));
+  public static Pose2dHelperClass S1 = new Pose2dHelperClass(-59.7, -48.5, Math.toDegrees(1.12748));
 
   // The middle sample
   public static Pose2dHelperClass S2 = new Pose2dHelperClass(-63, -50.8168, Math.toDegrees(1.4281));
@@ -105,7 +102,7 @@ public class BasketUnlimited extends AutoCommandBase {
                     .aimCommand()
                     .alongWith(new InstantCommand(() -> slide.setTurnServo(S1TurnPos))),
                 upLiftToBasket()),
-            stowArmFromBasket().alongWith(slideExtendCommand.get()),
+        stowArmFromBasket().alongWith(slideExtendCommand.get()),
         new WaitCommand(200),
         new LineToLinearPathCommand(drive, S1.toPose2d()),
         slide.grabCommand(),

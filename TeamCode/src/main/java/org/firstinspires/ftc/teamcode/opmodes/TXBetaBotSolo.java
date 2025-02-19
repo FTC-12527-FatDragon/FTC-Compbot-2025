@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -19,11 +18,9 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import edu.wpi.first.math.MathUtil;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
-import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.opmode.LocalizationTest;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
 import org.firstinspires.ftc.teamcode.opmodes.autos.BasketUnlimited;
 import org.firstinspires.ftc.teamcode.opmodes.autos.Chamber6;
@@ -31,7 +28,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
 import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStructure;
-import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.utils.FunctionalButton;
 import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
@@ -358,6 +354,10 @@ public class TXBetaBotSolo extends CommandOpMode {
       setPose = false;
       drive.setPoseEstimate(Pose.toPose2d());
     }
+
+    telemetry.addData("Pose X", drive.getPoseEstimate().getX());
+    telemetry.addData("Pose Y", drive.getPoseEstimate().getY());
+    telemetry.update();
   }
 
   public enum DriverMode {

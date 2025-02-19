@@ -76,7 +76,9 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   public static double VY_WEIGHT = 1;
   public static double OMEGA_WEIGHT = 1;
 
-  public static double ADMISSIBLE_TIMEOUT = 0.3;
+  public static double SLOW_ADMISSIBLE_TIMEOUT = 0.3;
+
+  public static double MED_ADMISSIBLE_TIMEOUT = 0.2;
 
   private TrajectorySequenceRunner fastTrajectorySequenceRunner;
   private TrajectorySequenceRunner medTrajectorySequenceRunner;
@@ -119,15 +121,15 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
             FAST_TRANSLATIONAL_PID,
             FAST_HEADING_PID,
             new Pose2d(1.5, 1.5, Math.toRadians(2)), // Pose Error
-            ADMISSIBLE_TIMEOUT);
+            SLOW_ADMISSIBLE_TIMEOUT);
 
     medFollower =
-        new HolonomicPIDVAFollower(
+        new SQPIDHolonomicFollower(
             SLOW_TRANSLATIONAL_PID,
             SLOW_TRANSLATIONAL_PID,
             SLOW_HEADING_PID,
             new Pose2d(0.5, 0.5, Math.toRadians(2)), // Pose Error
-            ADMISSIBLE_TIMEOUT);
+            MED_ADMISSIBLE_TIMEOUT);
 
     slowFollower =
         new SQPIDHolonomicFollower(
@@ -135,7 +137,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
             SLOW_TRANSLATIONAL_PID,
             SLOW_HEADING_PID,
             new Pose2d(xPoseError, yPoseError, Math.toRadians(headingPoseError)), // Pose Error
-            ADMISSIBLE_TIMEOUT);
+            SLOW_ADMISSIBLE_TIMEOUT);
 
     // LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -528,7 +530,5 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   }
 
   @Override
-  public void periodic() {
-
-  }
+  public void periodic() {}
 }
