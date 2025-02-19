@@ -27,19 +27,19 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   // SlideArmServo
   public static double SlideArmServo_AIM = 0.4;
   public static double SlideArmServo_GRAB = 0.3;
-  public static double SlideArmServo_HANDOFF = 0.56; // 0.56
+  public static double SlideArmServo_HANDOFF = 0.57; // 0.56
   public static double SlideArmServo_AIM_ = 0.428;
   public static double SlideArmServo_PREAIM = 0.3;
   public static double SlideArmServo_FOLD = 0.731;
 
   // intakeClawServo
-  public static double IntakeClawServo_OPEN = 0.66;
+  public static double IntakeClawServo_OPEN = 0.7;
   public static double IntakeClawServo_OPENWIDER = 0.2;
-  public static double IntakeClawServo_GRAB = 0.27;
+  public static double IntakeClawServo_GRAB = 0.305;
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;
-  public static double WristServo_FOLD = 0.51;
+  public static double WristServo_FOLD = 0.47;
 
   // wristTurnServo
   public static double WristTurnServo_POS0 = 0.2;
@@ -176,7 +176,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   public Command fastHandoffCommand() {
     return new SequentialCommandGroup(
         setGoalCommand(Goal.HANDOFF),
-        setTurnServoPosCommand(TurnServo.DEG_0, handoffCommand_wristTurn2wristHandoffDelayMs),
+        setTurnServoPosCommand(TurnServo.DEG_0, 0),
         new InstantCommand(() -> wristServo.setPosition(Goal.HANDOFF.wristPos)),
         new InstantCommand(() -> slideArmServo.setPosition(Goal.HANDOFF.slideArmPos)),
         new InstantCommand(() -> slideExtensionVal = Goal.HANDOFF.slideExtension),
@@ -193,7 +193,8 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
               forwardSlideExtension(Goal.AUTOSWIPE.slideExtension);
               slideArmServo.setPosition(Goal.AUTOSWIPE.slideArmPos);
               intakeClawServo.setPosition(Goal.AUTOSWIPE.clawAngle);
-            }));
+            }),
+        new WaitUntilCommand(this::slideMotorAtGoal));
   }
 
   public void openIntakeClaw() {
@@ -237,8 +238,8 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
     STOW(0, 0, 0.2, IntakeClawServo_OPEN),
     AIM(slideExtensionVal, SlideArmServo_AIM_, 0.2, IntakeClawServo_OPEN),
     GRAB(slideExtensionVal, SlideArmServo_GRAB, 0.2, IntakeClawServo_GRAB),
-    HANDOFF(-5, SlideArmServo_HANDOFF, 0.81, IntakeClawServo_GRAB),
-    AUTOSWIPE(SlideMotor_extensionValue, 0.2, 0.55, IntakeClawServo_GRAB);
+    HANDOFF(-5, SlideArmServo_HANDOFF, 0.75, IntakeClawServo_GRAB),
+    AUTOSWIPE(SlideMotor_extensionValue, 0.3, 0.45, IntakeClawServo_OPEN);
 
     public final double slideExtension;
     public final double slideArmPos;
@@ -354,7 +355,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
     DEG_05(0.4),
     DEG_07(0.6),
     DEG_08(0.8),
-    DEG_INVERTED_HORIZ(0.97),
+    DEG_INVERTED_HORIZ(0.925),
     UNKNOWN(-1);
     public final double turnAngleDeg;
 
@@ -424,11 +425,6 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
 
     slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     double setpointTicks = slideExtensionVal;
-
-    telemetry.addData("Current Goal", goal);
-    telemetry.addData("Goal Extension", setpointTicks);
-    telemetry.addData("Slide.CurrentPosition", getCurrentPosition());
-    telemetry.update();
 
     double pidPower = pidController.calculate(getCurrentPosition(), setpointTicks);
     pidPower *= 12 / batteryVoltageSensor.getVoltage();

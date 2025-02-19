@@ -65,7 +65,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   public static PIDCoefficients MED_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.3);
   public static PIDCoefficients MED_HEADING_PID = new PIDCoefficients(2, 0, 0);
 
-  public static PIDCoefficients SLOW_TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 0.3);
+  public static PIDCoefficients SLOW_TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0.05);
   public static PIDCoefficients SLOW_HEADING_PID = new PIDCoefficients(2.3, 0, 0);
 
   @Setter public TrajectoryMode currentTrajectoryMode = TrajectoryMode.FAST;
@@ -122,7 +122,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
             ADMISSIBLE_TIMEOUT);
 
     medFollower =
-        new SQPIDHolonomicFollower(
+        new HolonomicPIDVAFollower(
             SLOW_TRANSLATIONAL_PID,
             SLOW_TRANSLATIONAL_PID,
             SLOW_HEADING_PID,
@@ -529,14 +529,6 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
 
   @Override
   public void periodic() {
-    telemetry.addData("Velocity X", od.getPoseVelocity().getX());
-    telemetry.addData("Velocity Y", od.getPoseVelocity().getY());
-    telemetry.addData("Velocity Heading", od.getPoseVelocity().getHeading());
 
-    telemetry.addData("Error X", getLastError().getX());
-    telemetry.addData("Error Y", getLastError().getY());
-    telemetry.addData("Error Heading", getLastError().getHeading());
-
-    telemetry.addData("Current Mode", currentTrajectoryMode);
   }
 }

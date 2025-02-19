@@ -38,7 +38,7 @@ public class Lift extends MotorPIDSlideSubsystem {
   public static double MAX_VEL = 0;
   public static double MAX_ACL = 0;
 
-  public static double PRE_HANG_TICKS = 175;
+  public static double PRE_HANG_TICKS = 250;
 
   private final ElevatorFeedforward feedforward;
 
@@ -115,10 +115,6 @@ public class Lift extends MotorPIDSlideSubsystem {
   }
 
   public void periodicAsync() {
-    telemetry.addData("Lift.Current Goal", goal);
-    telemetry.addData("Lift.At Goal", atGoal());
-    telemetry.addData("Lift.Current Position", getCurrentPosition());
-    telemetry.addData("Lift.Is Resetting", isResetting);
     if (goal == Goal.OPEN_LOOP || isResetting) return;
 
     if (lastSetpoint != goal.setpointTicks) {
@@ -129,7 +125,6 @@ public class Lift extends MotorPIDSlideSubsystem {
     double timeInterval =
         Range.clip((timer.time(TimeUnit.MILLISECONDS) - lastTime) * 0.001, 0.001, 0.05);
 
-    telemetry.addData("Time Interval", timeInterval);
     setpointState = profile.calculate(timeInterval, setpointState, goalState);
 
     double pidPower = pidController.calculate(getCurrentPosition(), setpointState.position);
@@ -144,14 +139,12 @@ public class Lift extends MotorPIDSlideSubsystem {
 
     lastTime = timer.time(TimeUnit.MILLISECONDS);
 
-    telemetry.addData("Lift.PID Power", pidPower);
-    telemetry.addData("Lift.output", output);
 
     // telemetry.update();
   }
 
   public enum Goal {
-    HIGH_BASKET(770.0),
+    HIGH_BASKET(760.0),
     AUTO_BASKET(autoBasketHeight),
     LOW_BASKET(200),
     AUTO_TRANSFER(100),

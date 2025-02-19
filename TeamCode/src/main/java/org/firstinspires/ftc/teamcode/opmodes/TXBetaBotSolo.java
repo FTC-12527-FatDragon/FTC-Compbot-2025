@@ -19,11 +19,13 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import edu.wpi.first.math.MathUtil;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.drive.opmode.LocalizationTest;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
+import org.firstinspires.ftc.teamcode.opmodes.autos.BasketUnlimited;
 import org.firstinspires.ftc.teamcode.opmodes.autos.Chamber6;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
@@ -43,7 +45,6 @@ public class TXBetaBotSolo extends CommandOpMode {
   private Climber climber;
   private LiftClaw liftClaw;
   private SlideSuperStructure slide;
-  private Vision vision;
   private SampleMecanumDrive drive;
   private ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
@@ -61,18 +62,14 @@ public class TXBetaBotSolo extends CommandOpMode {
   public void initialize() {
     this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     gamepadEx1 = new GamepadEx(gamepad1);
-    gamepadEx2 = new GamepadEx(gamepad2);
 
     lift = new Lift(hardwareMap, telemetry);
     climber = new Climber(hardwareMap);
     liftClaw = new LiftClaw(hardwareMap);
     slide = new SlideSuperStructure(hardwareMap, telemetry);
     drive = new SampleMecanumDrive(hardwareMap);
-    vision = new Vision(hardwareMap, telemetry);
 
     initializeMode();
-    vision.initializeCamera();
-    vision.setLEDPWM();
 
     isTimerStart = false;
 
@@ -80,7 +77,7 @@ public class TXBetaBotSolo extends CommandOpMode {
     drive.breakFollowing(true);
 
     // climber = new Climber(hardwareMap);
-    drive.setPoseEstimate(Chamber6.startPose);
+    drive.setPoseEstimate(BasketUnlimited.startPose);
 
     // Teleop Drive Command
     drive.setDefaultCommand(
@@ -95,8 +92,6 @@ public class TXBetaBotSolo extends CommandOpMode {
     // =================================================================================
 
     // SAMPLE MODE
-
-    gamepadEx1.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(slide.swipeCommand());
 
     new FunctionalButton(
             () ->
@@ -231,7 +226,6 @@ public class TXBetaBotSolo extends CommandOpMode {
                 gamepadEx1.getButton(GamepadKeys.Button.DPAD_UP)
                     && (slide.getGoal() == SlideSuperStructure.Goal.AIM
                         || slide.getGoal() == SlideSuperStructure.Goal.HANDOFF)
-                    && slide.slideMotorAtHome()
                     && currentMode == DriverMode.SAMPLE)
         .whenPressed(
             new SequentialCommandGroup(
@@ -240,7 +234,7 @@ public class TXBetaBotSolo extends CommandOpMode {
                     new InstantCommand(),
                     () -> slide.getGoal() == SlideSuperStructure.Goal.HANDOFF),
                 new InstantCommand(() -> currentMode = DriverMode.SPECIMEN),
-                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.AVOID_COLLISION, 100),
+                liftClaw.setLiftClawServo(LiftClaw.LiftClawState.AVOID_COLLISION, 200),
                 slide.foldSlideStructureCommand(),
                 new WaitCommand(200),
                 liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 0),
@@ -360,14 +354,6 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     CommandScheduler.getInstance().run();
 
-    TelemetryPacket packet = new TelemetryPacket();
-
-    packet.fieldOverlay().setStroke("#3F51B5");
-    LocalizationTest.drawRobot(packet.fieldOverlay(), poseEstimate);
-    FtcDashboard.getInstance().sendTelemetryPacket(packet);
-    telemetry.addData("Pose X", poseEstimate.getX());
-    telemetry.addData("Pose Y", poseEstimate.getY());
-    telemetry.addData("Pose Heading", poseEstimate.getHeading());
     if (setPose) {
       setPose = false;
       drive.setPoseEstimate(Pose.toPose2d());

@@ -42,9 +42,9 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected Vision vision;
   protected Pose2d currentPose = new Pose2d();
 
-  public static long handoff_slide2LiftCloseDelayMs = 50;
+  public static long handoff_slide2LiftCloseDelayMs = 150;
   public static long handoff_liftClose2OpenIntakeDelayMs = 100;
-  public static int liftClawScoreThreshold = 75;
+  public static int liftClawScoreThreshold = 37;
 
   private static TrajectorySequence sequence = null;
 
@@ -105,8 +105,8 @@ public abstract class AutoCommandBase extends LinearOpMode {
   protected Command stowArmFromBasket() {
     return new SequentialCommandGroup(
         liftClaw.openClawCommand(),
-        new WaitCommand(100),
-        liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 200),
+        new WaitCommand(200),
+        liftClaw.setLiftClawServo(LiftClaw.LiftClawState.STOW, 100),
         new InstantCommand(() -> lift.setGoal(Lift.Goal.STOW)));
   }
 
@@ -165,15 +165,6 @@ public abstract class AutoCommandBase extends LinearOpMode {
     return new SequentialCommandGroup(
         liftClaw.setLiftClawServo(LiftClaw.LiftClawState.SCORE_CHAMBER, 200),
         new InstantCommand(() -> lift.setGoal(Lift.Goal.HANG)));
-  }
-
-  public Command switchToSpecimenMode() {
-    return new SequentialCommandGroup(
-        liftClaw.setLiftClawServo(LiftClaw.LiftClawState.AVOID_COLLISION, 100),
-        slide.foldSlideStructureCommand(),
-        new WaitCommand(200),
-        liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 0),
-        liftClaw.openClawCommand());
   }
 
   /**
