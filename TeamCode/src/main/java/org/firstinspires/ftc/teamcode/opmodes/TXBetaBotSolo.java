@@ -19,7 +19,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import edu.wpi.first.math.MathUtil;
 import java.util.function.Supplier;
-import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
 import org.firstinspires.ftc.teamcode.opmodes.autos.BasketUnlimited;
@@ -54,6 +53,7 @@ public class TXBetaBotSolo extends CommandOpMode {
 
   @Override
   public void initialize() {
+    CommandScheduler.getInstance().cancelAll();
     this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     gamepadEx1 = new GamepadEx(gamepad1);
 
@@ -67,10 +67,8 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     isTimerStart = false;
 
-    CommandScheduler.getInstance().cancelAll();
     drive.breakFollowing(true);
-
-    // climber = new Climber(hardwareMap);
+    
     drive.setPoseEstimate(BasketUnlimited.startPose);
 
     // Teleop Drive Command
@@ -233,10 +231,10 @@ public class TXBetaBotSolo extends CommandOpMode {
                     .foldSlideStructureCommand()
                     .alongWith(
                         new ConditionalCommand(
-                            new InstantCommand(() -> slide.backwardSlideExtension()),
-                            new InstantCommand(),
+                            new InstantCommand(() -> slide.backwardSlideExtension())
+                                .andThen(new WaitUntilCommand(() -> slide.slideMotorAtHome())),
+                            new InstantCommand().andThen(new WaitCommand(200)),
                             slide::isSlideExtended)),
-                new WaitCommand(200),
                 liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 0),
                 liftClaw.openClawCommand()));
 
@@ -372,11 +370,9 @@ public class TXBetaBotSolo extends CommandOpMode {
 
   @Override
   public void reset() {
-    CommandScheduler.getInstance().reset();
     CommandScheduler.getInstance().cancelAll();
+    CommandScheduler.getInstance().reset();
     drive.breakFollowing(true);
-    slide.setServoController(false);
-    liftClaw.setServoController(false);
   }
 
   public void initializeMode() {

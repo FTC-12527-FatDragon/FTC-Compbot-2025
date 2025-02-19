@@ -9,7 +9,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.util.NanoClock;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.RobotLog;
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
  *      regression.
  */
 @Config
-//@Autonomous(group = "drive")
+// @Autonomous(group = "drive")
 public class AutomaticFeedforwardTuner extends LinearOpMode {
   public static double MAX_POWER = 0.7;
   public static double DISTANCE = 100; // in
