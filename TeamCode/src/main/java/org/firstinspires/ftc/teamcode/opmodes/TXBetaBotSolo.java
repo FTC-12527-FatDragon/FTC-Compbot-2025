@@ -52,8 +52,6 @@ public class TXBetaBotSolo extends CommandOpMode {
   private boolean isTimerStart = false;
   private boolean lowBasketMode = false;
 
-  private SampleAutoAlignCommand sampleAutoAlignCommand;
-
   @Override
   public void initialize() {
     this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
