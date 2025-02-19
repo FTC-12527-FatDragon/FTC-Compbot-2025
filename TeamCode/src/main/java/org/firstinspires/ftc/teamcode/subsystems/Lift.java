@@ -33,7 +33,7 @@ public class Lift extends MotorPIDSlideSubsystem {
 
   //  private boolean isResetting = false;
   public static double resetPower = -0.7;
-  public static double hangAddtionalPower = 0;
+  public static double hangAdditionalPower = 0;
 
   public static double MAX_VEL = 0;
   public static double MAX_ACL = 0;
@@ -130,7 +130,7 @@ public class Lift extends MotorPIDSlideSubsystem {
     double pidPower = pidController.calculate(getCurrentPosition(), setpointState.position);
     double output = pidPower + feedforward.calculate(setpointState.velocity);
     if (goal == Goal.HANG) {
-      output += hangAddtionalPower;
+      output += hangAdditionalPower;
     }
     //    output *= 12 / batteryVoltageSensor.getVoltage();
     output = Range.clip(output, -1, 1);

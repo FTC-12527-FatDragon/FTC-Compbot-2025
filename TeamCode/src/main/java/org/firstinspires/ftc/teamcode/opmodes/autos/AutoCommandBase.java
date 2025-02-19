@@ -202,5 +202,9 @@ public abstract class AutoCommandBase extends LinearOpMode {
       telemetry.addData("Y Velocity", drive.getPoseVelocity().getY());
       telemetry.update();
     }
+
+    if (isStopRequested()) {
+      drive.resetHeading();
+    }
   }
 }

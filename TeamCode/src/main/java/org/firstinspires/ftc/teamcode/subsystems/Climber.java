@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.StartEndCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -51,13 +50,5 @@ public class Climber extends SubsystemBase {
 
   public Command holdOnCommand() {
     return new StartEndCommand(this::holdOn, this::stop);
-  }
-
-  public Command decline2ArmUp() {
-    return new WaitCommand(climberUpMs).deadlineWith(declineCommand());
-  }
-
-  public Command elevate2ArmDown() {
-    return new WaitCommand(climberUpMs).deadlineWith(elevateCommand());
   }
 }

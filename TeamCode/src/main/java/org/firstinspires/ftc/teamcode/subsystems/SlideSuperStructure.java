@@ -400,23 +400,6 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
     slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
   }
 
-  //  public Command resetCommand() {
-  //    return new StartEndCommand(
-  //            () -> {
-  //              runOpenLoop();
-  //              isResetting = true;
-  //            },
-  //            () -> {
-  //
-  //              isResetting = false;
-  //            },
-  //            this);
-  //  }
-
-  //  public boolean atHome() {
-  //    return MathUtils.isNear(getCurrentPosition(), 0, 5);
-  //  }
-
   @Override
   public void periodic() {
     if (!isAutoTurnControl) {

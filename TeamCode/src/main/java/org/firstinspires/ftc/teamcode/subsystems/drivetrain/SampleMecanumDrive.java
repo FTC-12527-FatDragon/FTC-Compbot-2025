@@ -102,7 +102,7 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
   private List<Integer> lastEncPositions = new ArrayList<>();
   private List<Integer> lastEncVels = new ArrayList<>();
 
-  private double yawHeading = 0;
+  public static double yawHeading = 0;
 
   private Telemetry telemetry;
 
