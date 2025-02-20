@@ -36,7 +36,6 @@ import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 @TeleOp(name = "Solo", group = "A")
 public class TXBetaBotSolo extends CommandOpMode {
   private GamepadEx gamepadEx1;
-  private GamepadEx gamepadEx2;
   private Lift lift;
   private Climber climber;
   private LiftClaw liftClaw;
@@ -52,7 +51,6 @@ public class TXBetaBotSolo extends CommandOpMode {
   private boolean isTimerStart = false;
   private boolean lowBasketMode = false;
 
-  private SampleAutoAlignCommand sampleAutoAlignCommand;
 
   @Override
   public void initialize() {
