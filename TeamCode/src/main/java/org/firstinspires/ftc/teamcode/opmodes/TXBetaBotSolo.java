@@ -113,6 +113,7 @@ public class TXBetaBotSolo extends CommandOpMode {
             () -> gamepadEx1.getButton(GamepadKeys.Button.X) && currentMode == DriverMode.SAMPLE)
         .whenPressed(
             new ParallelCommandGroup(
+                slide.manualResetCommand().withTimeout(100),
                 new ConditionalCommand(
                     new InstantCommand(() -> lift.setGoal(Lift.Goal.HIGH_BASKET)),
                     new InstantCommand(() -> lift.setGoal(Lift.Goal.LOW_BASKET)),
@@ -197,7 +198,6 @@ public class TXBetaBotSolo extends CommandOpMode {
     new FunctionalButton(
             () ->
                 gamepadEx1.getButton(GamepadKeys.Button.DPAD_DOWN)
-                    && lift.atHome(10)
                     && currentMode == DriverMode.SPECIMEN)
         .whenPressed(
             new SequentialCommandGroup(
