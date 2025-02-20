@@ -19,7 +19,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import edu.wpi.first.math.MathUtil;
 import java.util.function.Supplier;
-import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
 import org.firstinspires.ftc.teamcode.opmodes.autos.BasketUnlimited;
@@ -50,7 +49,6 @@ public class TXBetaBotSolo extends CommandOpMode {
   public static boolean shouldClimb = true;
   private boolean isTimerStart = false;
   private boolean lowBasketMode = false;
-
 
   @Override
   public void initialize() {
