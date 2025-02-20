@@ -136,23 +136,19 @@ public class BasketUnlimited extends AutoCommandBase {
             .alongWith(
                 slowHandoff(),
                 new WaitCommand(startStowToPath)
-                    .andThen(
-                        new LineToLinearPathCommand(drive, splinePoint1.toPose2d()))),
-
-
+                    .andThen(new LineToLinearPathCommand(drive, splinePoint1.toPose2d()))),
         autoSamplePickCommand(splinePoint1.toPose2d()),
         new LineToLinearPathCommand(drive, BasketForSpline.toPose2d())
-            .alongWith(slowHandoff(), upLiftToBasket()),
+            .alongWith(slowHandoff().andThen(upLiftToBasket())),
+        //            .andThen(slowHandoff(), upLiftToBasket()),
         stowArmFromBasket()
             .alongWith(
                 slowHandoff(),
                 new WaitCommand(startStowToPath)
-                    .andThen(
-                        new LineToLinearPathCommand(drive, splinePoint2.toPose2d()))),
-
+                    .andThen(new LineToLinearPathCommand(drive, splinePoint2.toPose2d()))),
         autoSamplePickCommand(splinePoint1.toPose2d()),
         new LineToLinearPathCommand(drive, BasketForSpline.toPose2d())
-            .alongWith(slowHandoff(), upLiftToBasket()),
+            .alongWith(slowHandoff().andThen(upLiftToBasket())),
         stowArmFromBasket());
   }
   // spotless:

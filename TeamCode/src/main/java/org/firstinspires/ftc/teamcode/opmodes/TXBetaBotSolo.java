@@ -65,7 +65,6 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     isTimerStart = false;
 
-    CommandScheduler.getInstance().cancelAll();
     drive.breakFollowing(true);
 
     drive.setPoseEstimate(BasketUnlimited.startPose);
