@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 
-@TeleOp(group = "drive")
 public class LocalizationTest extends LinearOpMode {
 
   public static void drawRobot(Canvas c, Pose2d t) {

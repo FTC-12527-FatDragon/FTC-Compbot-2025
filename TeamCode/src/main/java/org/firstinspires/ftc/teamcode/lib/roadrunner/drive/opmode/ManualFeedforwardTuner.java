@@ -40,7 +40,6 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
  * Pressing B/O (Xbox/PS4) will cede control back to the tuning process.
  */
 @Config
-@TeleOp(group = "drive")
 public class ManualFeedforwardTuner extends LinearOpMode {
   public static double DISTANCE = 15; // in
 

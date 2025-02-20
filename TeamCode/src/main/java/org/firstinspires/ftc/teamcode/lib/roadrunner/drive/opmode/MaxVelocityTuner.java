@@ -23,7 +23,6 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
  * <p>Further fine tuning of kF may be desired.
  */
 @Config
-@Autonomous(group = "drive")
 public class MaxVelocityTuner extends LinearOpMode {
   public static double RUNTIME = 2.0;
 

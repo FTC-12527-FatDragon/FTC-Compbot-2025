@@ -33,7 +33,7 @@ import org.firstinspires.ftc.teamcode.utils.FunctionalButton;
 import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 
 @Config
-@TeleOp(name = "Solo")
+@TeleOp(name = "Solo", group = "A")
 public class TXBetaBotSolo extends CommandOpMode {
   private GamepadEx gamepadEx1;
   private GamepadEx gamepadEx2;
