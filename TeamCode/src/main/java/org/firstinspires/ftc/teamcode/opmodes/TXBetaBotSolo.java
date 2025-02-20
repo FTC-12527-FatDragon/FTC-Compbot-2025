@@ -231,7 +231,13 @@ public class TXBetaBotSolo extends CommandOpMode {
                     () -> slide.getGoal() == SlideSuperStructure.Goal.HANDOFF),
                 new InstantCommand(() -> currentMode = DriverMode.SPECIMEN),
                 liftClaw.setLiftClawServo(LiftClaw.LiftClawState.AVOID_COLLISION, 200),
-                slide.foldSlideStructureCommand(),
+                slide
+                    .foldSlideStructureCommand()
+                    .alongWith(
+                        new ConditionalCommand(
+                            new InstantCommand(() -> slide.backwardSlideExtension()),
+                            new InstantCommand(),
+                            slide::isSlideExtended)),
                 new WaitCommand(200),
                 liftClaw.setLiftClawServo(LiftClaw.LiftClawState.GRAB_FROM_WALL, 0),
                 liftClaw.openClawCommand()));
