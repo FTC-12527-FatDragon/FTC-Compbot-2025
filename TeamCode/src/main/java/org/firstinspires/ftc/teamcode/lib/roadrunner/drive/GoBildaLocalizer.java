@@ -22,7 +22,6 @@ public class GoBildaLocalizer implements Localizer {
         DriveConstants.GoBildaXLocalizerDirection, DriveConstants.GoBildaYLocalizerDirection);
     odometry.setEncoderResolution(DriveConstants.GoBildaLocalizerEncoderResolution);
     odometry.setOffsets(mountOffsets.getX(), mountOffsets.getY());
-    odometry.resetPosAndIMU();
   }
 
   @NonNull

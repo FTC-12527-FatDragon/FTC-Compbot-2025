@@ -24,7 +24,6 @@ import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.sequence
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.sequencesegment.TurnSegment;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.trajectorysequence.sequencesegment.WaitSegment;
 import org.firstinspires.ftc.teamcode.lib.roadrunner.util.DashboardUtil;
-import org.firstinspires.ftc.teamcode.lib.roadrunner.util.LogFiles;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.DriveConstants;
 
 @Config
@@ -215,17 +214,6 @@ public class TrajectorySequenceRunner {
           new DriveSignal(
               driveSignal.getVel().times(NOMINAL_VOLTAGE / voltage),
               driveSignal.getAccel().times(NOMINAL_VOLTAGE / voltage));
-    }
-
-    if (targetPose != null) {
-      LogFiles.record(
-          targetPose,
-          poseEstimate,
-          voltage,
-          lastDriveEncPositions,
-          lastDriveEncVels,
-          lastTrackingEncPositions,
-          lastTrackingEncVels);
     }
 
     packet.put("x", poseEstimate.getX());

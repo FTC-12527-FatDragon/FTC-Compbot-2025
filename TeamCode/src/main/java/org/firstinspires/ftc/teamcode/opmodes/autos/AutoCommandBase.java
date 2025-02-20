@@ -191,16 +191,17 @@ public abstract class AutoCommandBase extends LinearOpMode {
     drive.setPoseEstimate(getStartPose());
     telemetry.addData("Init Complete", "Start Now");
     Command toRun = runAutoCommand().andThen(autoFinish());
-    waitForStart();
 
     CommandScheduler.getInstance().schedule(toRun);
+
+    waitForStart();
 
     while (opModeIsActive() && !isStopRequested()) {
       currentPose = drive.getPoseEstimate();
       lift.periodicAsync();
       CommandScheduler.getInstance().run();
-      telemetry.addData("Y Velocity", drive.getPoseVelocity().getY());
-      telemetry.update();
     }
+
+    CommandScheduler.getInstance().reset();
   }
 }

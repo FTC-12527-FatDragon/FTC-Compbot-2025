@@ -68,7 +68,6 @@ public class TXBetaBotSolo extends CommandOpMode {
     CommandScheduler.getInstance().cancelAll();
     drive.breakFollowing(true);
 
-    // climber = new Climber(hardwareMap);
     drive.setPoseEstimate(BasketUnlimited.startPose);
 
     // Teleop Drive Command
@@ -371,7 +370,6 @@ public class TXBetaBotSolo extends CommandOpMode {
   @Override
   public void reset() {
     CommandScheduler.getInstance().reset();
-    CommandScheduler.getInstance().cancelAll();
     drive.breakFollowing(true);
     slide.setServoController(false);
     liftClaw.setServoController(false);
