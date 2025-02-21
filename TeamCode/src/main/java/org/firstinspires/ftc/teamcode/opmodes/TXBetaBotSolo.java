@@ -22,7 +22,6 @@ import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
 import org.firstinspires.ftc.teamcode.opmodes.autos.BasketUnlimited;
-import org.firstinspires.ftc.teamcode.opmodes.autos.Chamber6;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
@@ -35,6 +34,7 @@ import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 @TeleOp(name = "Solo", group = "A")
 public class TXBetaBotSolo extends CommandOpMode {
   private GamepadEx gamepadEx1;
+  private GamepadEx gamepadEx2;
   private Lift lift;
   private Climber climber;
   private LiftClaw liftClaw;
@@ -55,6 +55,7 @@ public class TXBetaBotSolo extends CommandOpMode {
     CommandScheduler.getInstance().cancelAll();
     this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     gamepadEx1 = new GamepadEx(gamepad1);
+    gamepadEx2 = new GamepadEx(gamepad2);
 
     lift = new Lift(hardwareMap, telemetry);
     climber = new Climber(hardwareMap);
@@ -295,10 +296,8 @@ public class TXBetaBotSolo extends CommandOpMode {
                     && lift.getGoal() == Lift.Goal.STOW)
         .whenHeld(lift.manualResetCommand());
 
-    new FunctionalButton(
-            () ->
-                gamepadEx1.getButton(GamepadKeys.Button.RIGHT_STICK_BUTTON)
-                    && slide.getGoal().slideExtension == 0)
+    // TODO: You change this to try to enable the reset of the slide
+    new FunctionalButton(() -> gamepadEx1.getButton(GamepadKeys.Button.RIGHT_STICK_BUTTON))
         .whenHeld(slide.manualResetCommand());
 
     // =================================================================================
@@ -319,16 +318,21 @@ public class TXBetaBotSolo extends CommandOpMode {
                     && currentMode == DriverMode.CLIMB)
         .whenHeld(climber.declineCommand());
 
+    gamepadEx2
+        .getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+        .whenHeld(climber.elevateCommand())
+        .whenPressed(new InstantCommand(() -> shouldClimb = false));
+
+    gamepadEx2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(climber.declineCommand());
+
+    gamepadEx2.getGamepadButton(GamepadKeys.Button.B).toggleWhenPressed(climber.holdOnCommand());
+
     new FunctionalButton(
             () -> gamepadEx1.getButton(GamepadKeys.Button.B) && currentMode == DriverMode.CLIMB)
         .toggleWhenPressed(climber.holdOnCommand());
 
     new FunctionalButton(() -> MathUtil.isNear(110, timer.time(), 0.3) && shouldClimb)
         .whenPressed(climber.elevateCommand().withTimeout(2000));
-
-    gamepadEx1
-        .getGamepadButton(GamepadKeys.Button.BACK)
-        .whenPressed(new InstantCommand(() -> drive.setPoseEstimate(Chamber6.startPose)));
 
     // =================================================================================
 

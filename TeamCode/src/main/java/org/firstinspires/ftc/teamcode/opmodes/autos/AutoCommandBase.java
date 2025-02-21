@@ -81,7 +81,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
     return new AutoDriveCommand(drive, trajectorySequence);
   }
 
-  //TODO: If your basket 6 fails, first check this logic error
+  // TODO: If your basket 6 fails, first check this logic error
   protected Command autoSamplePickCommand(Pose2d goalPose) {
     AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
     AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
