@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
+import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
@@ -80,6 +81,7 @@ public abstract class AutoCommandBase extends LinearOpMode {
     return new AutoDriveCommand(drive, trajectorySequence);
   }
 
+  //TODO: If your basket 6 fails, first check this logic error
   protected Command autoSamplePickCommand(Pose2d goalPose) {
     AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
     AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
@@ -92,7 +94,8 @@ public abstract class AutoCommandBase extends LinearOpMode {
                 .andThen(
                     slide.aimCommand(turnServoSupplier),
                     new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)))),
-        new WaitCommand(50),
+        new ParallelRaceGroup(
+            new WaitCommand(1000), new WaitUntilCommand(() -> slide.slideMotorAtGoal())),
         slide.grabCommand());
     //        new ConditionalCommand(
     //            new ScheduleCommand(

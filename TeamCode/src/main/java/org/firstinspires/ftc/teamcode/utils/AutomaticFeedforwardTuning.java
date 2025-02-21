@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -14,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 
 @Config
-@TeleOp(name = "Automatic FF Tuning")
+// @TeleOp(name = "Automatic FF Tuning")
 public class AutomaticFeedforwardTuning extends LinearOpMode {
   public static boolean isFinished = false;
   public static double FF_RAMP_RATE = 0.1;

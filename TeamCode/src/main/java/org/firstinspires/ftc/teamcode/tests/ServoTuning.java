@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.MathUtils;
 
 @Config
-@TeleOp(name = "Easy Servo Tuning")
+@TeleOp(name = "Easy Servo Tuning", group = "Test")
 public class ServoTuning extends LinearOpMode {
   public static double originalPos = 0;
   public static double originalSmallerPos = -1;

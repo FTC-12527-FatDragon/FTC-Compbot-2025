@@ -7,7 +7,6 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ElevatorFeedforward;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
-@TeleOp(name = "Motion profile")
+// @TeleOp(name = "Motion profile")
 public class MotionProfileTest extends LinearOpMode {
   private final Telemetry telemetry_M =
       new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());

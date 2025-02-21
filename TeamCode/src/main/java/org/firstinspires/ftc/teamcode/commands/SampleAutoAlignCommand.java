@@ -42,6 +42,7 @@ public class SampleAutoAlignCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    drive.setCurrentTrajectoryMode(SampleMecanumDrive.TrajectoryMode.SLOW);
     isInitializing = true;
 
     isTargetVisibleWhenStart = vision.isTargetVisible();
@@ -57,7 +58,6 @@ public class SampleAutoAlignCommand extends CommandBase {
       slideExtensionValue = distanceOffset * tickPerUnit;
       distanceOffset = 0;
     }
-
 
     slideExtension.set(slideExtensionValue);
 

@@ -26,11 +26,11 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   // ---- Configs ----
   // SlideArmServo
   public static double SlideArmServo_AIM = 0.4;
-  public static double SlideArmServo_GRAB = 0.3;
-  public static double SlideArmServo_HANDOFF = 0.57; // 0.56
-  public static double SlideArmServo_AIM_ = 0.428;
+  public static double SlideArmServo_GRAB = 0.29;
+  public static double SlideArmServo_HANDOFF = 0.56; // 0.56
+  public static double SlideArmServo_AIM_ = 0.418;
   public static double SlideArmServo_PREAIM = 0.3;
-  public static double SlideArmServo_FOLD = 0.731;
+  public static double SlideArmServo_FOLD = 0.721;
 
   // intakeClawServo
   public static double IntakeClawServo_OPEN = 0.7;
@@ -318,8 +318,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   public void setTurnServo(AtomicReference<Double> servoPos) {
     try {
       setTurnServo(servoPos.get());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       telemetry.addData("OOps", "Your Limelight is Done");
     }
   }
@@ -371,7 +370,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
 
   public boolean slideMotorAtGoal() {
     return MathUtils.isNear(
-        goal.slideExtension, getCurrentPosition(), SlideMotor_atSetPointTolerance);
+        slideExtensionVal, getCurrentPosition(), SlideMotor_atSetPointTolerance);
   }
 
   public boolean slideMotorAtHome() {

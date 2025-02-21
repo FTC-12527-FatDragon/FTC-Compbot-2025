@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -18,7 +19,9 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import edu.wpi.first.math.MathUtil;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import org.firstinspires.ftc.teamcode.commands.SampleAutoAlignCommand;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
 import org.firstinspires.ftc.teamcode.opmodes.autos.BasketUnlimited;
@@ -27,13 +30,14 @@ import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
 import org.firstinspires.ftc.teamcode.subsystems.SlideSuperStructure;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.utils.FunctionalButton;
 import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 
 @Config
-@TeleOp(name = "Solo", group = "A")
-public class TXBetaBotSolo extends CommandOpMode {
+@TeleOp(name = "Judge Solo", group = "A")
+public class JudgeSolo extends CommandOpMode {
   private GamepadEx gamepadEx1;
   private Lift lift;
   private Climber climber;
@@ -46,9 +50,10 @@ public class TXBetaBotSolo extends CommandOpMode {
 
   public static boolean setPose = false;
   public static Pose2dHelperClass Pose = new Pose2dHelperClass();
-  public static boolean shouldClimb = true;
+  public static boolean shouldClimb = false;
   private boolean isTimerStart = false;
   private boolean lowBasketMode = false;
+  private Vision vision;
 
   @Override
   public void initialize() {
@@ -61,6 +66,10 @@ public class TXBetaBotSolo extends CommandOpMode {
     liftClaw = new LiftClaw(hardwareMap);
     slide = new SlideSuperStructure(hardwareMap, telemetry);
     drive = new SampleMecanumDrive(hardwareMap);
+    vision = new Vision(hardwareMap, telemetry);
+
+    vision.initializeCamera();
+    vision.setLEDPWM();
 
     initializeMode();
 
@@ -332,11 +341,13 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     // =================================================================================
 
-    new FunctionalButton(() -> MathUtil.isNear(60, timer.time(), 0.3))
-        .whenPressed(new InstantCommand(() -> gamepad1.rumble(500)));
+    gamepadEx1.getGamepadButton(GamepadKeys.Button.BACK).whenPressed(autoSamplePickCommand());
 
-    new FunctionalButton(() -> MathUtil.isNear(90, timer.time(), 0.3))
-        .whenPressed(new InstantCommand(() -> gamepad1.rumble(500)));
+    //        new FunctionalButton(() -> MathUtil.isNear(60, timer.time(), 0.3))
+    //                .whenPressed(new InstantCommand(() -> gamepad1.rumble(500)));
+    //
+    //        new FunctionalButton(() -> MathUtil.isNear(90, timer.time(), 0.3))
+    //                .whenPressed(new InstantCommand(() -> gamepad1.rumble(500)));
   }
 
   @Override
@@ -373,6 +384,29 @@ public class TXBetaBotSolo extends CommandOpMode {
     drive.breakFollowing(true);
     slide.setServoController(false);
     liftClaw.setServoController(false);
+  }
+
+  protected Command autoSamplePickCommand() {
+    AtomicReference<Double> turnServoSupplier = new AtomicReference<>();
+    AtomicReference<Double> slideExtensionSupplier = new AtomicReference<>();
+    SampleAutoAlignCommand sampleAutoAlignCommand =
+        new SampleAutoAlignCommand(
+            drive, vision, telemetry, turnServoSupplier, slideExtensionSupplier);
+    return new SequentialCommandGroup(
+        sampleAutoAlignCommand.alongWith(
+            new WaitUntilCommand(() -> !sampleAutoAlignCommand.isInitializing())
+                .andThen(
+                    slide.aimCommand(turnServoSupplier),
+                    new InstantCommand(() -> slide.forwardSlideExtension(slideExtensionSupplier)))),
+        new ParallelRaceGroup(
+            new WaitCommand(1000), new WaitUntilCommand(() -> slide.slideMotorAtGoal())),
+        slide.grabCommand());
+    //        new ConditionalCommand(
+    //            new ScheduleCommand(
+    //                new LineToLinearPathCommand(drive, goalPose)
+    //                    .andThen(autoSamplePickCommand(goalPose))),
+    //            new InstantCommand(),
+    //            () -> !slide.isClawGrabSample()));
   }
 
   public void initializeMode() {

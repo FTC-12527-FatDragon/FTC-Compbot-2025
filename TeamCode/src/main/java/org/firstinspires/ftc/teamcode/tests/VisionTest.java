@@ -6,11 +6,10 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
 @Config
-@TeleOp(name = "LimelightTest")
+// @TeleOp(name = "LimelightTest")
 public class VisionTest extends LinearOpMode {
   public static Vision.SampleColor color = Vision.SampleColor.RED;
   private Limelight3A camera;
