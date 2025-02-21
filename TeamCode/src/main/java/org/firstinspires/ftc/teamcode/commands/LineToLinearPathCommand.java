@@ -14,23 +14,29 @@ public class LineToLinearPathCommand extends CommandBase {
   private Pose2d currentPose;
   private TrajectorySequence trajectorySequence;
   private boolean shouldWithinRange;
+  private double maxAngAccel;
 
   public LineToLinearPathCommand(SampleMecanumDrive drive, Pose2d goalPose) {
-    this(drive, goalPose, false);
+    this(drive, goalPose, false, DriveConstants.MAX_ANG_ACCEL);
+  }
+
+  public LineToLinearPathCommand(SampleMecanumDrive drive, Pose2d goalPose, double maxAngAccel) {
+    this(drive, goalPose, false, maxAngAccel);
   }
 
   public LineToLinearPathCommand(
-      SampleMecanumDrive drive, Pose2d goalPose, boolean shouldWithinRange) {
+      SampleMecanumDrive drive, Pose2d goalPose, boolean shouldWithinRange, double maxAngAccel) {
     this.drive = drive;
     this.goalPose = goalPose;
     this.shouldWithinRange = shouldWithinRange;
+    this.maxAngAccel = maxAngAccel;
   }
 
   @Override
   public void initialize() {
     currentPose = new Pose2d();
     trajectorySequence =
-        TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate())
+        TrajectoryManager.trajectorySequenceBuilder(drive.getPoseEstimate(), maxAngAccel)
             .lineToLinearHeading(goalPose)
             .build();
     drive.followTrajectorySequenceAsync(trajectorySequence);

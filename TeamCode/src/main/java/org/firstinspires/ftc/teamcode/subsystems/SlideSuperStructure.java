@@ -316,7 +316,12 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   }
 
   public void setTurnServo(AtomicReference<Double> servoPos) {
-    setTurnServo(servoPos.get());
+    try {
+      setTurnServo(servoPos.get());
+    }
+    catch (Exception e) {
+      telemetry.addData("OOps", "Your Limelight is Done");
+    }
   }
 
   public void setTurnServo(double servoPos) {

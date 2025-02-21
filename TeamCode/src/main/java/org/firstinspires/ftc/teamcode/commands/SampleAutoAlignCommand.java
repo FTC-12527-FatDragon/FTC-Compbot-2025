@@ -47,10 +47,8 @@ public class SampleAutoAlignCommand extends CommandBase {
     isTargetVisibleWhenStart = vision.isTargetVisible();
 
     setTurnServo();
-    telemetry.addData("isVisibleWhenStart", isTargetVisibleWhenStart);
 
     Pose2d currentPoseRelativeToField = drive.getPoseEstimate();
-    telemetry.addData("Current Pose", currentPoseRelativeToField);
 
     double distanceOffset = vision.getDistance() / 25.4; // inches
     double slideExtensionValue = 0;
@@ -60,13 +58,11 @@ public class SampleAutoAlignCommand extends CommandBase {
       distanceOffset = 0;
     }
 
-    telemetry.addData("Slide Extension Value Auto", slideExtensionValue);
 
     slideExtension.set(slideExtensionValue);
 
     Pose2d targetPoseRelativeToRobot =
         new Pose2dHelperClass(distanceOffset, -vision.getStrafeOffset() / 25.4, 0).toPose2d();
-    telemetry.addData("Target Robot Pose", targetPoseRelativeToRobot);
 
     // Transform target pose from robot-relative to field-relative coordinates
     double fieldX =
@@ -83,7 +79,6 @@ public class SampleAutoAlignCommand extends CommandBase {
         currentPoseRelativeToField.getHeading() + 0; // We move our claw instead of robot heading
 
     Pose2d targetPoseRelativeToField = new Pose2d(fieldX, fieldY, fieldHeading);
-    telemetry.addData("Target Field Pose", targetPoseRelativeToField);
     if (isTargetVisibleWhenStart) {
       trajectorySequence =
           TrajectoryManager.trajectorySequenceBuilder(currentPoseRelativeToField)
@@ -106,7 +101,6 @@ public class SampleAutoAlignCommand extends CommandBase {
     mappedDegrees = 180 - mappedDegrees;
     double resultDegrees = MathUtils.linear(mappedDegrees, 0, 180, 0.2, 1);
     turnServo.set(resultDegrees);
-    telemetry.addData("Result Degrees", resultDegrees);
   }
 
   @Override

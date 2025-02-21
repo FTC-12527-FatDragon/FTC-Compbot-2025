@@ -52,6 +52,7 @@ public class TXBetaBotSolo extends CommandOpMode {
 
   @Override
   public void initialize() {
+    CommandScheduler.getInstance().cancelAll();
     this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     gamepadEx1 = new GamepadEx(gamepad1);
 
@@ -107,7 +108,7 @@ public class TXBetaBotSolo extends CommandOpMode {
             () -> gamepadEx1.getButton(GamepadKeys.Button.X) && currentMode == DriverMode.SAMPLE)
         .whenPressed(
             new ParallelCommandGroup(
-                slide.manualResetCommand().withTimeout(100),
+//                slide.manualResetCommand().withTimeout(100),
                 new ConditionalCommand(
                     new InstantCommand(() -> lift.setGoal(Lift.Goal.HIGH_BASKET)),
                     new InstantCommand(() -> lift.setGoal(Lift.Goal.LOW_BASKET)),

@@ -72,4 +72,9 @@ public class TrajectoryManager {
     return new TrajectorySequenceBuilder(
         startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT, MAX_ANG_VEL, MAX_ANG_ACCEL);
   }
+
+  public static TrajectorySequenceBuilder trajectorySequenceBuilder(Pose2d startPose, double maxAngAccel) {
+    return new TrajectorySequenceBuilder(
+            startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT, MAX_ANG_VEL, maxAngAccel);
+  }
 }

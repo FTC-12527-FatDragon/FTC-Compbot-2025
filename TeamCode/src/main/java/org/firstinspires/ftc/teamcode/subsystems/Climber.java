@@ -38,7 +38,7 @@ public class Climber extends SubsystemBase {
   }
 
   public void holdOn() {
-    climber.setPower(-0.5);
+    climber.setPower(-0.7);
   }
 
   public Command elevateCommand() {
