@@ -48,6 +48,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   // slideMotor
   public static double SlideMotor_atSetPointTolerance = 18;
   public static double SlideMotor_extensionValue = 300;
+  public static double SlideMotor_stowValue = -10;
 
   // aimCommand
   public static long aimCommand_wristTurn2ArmDelayMs = 0;
@@ -181,6 +182,16 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
         new InstantCommand(() -> slideArmServo.setPosition(Goal.HANDOFF.slideArmPos)),
         new InstantCommand(() -> slideExtensionVal = Goal.HANDOFF.slideExtension),
         new WaitUntilCommand(this::slideMotorAtHome));
+  }
+
+  public Command fastHandoffCommandAuto() {
+    return new SequentialCommandGroup(
+            setGoalCommand(Goal.HANDOFF),
+            setTurnServoPosCommand(TurnServo.DEG_0, 0),
+            new InstantCommand(() -> wristServo.setPosition(Goal.HANDOFF.wristPos)),
+            new InstantCommand(() -> slideArmServo.setPosition(Goal.HANDOFF.slideArmPos)),
+            new InstantCommand(() -> slideExtensionVal = SlideMotor_stowValue),
+            new WaitUntilCommand(this::slideMotorAtHome));
   }
 
   public Command swipeCommand() {

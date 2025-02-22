@@ -147,6 +147,7 @@ public class Lift extends MotorPIDSlideSubsystem {
   }
 
   public enum Goal {
+    HIGH_BASKET_TELEOP(780.0),
     HIGH_BASKET(760.0),
     AUTO_BASKET(autoBasketHeight),
     LOW_BASKET(200),

@@ -69,8 +69,6 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     drive.breakFollowing(true);
 
-    drive.setPoseEstimate(BasketUnlimited.startPose);
-
     // Teleop Drive Command
     drive.setDefaultCommand(
         new TeleopDriveCommand(
@@ -95,12 +93,12 @@ public class TXBetaBotSolo extends CommandOpMode {
                 gamepadEx1.getButton(GamepadKeys.Button.START)
                     && lift.getGoal() == Lift.Goal.LOW_BASKET
                     && currentMode == DriverMode.SAMPLE)
-        .whenPressed(() -> lift.setGoal(Lift.Goal.HIGH_BASKET));
+        .whenPressed(() -> lift.setGoal(Lift.Goal.HIGH_BASKET_TELEOP));
 
     new FunctionalButton(
             () ->
                 gamepadEx1.getButton(GamepadKeys.Button.START)
-                    && lift.getGoal() == Lift.Goal.HIGH_BASKET
+                    && lift.getGoal() == Lift.Goal.HIGH_BASKET_TELEOP
                     && currentMode == DriverMode.SAMPLE)
         .whenPressed(() -> lift.setGoal(Lift.Goal.LOW_BASKET));
 
@@ -111,7 +109,7 @@ public class TXBetaBotSolo extends CommandOpMode {
             new ParallelCommandGroup(
                 //                slide.manualResetCommand().withTimeout(100),
                 new ConditionalCommand(
-                    new InstantCommand(() -> lift.setGoal(Lift.Goal.HIGH_BASKET)),
+                    new InstantCommand(() -> lift.setGoal(Lift.Goal.HIGH_BASKET_TELEOP)),
                     new InstantCommand(() -> lift.setGoal(Lift.Goal.LOW_BASKET)),
                     () -> !lowBasketMode),
                 new WaitUntilCommand(() -> lift.getCurrentPosition() > 150)
@@ -175,7 +173,7 @@ public class TXBetaBotSolo extends CommandOpMode {
                 gamepadEx1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.5
                     && slide.getGoal() == SlideSuperStructure.Goal.AIM
                     && currentMode == DriverMode.SAMPLE)
-        .whenPressed(new InstantCommand(slide::forwardSlideExtension));
+        .whenPressed(new InstantCommand(() -> slide.forwardSlideExtension(320)));
 
     new FunctionalButton(
             () ->
@@ -323,9 +321,11 @@ public class TXBetaBotSolo extends CommandOpMode {
         .whenHeld(climber.elevateCommand())
         .whenPressed(new InstantCommand(() -> shouldClimb = false));
 
-    gamepadEx2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(climber.declineCommand());
+    gamepadEx2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(climber.declineCommand())
+            .whenPressed(new InstantCommand(() -> shouldClimb = false));
 
-    gamepadEx2.getGamepadButton(GamepadKeys.Button.B).toggleWhenPressed(climber.holdOnCommand());
+    gamepadEx2.getGamepadButton(GamepadKeys.Button.B).toggleWhenPressed(climber.holdOnCommand())
+            .whenPressed(new InstantCommand(() -> shouldClimb = false));
 
     new FunctionalButton(
             () -> gamepadEx1.getButton(GamepadKeys.Button.B) && currentMode == DriverMode.CLIMB)
@@ -350,18 +350,17 @@ public class TXBetaBotSolo extends CommandOpMode {
       isTimerStart = true;
     }
 
-    Pose2d poseEstimate = drive.getPoseEstimate();
     lift.periodicAsync();
 
     CommandScheduler.getInstance().run();
 
-    if (setPose) {
-      setPose = false;
-      drive.setPoseEstimate(Pose.toPose2d());
-    }
+//    if (setPose) {
+//      setPose = false;
+//      drive.setPoseEstimate(Pose.toPose2d());
+//    }
 
-    telemetry.addData("Pose X", drive.getPoseEstimate().getX());
-    telemetry.addData("Pose Y", drive.getPoseEstimate().getY());
+//    telemetry.addData("Pose X", drive.getPoseEstimate().getX());
+//    telemetry.addData("Pose Y", drive.getPoseEstimate().getY());
     telemetry.update();
   }
 

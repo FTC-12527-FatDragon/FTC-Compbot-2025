@@ -15,8 +15,8 @@ import lombok.RequiredArgsConstructor;
 public class LiftClaw extends SubsystemBase {
   public static double LiftArmServo_SCORE_BASKET = 0.7;
   public static double LiftArmServo_STOW = 0.155;
-  public static double LiftArmServo_GRAB_WALL = 0.26;
-  public static double LiftArmServo_SCORE_CHAMBER = 0.7;
+  public static double LiftArmServo_GRAB_WALL = 0.25;
+  public static double LiftArmServo_SCORE_CHAMBER = 0.69;
   public static double LiftArmServo_AVOID_COLLISION = 0.4;
 
   public static double ClawServo_CLOSE = 0.68;
