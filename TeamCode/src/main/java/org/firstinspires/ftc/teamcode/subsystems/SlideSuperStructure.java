@@ -186,12 +186,12 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
 
   public Command fastHandoffCommandAuto() {
     return new SequentialCommandGroup(
-            setGoalCommand(Goal.HANDOFF),
-            setTurnServoPosCommand(TurnServo.DEG_0, 0),
-            new InstantCommand(() -> wristServo.setPosition(Goal.HANDOFF.wristPos)),
-            new InstantCommand(() -> slideArmServo.setPosition(Goal.HANDOFF.slideArmPos)),
-            new InstantCommand(() -> slideExtensionVal = SlideMotor_stowValue),
-            new WaitUntilCommand(this::slideMotorAtHome));
+        setGoalCommand(Goal.HANDOFF),
+        setTurnServoPosCommand(TurnServo.DEG_0, 0),
+        new InstantCommand(() -> wristServo.setPosition(Goal.HANDOFF.wristPos)),
+        new InstantCommand(() -> slideArmServo.setPosition(Goal.HANDOFF.slideArmPos)),
+        new InstantCommand(() -> slideExtensionVal = SlideMotor_stowValue),
+        new WaitUntilCommand(this::slideMotorAtHome));
   }
 
   public Command swipeCommand() {

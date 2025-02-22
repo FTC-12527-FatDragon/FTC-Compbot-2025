@@ -142,13 +142,12 @@ public abstract class AutoCommandBase extends LinearOpMode {
 
   public static Command fastHandoffAuto(SlideSuperStructure slide, LiftClaw liftClaw) {
     return new SequentialCommandGroup(
-            liftClaw.openClawCommand(),
-            slide.fastHandoffCommandAuto().andThen(new WaitCommand(handoff_slide2LiftCloseDelayMs)),
-            liftClaw.closeClawCommand(),
-            new WaitCommand(handoff_liftClose2OpenIntakeDelayMs),
-            new InstantCommand(slide::openIntakeClaw));
+        liftClaw.openClawCommand(),
+        slide.fastHandoffCommandAuto().andThen(new WaitCommand(handoff_slide2LiftCloseDelayMs)),
+        liftClaw.closeClawCommand(),
+        new WaitCommand(handoff_liftClose2OpenIntakeDelayMs),
+        new InstantCommand(slide::openIntakeClaw));
   }
-
 
   public Command wait(SampleMecanumDrive drive, long ms) {
     return new ParallelDeadlineGroup(

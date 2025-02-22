@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
@@ -21,7 +20,6 @@ import edu.wpi.first.math.MathUtil;
 import java.util.function.Supplier;
 import org.firstinspires.ftc.teamcode.commands.TeleopDriveCommand;
 import org.firstinspires.ftc.teamcode.opmodes.autos.AutoCommandBase;
-import org.firstinspires.ftc.teamcode.opmodes.autos.BasketUnlimited;
 import org.firstinspires.ftc.teamcode.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.subsystems.LiftClaw;
@@ -321,11 +319,15 @@ public class TXBetaBotSolo extends CommandOpMode {
         .whenHeld(climber.elevateCommand())
         .whenPressed(new InstantCommand(() -> shouldClimb = false));
 
-    gamepadEx2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(climber.declineCommand())
-            .whenPressed(new InstantCommand(() -> shouldClimb = false));
+    gamepadEx2
+        .getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+        .whenHeld(climber.declineCommand())
+        .whenPressed(new InstantCommand(() -> shouldClimb = false));
 
-    gamepadEx2.getGamepadButton(GamepadKeys.Button.B).toggleWhenPressed(climber.holdOnCommand())
-            .whenPressed(new InstantCommand(() -> shouldClimb = false));
+    gamepadEx2
+        .getGamepadButton(GamepadKeys.Button.B)
+        .toggleWhenPressed(climber.holdOnCommand())
+        .whenPressed(new InstantCommand(() -> shouldClimb = false));
 
     new FunctionalButton(
             () -> gamepadEx1.getButton(GamepadKeys.Button.B) && currentMode == DriverMode.CLIMB)
@@ -354,13 +356,13 @@ public class TXBetaBotSolo extends CommandOpMode {
 
     CommandScheduler.getInstance().run();
 
-//    if (setPose) {
-//      setPose = false;
-//      drive.setPoseEstimate(Pose.toPose2d());
-//    }
+    //    if (setPose) {
+    //      setPose = false;
+    //      drive.setPoseEstimate(Pose.toPose2d());
+    //    }
 
-//    telemetry.addData("Pose X", drive.getPoseEstimate().getX());
-//    telemetry.addData("Pose Y", drive.getPoseEstimate().getY());
+    //    telemetry.addData("Pose X", drive.getPoseEstimate().getX());
+    //    telemetry.addData("Pose Y", drive.getPoseEstimate().getY());
     telemetry.update();
   }
 

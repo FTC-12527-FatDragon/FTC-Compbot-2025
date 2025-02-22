@@ -116,11 +116,11 @@ public class SampleMecanumDrive extends MecanumDrive implements Subsystem {
         LATERAL_MULTIPLIER); // Drive Constants are passed to here
 
     fastFollower =
-        new HolonomicPIDVAFollower(
+        new SQPIDHolonomicFollower(
             FAST_TRANSLATIONAL_PID,
             FAST_TRANSLATIONAL_PID,
             FAST_HEADING_PID,
-            new Pose2d(1.5, 1.5, Math.toRadians(2)), // Pose Error
+            new Pose2d(0.15, 0.15, Math.toRadians(4)), // Pose Error
             SLOW_ADMISSIBLE_TIMEOUT);
 
     medFollower =

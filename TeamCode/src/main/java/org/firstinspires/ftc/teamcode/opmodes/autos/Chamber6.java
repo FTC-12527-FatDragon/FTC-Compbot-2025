@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.FunctionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -23,7 +24,7 @@ import org.firstinspires.ftc.teamcode.utils.Pose2dHelperClass;
 @Config
 @Autonomous(name = "Chamber 6", group = "Autos")
 public class Chamber6 extends AutoCommandBase {
-  public static Pose2d startPose = new Pose2d(38.9 - 23.75, -61.26, Math.toRadians(270));
+  public static Pose2d startPose = new Pose2d(38.9 - 23.75 * 2, -61.26, Math.toRadians(270));
 
   public static Pose2dHelperClass grabSpecPose = new Pose2dHelperClass(38.9, -62.26, 270);
   public static Pose2dHelperClass grabSpecStartPose = new Pose2dHelperClass(38.9, -61.26, 270);
@@ -51,7 +52,7 @@ public class Chamber6 extends AutoCommandBase {
   public static long waitForArm = 200;
 
   private final Trajectory sampleToObservation =
-      TrajectoryManager.trajectoryBuilder(new Pose2d(3, -30, Math.toRadians(270)), 40, 25)
+      TrajectoryManager.trajectoryBuilder(spec1Pose.toPose2d(), 40, 25)
           .splineToLinearHeading(new Pose2d(37, -25, Math.toRadians(270)), Math.toRadians(90))
           .splineToLinearHeading(new Pose2d(41, -10, Math.toRadians(270)), Math.toRadians(0))
           .splineToLinearHeading(new Pose2d(45, -25, Math.toRadians(270)), Math.toRadians(270))
@@ -95,7 +96,7 @@ public class Chamber6 extends AutoCommandBase {
         new LineToLinearPathCommand(drive, spec1Pose.toPose2d())
             .alongWith(new WaitCommand(delayToUpLift).andThen(upLiftToHang())),
         hangSpecimen(),
-        new WaitUntilCommand(() -> lift.isPreHang()),
+        new ParallelRaceGroup(new WaitCommand(2000), new WaitUntilCommand(() -> lift.isPreHang())),
         liftClaw.openClawCommand(),
         new AutoDriveCommand(drive, sampleToObservation)
             .alongWith(new WaitCommand(delayToStow).andThen(stowLiftAndArm())),
@@ -137,7 +138,7 @@ public class Chamber6 extends AutoCommandBase {
         new LineToLinearPathCommand(drive, specHangPose)
             .alongWith(new WaitCommand(delayToUpLift).andThen(upLiftToHang())),
         hangSpecimen(),
-        new WaitUntilCommand(() -> lift.isPreHang()),
+        new ParallelRaceGroup(new WaitCommand(2000), new WaitUntilCommand(() -> lift.isPreHang())),
         liftClaw.openClawCommand(),
         new LineToLinearPathCommand(drive, grabSpecPose.toPose2d())
             .alongWith(new WaitCommand(delayToStow).andThen(stowLiftAndArm())));
