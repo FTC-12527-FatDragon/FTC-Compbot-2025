@@ -31,13 +31,13 @@ public class Chamber6 extends AutoCommandBase {
 
   public static Pose2dHelperClass spec1Pose = new Pose2dHelperClass(4, -28.5, 270);
 
-  public static Pose2dHelperClass spec2Pose = new Pose2dHelperClass(2, -28.5, 270);
+  public static Pose2dHelperClass spec2Pose = new Pose2dHelperClass(1, -28.5, 270);
 
-  public static Pose2dHelperClass spec3Pose = new Pose2dHelperClass(0, -28.5, 270);
+  public static Pose2dHelperClass spec3Pose = new Pose2dHelperClass(-2, -28.5, 270);
 
-  public static Pose2dHelperClass spec4Pose = new Pose2dHelperClass(-2, -28.5, 270);
+  public static Pose2dHelperClass spec4Pose = new Pose2dHelperClass(-5, -28.5, 270);
 
-  public static Pose2dHelperClass spec5Pose = new Pose2dHelperClass(-4, -28.5, 270);
+  public static Pose2dHelperClass spec5Pose = new Pose2dHelperClass(-8, -28.5, 270);
 
   public static Pose2dHelperClass spec6Pose = new Pose2dHelperClass(-1.118, -31.49, 270);
 

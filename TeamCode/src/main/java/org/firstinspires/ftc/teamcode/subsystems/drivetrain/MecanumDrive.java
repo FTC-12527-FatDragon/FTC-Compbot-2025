@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.drivetrain;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.hardware.rev.Rev9AxisImu;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.teamcode.lib.gobilda.GoBildaPinpointDriver;
 
 public class MecanumDrive extends SubsystemBase {
   private final DcMotor leftFrontMotor, leftBackMotor, rightFrontMotor, rightBackMotor;
-  private final IMU imu;
+  private final Rev9AxisImu imu;
   private double yawOffset;
 
   public MecanumDrive(final HardwareMap hardwareMap) {
@@ -31,7 +32,7 @@ public class MecanumDrive extends SubsystemBase {
     leftFrontMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     leftBackMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-    imu = hardwareMap.get(IMU.class, "imu");
+    imu = hardwareMap.get(Rev9AxisImu.class, "imu");
     IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.DOWN, RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
     imu.initialize(parameters);
   }
