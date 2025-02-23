@@ -33,9 +33,9 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   public static double SlideArmServo_FOLD = 0.721;
 
   // intakeClawServo
-  public static double IntakeClawServo_OPEN = 0.7;
+  public static double IntakeClawServo_OPEN = 0.6;
   public static double IntakeClawServo_OPENWIDER = 0.2;
-  public static double IntakeClawServo_GRAB = 0.305;
+  public static double IntakeClawServo_GRAB = 0.22;
   // wristServo
   public static double WristServo_UP = 0.05;
   public static double WristServo_DOWN = 0.75;
@@ -62,6 +62,8 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
   public static long slowHandoffCommand_ArmHandoff2SlideRetractDelayMs = 0;
   // swipeCommand
   public static long swipeCommand_wrist2ExtendDelayMs = 50;
+
+  public static double handoffCommand_OpenClawAuto = 0.58;
 
   private final Servo intakeClawServo, wristServo, wristTurnServo;
   private final Servo slideArmServo;
@@ -128,7 +130,7 @@ public class SlideSuperStructure extends MotorPIDSlideSubsystem {
         new InstantCommand(() -> setTurnServo(turnServoRef)),
         setServoPosCommand(slideArmServo, Goal.AIM.slideArmPos, aimCommand_Arm2OpenDelayMs),
         new InstantCommand(() -> wristServo.setPosition(Goal.AIM.wristPos)),
-        new InstantCommand(() -> intakeClawServo.setPosition(Goal.AIM.clawAngle)));
+        new InstantCommand(() -> intakeClawServo.setPosition(handoffCommand_OpenClawAuto)));
   }
 
   //  public Command preAimCommand() {

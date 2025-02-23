@@ -1,15 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems.drivetrain;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.lib.gobilda.GoBildaPinpointDriver;
 
-@Deprecated
 public class MecanumDrive extends SubsystemBase {
   private final DcMotor leftFrontMotor, leftBackMotor, rightFrontMotor, rightBackMotor;
-  private final GoBildaPinpointDriver od;
+  private final IMU imu;
   private double yawOffset;
 
   public MecanumDrive(final HardwareMap hardwareMap) {
@@ -17,34 +20,31 @@ public class MecanumDrive extends SubsystemBase {
     leftBackMotor = hardwareMap.get(DcMotor.class, "leftBackMotor");
     rightFrontMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
     rightBackMotor = hardwareMap.get(DcMotor.class, "rightBackMotor");
-    od = hardwareMap.get(GoBildaPinpointDriver.class, "od");
 
     leftFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     leftBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightFrontMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     rightBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-    od.resetPosAndIMU();
-    od.setEncoderDirections(
-        GoBildaPinpointDriver.EncoderDirection.FORWARD,
-        GoBildaPinpointDriver.EncoderDirection.FORWARD);
-    od.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-    od.setOffsets(0, 0);
     rightFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     leftFrontMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     leftBackMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+    imu = hardwareMap.get(IMU.class, "imu");
+    IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.DOWN, RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
+    imu.initialize(parameters);
   }
 
   public void reset() {
-    yawOffset = od.getHeading();
+    imu.resetYaw();
   }
 
   public void moveRobotFieldRelative(double forward, double fun, double turn) {
-    od.update();
+
 
     turn *= 0.8;
-    double botHeading = od.getHeading() - yawOffset;
+    double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
     // Rotate the movement direction counter to the bot's rotation\\
     double rotX = fun * Math.cos(-botHeading) - forward * Math.sin(-botHeading);
     double rotY = fun * Math.sin(-botHeading) + forward * Math.cos(-botHeading);
